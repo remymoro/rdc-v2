@@ -1,4 +1,4 @@
-import { Adresse, AdresseVide } from './adresse';
+import { Adresse, AdresseTropLongue, AdresseVide } from './adresse';
 
 describe('Adresse', () => {
   it('accepte une adresse', () => {
@@ -15,5 +15,21 @@ describe('Adresse', () => {
     expect(() => Adresse.creer('')).toThrow(
       expect.objectContaining({ code: 'ADRESSE_EMPTY' }),
     );
+  });
+
+  describe('longueur maximale : 255 caractères', () => {
+    it('accepte une adresse de 255 caractères', () => {
+      expect(Adresse.creer('a'.repeat(255)).valeur).toHaveLength(255);
+    });
+
+    it('refuse une adresse de 256 caractères', () => {
+      expect(() => Adresse.creer('a'.repeat(256))).toThrow(AdresseTropLongue);
+    });
+
+    it('expose le code d’erreur de RDC v1', () => {
+      expect(() => Adresse.creer('a'.repeat(256))).toThrow(
+        expect.objectContaining({ code: 'ADRESSE_TOO_LONG' }),
+      );
+    });
   });
 });

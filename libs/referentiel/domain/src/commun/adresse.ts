@@ -8,13 +8,28 @@ export class AdresseVide extends Error {
   }
 }
 
+/** Erreur métier : une adresse ne dépasse pas 255 caractères. */
+export class AdresseTropLongue extends Error {
+  readonly code = 'ADRESSE_TOO_LONG';
+
+  constructor(readonly longueurMaximale: number) {
+    super(`L'adresse ne peut pas dépasser ${longueurMaximale} caractères`);
+    this.name = 'AdresseTropLongue';
+  }
+}
+
 /** Ligne de rue d'une adresse postale (numéro, type et nom de voie). */
 export class Adresse {
+  static readonly LONGUEUR_MAXIMALE = 255;
+
   private constructor(readonly valeur: string) {}
 
   static creer(valeur: string): Adresse {
     if (valeur.trim().length === 0) {
       throw new AdresseVide();
+    }
+    if (valeur.length > Adresse.LONGUEUR_MAXIMALE) {
+      throw new AdresseTropLongue(Adresse.LONGUEUR_MAXIMALE);
     }
     return new Adresse(valeur);
   }
