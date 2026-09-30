@@ -15,3 +15,4 @@ export {
   TelephoneInvalide,
   TelephoneVide,
 } from './commun/telephone';
+export { Email, EmailVide } from './commun/email';
