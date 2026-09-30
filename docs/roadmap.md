@@ -61,4 +61,5 @@ traduire une violation d'unicité de `cleDoublon` en `CentreDejaExistant` (créa
 simultanées, TENETS-ADAPTER-006).
 
 ⚠️ **Avant tout déploiement** : authentification ADMIN sur `POST /api/centres`
-(étape 4, ADR-0009).
+(étape 4, ADR-0009). En attendant, l'API refuse de démarrer en production
+(`verifierDeploiementAutorise`) : à supprimer à l'étape 4.

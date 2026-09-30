@@ -34,6 +34,9 @@ NestJS. Le front n'utilise que les champs `message` et `code` des erreurs.
 
 - ⚠️ **Aucun déploiement de la v2 avant l'étape 4** : la route doit être
   réservée à l'ADMIN, avec un test « refusé » (ADR-0003, R11).
+- Règle appliquée par le code : `verifierDeploiementAutorise` (`apps/api/src/securite`)
+  fait échouer le démarrage de l'API quand `NODE_ENV=production`. L'étape 4 le
+  supprime en même temps qu'elle ajoute le contrôle ADMIN.
 - Les codes des erreurs de validation métier diffèrent de la v1 à la création
   (plus précis) ; à revérifier si un écran du front se met à lire `code`.
 - Les tests E2E refusent de s'exécuter sur une autre base que `rdc_test`.
