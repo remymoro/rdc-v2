@@ -20,7 +20,7 @@
 | ------------------------------------------ | --------------------------------- | ------ | ----- | ---------------------------------------------- |
 | Domaine (unitaires)                        | `libs/*/domain/**/*.spec.ts`      | ✅     | ✅    | —                                              |
 | Use cases (fakes en mémoire)               | `libs/*/application/**/*.spec.ts` | ✅     | ✅    | —                                              |
-| Contrat d'adapter (en mémoire puis Prisma) | `*.test-utils.ts` + `*.spec.ts`   | ❌     | ❌    | `CentreRepository`                             |
+| Contrat d'adapter (en mémoire puis Prisma) | `*.test-utils.ts` + `*.spec.ts`   | ✅     | ✅    | Fake en mémoire ; Prisma à venir               |
 | Intégration (Prisma + PostgreSQL)          | `*.integration.spec.ts`           | ❌     | ❌    | `PrismaCentreRepository` : Prisma, Docker, CI  |
 | E2E HTTP boîte noire                       | `apps/api-e2e`                    | ⚠️     | ❌    | `POST /api/centres` : remplace l'exemple de Nx |
 
@@ -58,7 +58,8 @@ L'ordre des étapes 3 à 7 reste à confirmer avec la carte des contextes.
 | `Centre.creer()` avec l'état initial complet ; `Centre.reconstituer()`                        | ✅   |
 | `CleDoublonCentre` : clé de rapprochement de la v1                                            | ✅   |
 | `CreerCentreUseCase` : création, enregistrement, refus des doublons (`CENTRE_ALREADY_EXISTS`) | ✅   |
-| Suite de contrat `CentreRepository`, puis `PrismaCentreRepository`                            | ⏳   |
+| Suite de contrat `CentreRepository` (passée par le fake en mémoire)                           | ✅   |
+| `PrismaCentreRepository` (passe la même suite, sur PostgreSQL)                                | ⏳   |
 | `POST /api/centres`, erreurs HTTP, test E2E                                                   | ⏳   |
 
 À décider à l'étape Prisma (ADR) : stocker `CleDoublonCentre` dans une colonne

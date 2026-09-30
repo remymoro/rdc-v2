@@ -63,6 +63,15 @@ Principes :
 - Le `shared-kernel` reste minuscule : tout ajout y est discuté en revue (un
   noyau partagé qui grossit recrée le couplage que les contextes évitent).
 
+Outils de test partagés (suites de contrat, fakes) :
+
+- fichiers `*.test-utils.ts` : exclus du build, inclus dans les tests, non
+  soumis à la règle « pas d'horloge » ;
+- jamais exportés par `index.ts` (API de production) ;
+- exposés aux autres libs par un point d'entrée dédié `src/testing.test-utils.ts`,
+  importé via l'alias `@rdc/<contexte>-<couche>/testing` (déclaré dans
+  `tsconfig.base.json`). Exemple : `@rdc/referentiel-domain/testing`.
+
 Chaque nouveau contexte demande :
 
 1. ses libs, générées avec leurs tags :

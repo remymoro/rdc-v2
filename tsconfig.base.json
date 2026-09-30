@@ -25,6 +25,9 @@
       ],
       "@rdc/shared-kernel-application": [
         "./libs/shared-kernel/application/src/index.ts"
+      ],
+      "@rdc/referentiel-domain/testing": [
+        "./libs/referentiel/domain/src/testing.test-utils.ts"
       ]
     }
   },
