@@ -1,4 +1,4 @@
-import { CentreId } from './centre-id';
+import type { CentreId } from './centre-id';
 
 /** Un centre archivé ne peut plus changer d'état. */
 export class CentreArchive extends Error {

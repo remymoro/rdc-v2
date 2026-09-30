@@ -72,3 +72,4 @@ simultanées, TENETS-ADAPTER-006).
 | Domaine : désactiver un centre déjà inactif sans modifier `modifieLe` | ✅   |
 | Domaine : réactiver un centre inactif et dater la modification        | ✅   |
 | Domaine : refuser d'activer ou désactiver un centre archivé           | ✅   |
+| HTTP : traduire `CentreArchive` en 409 et le couvrir en E2E sur PATCH | ⏭️   |
