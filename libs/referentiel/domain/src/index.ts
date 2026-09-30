@@ -1,5 +1,6 @@
 export { Centre } from './centre/centre';
 export type { EtatCentre, NouveauCentre } from './centre/centre';
+export { CentreRepository } from './ports/centre.repository';
 export { CentreId, CentreIdInvalide, CentreIdVide } from './centre/centre-id';
 export { StatutCentre } from './centre/statut-centre';
 export { Nom, NomTropLong, NomVide } from './commun/nom';

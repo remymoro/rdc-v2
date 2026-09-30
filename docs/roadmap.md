@@ -19,13 +19,10 @@
 | Niveau                                     | Où                                | Existe | En CI | Arrive avec                                    |
 | ------------------------------------------ | --------------------------------- | ------ | ----- | ---------------------------------------------- |
 | Domaine (unitaires)                        | `libs/*/domain/**/*.spec.ts`      | ✅     | ✅    | —                                              |
-| Use cases (fakes en mémoire)               | `libs/*/application/**/*.spec.ts` | ❌     | ✅\*  | `CreerCentreUseCase`                           |
+| Use cases (fakes en mémoire)               | `libs/*/application/**/*.spec.ts` | ✅     | ✅    | —                                              |
 | Contrat d'adapter (en mémoire puis Prisma) | `*.test-utils.ts` + `*.spec.ts`   | ❌     | ❌    | `CentreRepository`                             |
 | Intégration (Prisma + PostgreSQL)          | `*.integration.spec.ts`           | ❌     | ❌    | `PrismaCentreRepository` : Prisma, Docker, CI  |
 | E2E HTTP boîte noire                       | `apps/api-e2e`                    | ⚠️     | ❌    | `POST /api/centres` : remplace l'exemple de Nx |
-
-\* La cible `test` existe déjà : les premiers tests de use case tourneront en CI
-sans autre changement.
 
 À faire au passage :
 
@@ -59,7 +56,8 @@ L'ordre des étapes 3 à 7 reste à confirmer avec la carte des contextes.
 | `CentreId` : vide, format UUID, normalisation                   | ✅   |
 | Adresse : code postal, ville, voie sans abréviation             | ⏳   |
 | Téléphone et email facultatifs                                  | ⏳   |
-| `CreerCentreUseCase`, refus des doublons                        | ⏳   |
+| `CreerCentreUseCase` : création et enregistrement               | ✅   |
+| Refus des doublons (`CENTRE_ALREADY_EXISTS`)                    | ⏳   |
 | `CentreRepository` + contrat, puis `PrismaCentreRepository`     | ⏳   |
 | `POST /api/centres`, erreurs HTTP, test E2E                     | ⏳   |
 

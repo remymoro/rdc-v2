@@ -1,2 +1,2 @@
-// API publique de la lib. Les exports arrivent avec le premier use case (TDD).
-export {};
+export { Clock } from './ports/clock';
+export { UnitOfWork } from './ports/unit-of-work';
