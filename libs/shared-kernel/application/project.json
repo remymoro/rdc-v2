@@ -1,0 +1,14 @@
+{
+  "name": "shared-kernel-application",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared-kernel/application/src",
+  "projectType": "library",
+  "tags": ["context:shared-kernel", "layer:application"],
+  "targets": {
+    "test": {
+      "options": {
+        "passWithNoTests": true
+      }
+    }
+  }
+}

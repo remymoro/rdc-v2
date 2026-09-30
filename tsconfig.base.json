@@ -22,6 +22,9 @@
       "@rdc/referentiel-domain": ["./libs/referentiel/domain/src/index.ts"],
       "@rdc/referentiel-application": [
         "./libs/referentiel/application/src/index.ts"
+      ],
+      "@rdc/shared-kernel-application": [
+        "./libs/shared-kernel/application/src/index.ts"
       ]
     }
   },
