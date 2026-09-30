@@ -111,5 +111,22 @@ describe('Centre', () => {
         expect(centre.modifieLe).toEqual(premiereDesactivation);
       });
     });
+
+    describe('activer', () => {
+      it('repasse un centre inactif à ACTIF et date la modification', () => {
+        const desactiveLe = new Date('2026-10-20T14:00:00.000Z');
+        const centre = Centre.reconstituer({
+          ...donneesObligatoires(),
+          statut: StatutCentre.INACTIF,
+          creeLe: maintenant,
+          modifieLe: desactiveLe,
+        });
+
+        centre.activer(plusTard);
+
+        expect(centre.statut).toBe(StatutCentre.ACTIF);
+        expect(centre.modifieLe).toEqual(plusTard);
+      });
+    });
   });
 });

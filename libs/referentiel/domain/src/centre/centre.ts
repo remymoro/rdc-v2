@@ -93,4 +93,10 @@ export class Centre {
     this.statutActuel = StatutCentre.INACTIF;
     this.derniereModification = maintenant;
   }
+
+  /** Remet en service un centre précédemment désactivé. */
+  activer(maintenant: Date): void {
+    this.statutActuel = StatutCentre.ACTIF;
+    this.derniereModification = maintenant;
+  }
 }

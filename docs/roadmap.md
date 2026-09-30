@@ -70,3 +70,4 @@ simultanées, TENETS-ADAPTER-006).
 | --------------------------------------------------------------------- | ---- |
 | Domaine : désactiver un centre actif et dater la modification         | ✅   |
 | Domaine : désactiver un centre déjà inactif sans modifier `modifieLe` | ✅   |
+| Domaine : réactiver un centre inactif et dater la modification        | ✅   |
