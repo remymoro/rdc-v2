@@ -3,6 +3,20 @@ import { CentreId, CentreIdInvalide, CentreIdVide } from './centre-id';
 describe('CentreId', () => {
   const uuidValide = '7f1c9d7e-2d4b-4f7a-9c1e-3b8a5d6e0f12';
 
+  describe('normalisation', () => {
+    it('retire les espaces et passe en minuscules', () => {
+      expect(CentreId.creer(`  ${uuidValide.toUpperCase()}  `).valeur).toBe(
+        uuidValide,
+      );
+    });
+
+    it('rend égales deux écritures du même identifiant', () => {
+      const enMajuscules = CentreId.creer(uuidValide.toUpperCase());
+      const enMinuscules = CentreId.creer(uuidValide);
+      expect(enMajuscules.equals(enMinuscules)).toBe(true);
+    });
+  });
+
   describe('format UUID', () => {
     it('accepte un UUID', () => {
       expect(CentreId.creer(uuidValide).valeur).toBe(uuidValide);

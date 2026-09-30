@@ -1,5 +1,5 @@
 const FORMAT_UUID =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
 /** Erreur métier : l'identifiant d'un centre est obligatoire. */
 export class CentreIdVide extends Error {
@@ -28,13 +28,14 @@ export class CentreId {
   private constructor(readonly valeur: string) {}
 
   static creer(valeur: string): CentreId {
-    if (valeur.trim().length === 0) {
+    const identifiant = valeur.trim().toLowerCase();
+    if (identifiant.length === 0) {
       throw new CentreIdVide();
     }
-    if (!FORMAT_UUID.test(valeur)) {
+    if (!FORMAT_UUID.test(identifiant)) {
       throw new CentreIdInvalide();
     }
-    return new CentreId(valeur);
+    return new CentreId(identifiant);
   }
 
   equals(autre: CentreId): boolean {
