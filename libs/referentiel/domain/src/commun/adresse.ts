@@ -1,3 +1,5 @@
+import { texteObligatoire } from './texte-obligatoire';
+
 /** Erreur métier : une adresse ne peut pas être vide. */
 export class AdresseVide extends Error {
   readonly code = 'ADRESSE_EMPTY';
@@ -25,13 +27,14 @@ export class Adresse {
   private constructor(readonly valeur: string) {}
 
   static creer(valeur: string): Adresse {
-    const adresse = valeur.trim().replace(/\s+/g, ' ');
-    if (adresse.length === 0) {
-      throw new AdresseVide();
-    }
-    if (adresse.length > Adresse.LONGUEUR_MAXIMALE) {
-      throw new AdresseTropLongue(Adresse.LONGUEUR_MAXIMALE);
-    }
-    return new Adresse(adresse);
+    return new Adresse(
+      texteObligatoire(valeur, {
+        longueurMaximale: Adresse.LONGUEUR_MAXIMALE,
+        espacesInternes: 'reduits',
+        siVide: () => new AdresseVide(),
+        siTropLong: (longueurMaximale) =>
+          new AdresseTropLongue(longueurMaximale),
+      }),
+    );
   }
 }

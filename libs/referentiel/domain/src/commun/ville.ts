@@ -1,3 +1,5 @@
+import { texteObligatoire } from './texte-obligatoire';
+
 /** Erreur métier : une ville ne peut pas être vide. */
 export class VilleVide extends Error {
   readonly code = 'VILLE_EMPTY';
@@ -24,13 +26,13 @@ export class Ville {
   private constructor(readonly valeur: string) {}
 
   static creer(valeur: string): Ville {
-    const ville = valeur.trim().replace(/\s+/g, ' ');
-    if (ville.length === 0) {
-      throw new VilleVide();
-    }
-    if (ville.length > Ville.LONGUEUR_MAXIMALE) {
-      throw new VilleTropLongue(Ville.LONGUEUR_MAXIMALE);
-    }
-    return new Ville(ville);
+    return new Ville(
+      texteObligatoire(valeur, {
+        longueurMaximale: Ville.LONGUEUR_MAXIMALE,
+        espacesInternes: 'reduits',
+        siVide: () => new VilleVide(),
+        siTropLong: (longueurMaximale) => new VilleTropLongue(longueurMaximale),
+      }),
+    );
   }
 }

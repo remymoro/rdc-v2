@@ -1,3 +1,5 @@
+import { texteObligatoire } from './texte-obligatoire';
+
 /** Erreur métier : un nom ne peut pas être vide (TENETS-ERROR-002). */
 export class NomVide extends Error {
   readonly code = 'NOM_EMPTY';
@@ -24,13 +26,13 @@ export class Nom {
   private constructor(readonly valeur: string) {}
 
   static creer(valeur: string): Nom {
-    const nom = valeur.trim();
-    if (nom.length === 0) {
-      throw new NomVide();
-    }
-    if (nom.length > Nom.LONGUEUR_MAXIMALE) {
-      throw new NomTropLong(Nom.LONGUEUR_MAXIMALE);
-    }
-    return new Nom(nom);
+    return new Nom(
+      texteObligatoire(valeur, {
+        longueurMaximale: Nom.LONGUEUR_MAXIMALE,
+        espacesInternes: 'conserves',
+        siVide: () => new NomVide(),
+        siTropLong: (longueurMaximale) => new NomTropLong(longueurMaximale),
+      }),
+    );
   }
 }
