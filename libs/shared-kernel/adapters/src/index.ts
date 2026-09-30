@@ -3,3 +3,5 @@ export { PrismaTransaction } from './prisma/prisma-transaction';
 export type { Prisma } from './prisma/generated/client';
 export { PrismaUnitOfWork } from './prisma/prisma-unit-of-work';
 export { SystemClock } from './horloge/system-clock';
+export { envoyerErreur, type ErreurHttp } from './http/reponse-erreur';
+export { SharedKernelModule } from './nest/shared-kernel.module';
