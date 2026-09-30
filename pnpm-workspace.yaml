@@ -1,3 +1,12 @@
 autoInstallPeers: true
+# Dépendances autorisées à exécuter leurs scripts d'installation (ADR-0002).
 onlyBuiltDependencies:
   - nx
+  - prisma
+  - '@prisma/engines'
+
+# Correctifs de sécurité de dépendances transitives de Prisma 7.10 (ADR-0008).
+# À retirer quand Prisma les intégrera lui-même.
+overrides:
+  mysql2: '>=3.23.1'
+  deepmerge-ts: '^8.0.0'

@@ -9,7 +9,12 @@ développée en **TDD** selon les règles **DDD + architecture hexagonale** de T
 nvm use            # Node 24 (.nvmrc)
 corepack enable    # pnpm à la version fixée dans package.json
 pnpm install
-pnpm verify        # lint + tests + build
+cp .env.example .env
+docker compose up -d postgres    # PostgreSQL 16 (bases rdc et rdc_test)
+pnpm prisma generate             # client Prisma (non versionné)
+pnpm prisma migrate deploy       # migrations v1 + v2
+pnpm verify                      # lint + tests + build
+pnpm nx run-many -t test-integration   # tests sur PostgreSQL
 pnpm nx serve api  # http://localhost:3000/api
 ```
 

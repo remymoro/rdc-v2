@@ -20,8 +20,8 @@
 | ------------------------------------------ | --------------------------------- | ------ | ----- | ---------------------------------------------- |
 | Domaine (unitaires)                        | `libs/*/domain/**/*.spec.ts`      | ✅     | ✅    | —                                              |
 | Use cases (fakes en mémoire)               | `libs/*/application/**/*.spec.ts` | ✅     | ✅    | —                                              |
-| Contrat d'adapter (en mémoire puis Prisma) | `*.test-utils.ts` + `*.spec.ts`   | ✅     | ✅    | Fake en mémoire ; Prisma à venir               |
-| Intégration (Prisma + PostgreSQL)          | `*.integration.spec.ts`           | ❌     | ❌    | `PrismaCentreRepository` : Prisma, Docker, CI  |
+| Contrat d'adapter (en mémoire puis Prisma) | `*.test-utils.ts` + `*.spec.ts`   | ✅     | ✅    | —                                              |
+| Intégration (Prisma + PostgreSQL)          | `*.integration.spec.ts`           | ✅     | ✅    | —                                              |
 | E2E HTTP boîte noire                       | `apps/api-e2e`                    | ⚠️     | ❌    | `POST /api/centres` : remplace l'exemple de Nx |
 
 À faire au passage :
@@ -59,12 +59,13 @@ L'ordre des étapes 3 à 7 reste à confirmer avec la carte des contextes.
 | `CleDoublonCentre` : clé de rapprochement de la v1                                            | ✅   |
 | `CreerCentreUseCase` : création, enregistrement, refus des doublons (`CENTRE_ALREADY_EXISTS`) | ✅   |
 | Suite de contrat `CentreRepository` (passée par le fake en mémoire)                           | ✅   |
-| `PrismaCentreRepository` (passe la même suite, sur PostgreSQL)                                | ⏳   |
+| `PrismaCentreRepository` (passe la même suite, sur PostgreSQL, ADR-0008)                      | ✅   |
 | `POST /api/centres`, erreurs HTTP, test E2E                                                   | ⏳   |
 
-À décider à l'étape Prisma (ADR) : stocker `CleDoublonCentre` dans une colonne
-**unique**, pour une recherche directe et une protection contre deux créations
-simultanées du même centre (l'adapter traduira la violation en `CentreDejaExistant`).
+Avant la mise en production (ADR-0008) : script de reprise qui calcule
+`cleDoublon` pour les centres de la v1, puis colonne rendue obligatoire. Reste à
+traduire une violation d'unicité de `cleDoublon` en `CentreDejaExistant` (créations
+simultanées, TENETS-ADAPTER-006).
 
 À ne pas oublier pour l'adapter HTTP : un téléphone vide (`""`) signifie « pas de
 téléphone » et doit être converti en absent avant d'appeler le domaine (ADR-0007).

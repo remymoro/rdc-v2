@@ -28,7 +28,11 @@
       ],
       "@rdc/referentiel-domain/testing": [
         "./libs/referentiel/domain/src/testing.test-utils.ts"
-      ]
+      ],
+      "@rdc/shared-kernel-adapters": [
+        "./libs/shared-kernel/adapters/src/index.ts"
+      ],
+      "@rdc/referentiel-adapters": ["./libs/referentiel/adapters/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

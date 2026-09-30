@@ -1,0 +1,15 @@
+-- Supprime Benevole."lastActivityAt".
+--
+-- La colonne alimentait la colonne « Dernière activité » du tableau des
+-- bénévoles du centre et du PDF « Répertoire des bénévoles ». Les deux
+-- affichages sont retirés, et les trois use cases de planification (magasin,
+-- bénévoles centre, chauffeur) ne mettent plus la date à jour : le champ, son
+-- getter et la méthode mettreAJourDerniereActivite() du domaine partent avec
+-- la colonne.
+--
+-- Suppression définitive : les dates déjà enregistrées ne sont pas
+-- récupérables. La mention RGPD « conservées 3 ans à compter de la dernière
+-- activité » du formulaire bénévole perd sa donnée de support ; aucun code
+-- n'appliquait cette rétention, l'anonymisation restant une action manuelle de
+-- l'administrateur.
+ALTER TABLE "Benevole" DROP COLUMN "lastActivityAt";

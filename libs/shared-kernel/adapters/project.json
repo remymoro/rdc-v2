@@ -1,0 +1,14 @@
+{
+  "name": "shared-kernel-adapters",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared-kernel/adapters/src",
+  "projectType": "library",
+  "tags": ["context:shared-kernel", "layer:adapters"],
+  "targets": {
+    "test": {
+      "options": {
+        "passWithNoTests": true
+      }
+    }
+  }
+}

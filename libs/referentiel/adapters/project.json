@@ -1,0 +1,23 @@
+{
+  "name": "referentiel-adapters",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/referentiel/adapters/src",
+  "projectType": "library",
+  "tags": ["context:referentiel", "layer:adapters"],
+  "targets": {
+    "test": {
+      "options": {
+        "passWithNoTests": true
+      }
+    },
+    "test-integration": {
+      "executor": "@nx/jest:jest",
+      "outputs": [],
+      "options": {
+        "jestConfig": "libs/referentiel/adapters/jest.integration.config.cts",
+        "runInBand": true,
+        "passWithNoTests": false
+      }
+    }
+  }
+}
