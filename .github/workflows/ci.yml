@@ -74,8 +74,8 @@ jobs:
       - name: Formatage
         run: pnpm nx format:check
 
-      - name: Lint (architecture comprise), tests et build des projets touchés
-        run: pnpm nx affected -t lint test build
+      - name: Lint (architecture comprise), types, tests et build des projets touchés
+        run: pnpm nx affected -t lint typecheck test build
 
       # Les 33 migrations (v1 + v2) doivent s'appliquer sur une base vierge.
       - name: Migrations sur une base vierge

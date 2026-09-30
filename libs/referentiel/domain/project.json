@@ -9,6 +9,19 @@
       "options": {
         "passWithNoTests": true
       }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", "^default"],
+      "outputs": [],
+      "options": {
+        "commands": [
+          "tsc --noEmit -p libs/referentiel/domain/tsconfig.lib.json",
+          "tsc --noEmit -p libs/referentiel/domain/tsconfig.spec.json"
+        ],
+        "parallel": false
+      }
     }
   }
 }
