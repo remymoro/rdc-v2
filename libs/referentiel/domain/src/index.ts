@@ -1,5 +1,6 @@
 export { Centre } from './centre/centre';
 export type { EtatCentre, NouveauCentre } from './centre/centre';
+export { CentreArchive } from './centre/centre.errors';
 export { CentreRepository } from './ports/centre.repository';
 export { CleDoublonCentre } from './centre/cle-doublon-centre';
 export type { IdentiteCentre } from './centre/cle-doublon-centre';

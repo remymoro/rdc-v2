@@ -5,6 +5,7 @@ import { Nom } from '../commun/nom';
 import { Telephone } from '../commun/telephone';
 import { Ville } from '../commun/ville';
 import { Centre } from './centre';
+import { CentreArchive } from './centre.errors';
 import { CentreId } from './centre-id';
 import { StatutCentre } from './statut-centre';
 
@@ -126,6 +127,39 @@ describe('Centre', () => {
 
         expect(centre.statut).toBe(StatutCentre.ACTIF);
         expect(centre.modifieLe).toEqual(plusTard);
+      });
+    });
+
+    describe('centre archivé', () => {
+      it.each([
+        {
+          action: "l'activer",
+          executer: (centre: Centre) => centre.activer(plusTard),
+        },
+        {
+          action: 'le désactiver',
+          executer: (centre: Centre) => centre.desactiver(plusTard),
+        },
+      ])('refuse de $action avec CENTRE_ARCHIVED', ({ executer }) => {
+        const archiveLe = new Date('2026-10-20T14:00:00.000Z');
+        const centre = Centre.reconstituer({
+          ...donneesObligatoires(),
+          statut: StatutCentre.ARCHIVE,
+          creeLe: maintenant,
+          modifieLe: archiveLe,
+        });
+
+        let erreur: unknown;
+        try {
+          executer(centre);
+        } catch (cause) {
+          erreur = cause;
+        }
+
+        expect(erreur).toBeInstanceOf(CentreArchive);
+        expect(erreur).toMatchObject({ code: 'CENTRE_ARCHIVED', centreId: id });
+        expect(centre.statut).toBe(StatutCentre.ARCHIVE);
+        expect(centre.modifieLe).toEqual(archiveLe);
       });
     });
   });

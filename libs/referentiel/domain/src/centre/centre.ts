@@ -4,6 +4,7 @@ import { Email } from '../commun/email';
 import { Nom } from '../commun/nom';
 import { Telephone } from '../commun/telephone';
 import { Ville } from '../commun/ville';
+import { CentreArchive } from './centre.errors';
 import { CentreId } from './centre-id';
 import { StatutCentre } from './statut-centre';
 
@@ -86,6 +87,10 @@ export class Centre {
 
   /** Met le centre en pause : il ne participe plus aux nouvelles opérations. */
   desactiver(maintenant: Date): void {
+    if (this.statutActuel === StatutCentre.ARCHIVE) {
+      throw new CentreArchive(this.id);
+    }
+
     if (this.statutActuel === StatutCentre.INACTIF) {
       return;
     }
@@ -96,6 +101,10 @@ export class Centre {
 
   /** Remet en service un centre précédemment désactivé. */
   activer(maintenant: Date): void {
+    if (this.statutActuel === StatutCentre.ARCHIVE) {
+      throw new CentreArchive(this.id);
+    }
+
     this.statutActuel = StatutCentre.ACTIF;
     this.derniereModification = maintenant;
   }
