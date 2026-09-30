@@ -58,4 +58,26 @@ describe('Centre', () => {
       expect(centre.email).toBeUndefined();
     });
   });
+
+  describe('reconstituer', () => {
+    it("restitue l'état persisté tel quel, sans valeur par défaut", () => {
+      const creeLe = new Date('2024-03-01T08:00:00.000Z');
+      const modifieLe = new Date('2025-06-15T14:30:00.000Z');
+
+      const centre = Centre.reconstituer({
+        ...donneesObligatoires(),
+        telephone: Telephone.creer('05 53 12 34 56'),
+        statut: StatutCentre.ARCHIVE,
+        creeLe,
+        modifieLe,
+      });
+
+      expect(centre.id.equals(id)).toBe(true);
+      expect(centre.statut).toBe(StatutCentre.ARCHIVE);
+      expect(centre.creeLe).toEqual(creeLe);
+      expect(centre.modifieLe).toEqual(modifieLe);
+      expect(centre.telephone?.valeur).toBe('+33553123456');
+      expect(centre.email).toBeUndefined();
+    });
+  });
 });

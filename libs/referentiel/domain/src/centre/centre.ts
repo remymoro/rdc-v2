@@ -20,6 +20,13 @@ export interface NouveauCentre {
   readonly email?: Email;
 }
 
+/** État persisté complet d'un centre existant (TENETS-LIFECYCLE-005). */
+export interface EtatCentre extends NouveauCentre {
+  readonly statut: StatutCentre;
+  readonly creeLe: Date;
+  readonly modifieLe: Date;
+}
+
 export class Centre {
   private constructor(
     readonly id: CentreId,
@@ -47,6 +54,25 @@ export class Centre {
       StatutCentre.ACTIF,
       maintenant,
       maintenant,
+    );
+  }
+
+  /**
+   * Centre existant, relu depuis la base : l'état persisté est restitué tel
+   * quel, sans statut initial ni date par défaut (TENETS-LIFECYCLE-005).
+   */
+  static reconstituer(etat: EtatCentre): Centre {
+    return new Centre(
+      etat.id,
+      etat.nom,
+      etat.adresse,
+      etat.codePostal,
+      etat.ville,
+      etat.telephone,
+      etat.email,
+      etat.statut,
+      etat.creeLe,
+      etat.modifieLe,
     );
   }
 }
