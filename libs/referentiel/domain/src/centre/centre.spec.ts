@@ -94,6 +94,22 @@ describe('Centre', () => {
         expect(centre.modifieLe).toEqual(plusTard);
         expect(centre.creeLe).toEqual(maintenant);
       });
+
+      it('est sans effet pour un centre déjà inactif', () => {
+        // Date distincte de creeLe et de plusTard : aucune confusion possible.
+        const premiereDesactivation = new Date('2026-10-20T14:00:00.000Z');
+        const centre = Centre.reconstituer({
+          ...donneesObligatoires(),
+          statut: StatutCentre.INACTIF,
+          creeLe: maintenant,
+          modifieLe: premiereDesactivation,
+        });
+
+        centre.desactiver(plusTard);
+
+        expect(centre.statut).toBe(StatutCentre.INACTIF);
+        expect(centre.modifieLe).toEqual(premiereDesactivation);
+      });
     });
   });
 });

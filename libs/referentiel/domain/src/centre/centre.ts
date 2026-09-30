@@ -86,6 +86,10 @@ export class Centre {
 
   /** Met le centre en pause : il ne participe plus aux nouvelles opérations. */
   desactiver(maintenant: Date): void {
+    if (this.statutActuel === StatutCentre.INACTIF) {
+      return;
+    }
+
     this.statutActuel = StatutCentre.INACTIF;
     this.derniereModification = maintenant;
   }

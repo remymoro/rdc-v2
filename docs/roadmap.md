@@ -63,3 +63,10 @@ simultanées, TENETS-ADAPTER-006).
 ⚠️ **Avant tout déploiement** : authentification ADMIN sur `POST /api/centres`
 (étape 4, ADR-0009). En attendant, l'API refuse de démarrer en production
 (`verifierDeploiementAutorise`) : à supprimer à l'étape 4.
+
+## Étape 2 — Cycle de vie d'un centre
+
+| Élément                                                               | État |
+| --------------------------------------------------------------------- | ---- |
+| Domaine : désactiver un centre actif et dater la modification         | ✅   |
+| Domaine : désactiver un centre déjà inactif sans modifier `modifieLe` | ✅   |

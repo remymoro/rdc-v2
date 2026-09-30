@@ -49,3 +49,7 @@ Thumbs.db
 
 # Client Prisma généré (pnpm prisma generate)
 libs/shared-kernel/adapters/src/prisma/generated
+
+# Sauvegardes laissées par les outils de fusion ou de patch
+*.orig
+*.rej
