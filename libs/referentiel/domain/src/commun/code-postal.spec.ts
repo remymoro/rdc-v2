@@ -5,6 +5,10 @@ describe('CodePostal', () => {
     expect(CodePostal.creer('47000').valeur).toBe('47000');
   });
 
+  it('retire les espaces en début et en fin', () => {
+    expect(CodePostal.creer('  47000  ').valeur).toBe('47000');
+  });
+
   it.each([
     '', // vide
     '4700', // 4 chiffres

@@ -14,9 +14,10 @@ export class CodePostal {
   private constructor(readonly valeur: string) {}
 
   static creer(valeur: string): CodePostal {
-    if (!CINQ_CHIFFRES.test(valeur)) {
+    const codePostal = valeur.trim();
+    if (!CINQ_CHIFFRES.test(codePostal)) {
       throw new CodePostalInvalide();
     }
-    return new CodePostal(valeur);
+    return new CodePostal(codePostal);
   }
 }
