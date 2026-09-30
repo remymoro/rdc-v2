@@ -62,3 +62,6 @@ L'ordre des étapes 3 à 7 reste à confirmer avec la carte des contextes.
 | `CreerCentreUseCase`, refus des doublons                        | ⏳   |
 | `CentreRepository` + contrat, puis `PrismaCentreRepository`     | ⏳   |
 | `POST /api/centres`, erreurs HTTP, test E2E                     | ⏳   |
+
+À ne pas oublier pour l'adapter HTTP : un téléphone vide (`""`) signifie « pas de
+téléphone » et doit être converti en absent avant d'appeler le domaine (ADR-0007).
