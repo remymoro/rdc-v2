@@ -1,10 +1,16 @@
-# Intégration continue (ADR-0003, règle R4).
-# Une branche ne peut être fusionnée sur main que si ce workflow est vert.
+# Intégration continue (ADR-0003 R4, ADR-0010).
+# main est protégée : une pull request n'y est fusionnée que si le check « ci »
+# est vert, sur un code à jour avec main.
 name: CI
 
 on:
+  # Chaque pull request vers main (et chaque nouveau push sur sa branche).
+  pull_request:
+    branches: [main]
+  # main elle-même, après chaque fusion : sert de base à `nx affected`.
   push:
-    branches: ['**']
+    branches: [main]
+  # Lancement manuel (onglet Actions), sur n'importe quelle branche.
   workflow_dispatch:
 
 permissions:
@@ -16,7 +22,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  main:
+  # Le nom du job est celui du check obligatoire dans la protection de main.
+  ci:
+    name: ci
     runs-on: ubuntu-24.04
 
     # PostgreSQL 16 pour les tests d'intégration (ADR-0004, ADR-0008).

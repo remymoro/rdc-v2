@@ -35,6 +35,8 @@ reprend le métier, pas le code.
   Express ; jamais `new Date()` sans argument ni `Date.now()`.
 - Un contexte n'importe que lui-même et le `shared-kernel`.
 - Toute décision importante ou tout écart à une règle : un ADR.
+- Jamais de push sur `main` : une branche `feat/<contexte>-<fonctionnalité>`, un
+  commit par cycle TDD, une pull request, CI verte avant fusion (ADR-0010).
 
 ## Commandes
 
