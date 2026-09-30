@@ -1,3 +1,6 @@
+const FORMAT_UUID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /** Erreur métier : l'identifiant d'un centre est obligatoire. */
 export class CentreIdVide extends Error {
   readonly code = 'CENTRE_ID_EMPTY';
@@ -5,6 +8,16 @@ export class CentreIdVide extends Error {
   constructor() {
     super("L'identifiant du centre est obligatoire");
     this.name = 'CentreIdVide';
+  }
+}
+
+/** Erreur métier : l'identifiant d'un centre est un UUID. */
+export class CentreIdInvalide extends Error {
+  readonly code = 'CENTRE_ID_INVALID';
+
+  constructor() {
+    super("L'identifiant du centre est invalide");
+    this.name = 'CentreIdInvalide';
   }
 }
 
@@ -17,6 +30,9 @@ export class CentreId {
   static creer(valeur: string): CentreId {
     if (valeur.trim().length === 0) {
       throw new CentreIdVide();
+    }
+    if (!FORMAT_UUID.test(valeur)) {
+      throw new CentreIdInvalide();
     }
     return new CentreId(valeur);
   }
