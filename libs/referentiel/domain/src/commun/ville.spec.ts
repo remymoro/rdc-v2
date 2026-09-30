@@ -15,6 +15,16 @@ describe('Ville', () => {
     );
   });
 
+  describe('espaces en début et en fin', () => {
+    it('sont retirés', () => {
+      expect(Ville.creer('  Agen  ').valeur).toBe('Agen');
+    });
+
+    it('ne comptent pas dans la longueur maximale', () => {
+      expect(Ville.creer(`  ${'a'.repeat(100)}  `).valeur).toHaveLength(100);
+    });
+  });
+
   describe('longueur maximale : 100 caractères', () => {
     it('accepte une ville de 100 caractères', () => {
       expect(Ville.creer('a'.repeat(100)).valeur).toHaveLength(100);

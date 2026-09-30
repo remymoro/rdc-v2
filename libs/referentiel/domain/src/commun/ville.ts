@@ -24,12 +24,13 @@ export class Ville {
   private constructor(readonly valeur: string) {}
 
   static creer(valeur: string): Ville {
-    if (valeur.trim().length === 0) {
+    const ville = valeur.trim();
+    if (ville.length === 0) {
       throw new VilleVide();
     }
-    if (valeur.length > Ville.LONGUEUR_MAXIMALE) {
+    if (ville.length > Ville.LONGUEUR_MAXIMALE) {
       throw new VilleTropLongue(Ville.LONGUEUR_MAXIMALE);
     }
-    return new Ville(valeur);
+    return new Ville(ville);
   }
 }
