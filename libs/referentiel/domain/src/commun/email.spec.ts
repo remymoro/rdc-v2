@@ -23,6 +23,12 @@ describe('Email', () => {
     );
   });
 
+  it('passe l’email en minuscules', () => {
+    expect(Email.creer('Agen@RestosDuCoeur.ORG').valeur).toBe(
+      'agen@restosducoeur.org',
+    );
+  });
+
   describe('longueur maximale : 254 caractères', () => {
     // 64 + 1 + (185 + 4) = 254 caractères
     const email254 = `${'a'.repeat(64)}@${'b'.repeat(185)}.org`;

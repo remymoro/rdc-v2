@@ -32,7 +32,7 @@ export class Email {
         espacesInternes: 'conserves',
         siVide: () => new EmailVide(),
         siTropLong: (longueurMaximale) => new EmailTropLong(longueurMaximale),
-      }),
+      }).toLowerCase(),
     );
   }
 }
