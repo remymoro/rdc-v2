@@ -3,7 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/api/src",
   "projectType": "application",
-  "tags": [],
+  "tags": ["type:app", "layer:composition"],
   "targets": {
     "prune-lockfile": {
       "dependsOn": ["build"],

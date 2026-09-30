@@ -1,9 +1,19 @@
 {
-  "name": "@rdc-v2/source",
+  "name": "@rdc/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
   "private": true,
+  "packageManager": "pnpm@10.30.3",
+  "engines": {
+    "node": ">=24.11.0"
+  },
+  "scripts": {
+    "lint": "nx run-many -t lint",
+    "test": "nx run-many -t test",
+    "build": "nx run-many -t build",
+    "format:check": "nx format:check",
+    "verify": "nx run-many -t lint test build"
+  },
   "dependencies": {
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
