@@ -10,3 +10,4 @@ export {
   AdresseTropLongue,
   AdresseVide,
 } from './commun/adresse';
+export { Telephone, TelephoneVide } from './commun/telephone';
