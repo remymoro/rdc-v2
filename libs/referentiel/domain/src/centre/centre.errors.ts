@@ -5,7 +5,7 @@ export class CentreArchive extends Error {
   readonly code = 'CENTRE_ARCHIVED';
 
   constructor(readonly centreId: CentreId) {
-    super(`Le centre ${centreId.valeur} est archivé`);
+    super('Ce centre est archivé : il ne peut plus être modifié.');
     this.name = 'CentreArchive';
   }
 }

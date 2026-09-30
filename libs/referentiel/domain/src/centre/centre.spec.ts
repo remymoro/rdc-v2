@@ -158,6 +158,10 @@ describe('Centre', () => {
 
         expect(erreur).toBeInstanceOf(CentreArchive);
         expect(erreur).toMatchObject({ code: 'CENTRE_ARCHIVED', centreId: id });
+        // Message affiché tel quel par le front : lisible, sans identifiant technique.
+        expect(erreur).toMatchObject({
+          message: 'Ce centre est archivé : il ne peut plus être modifié.',
+        });
         expect(centre.statut).toBe(StatutCentre.ARCHIVE);
         expect(centre.modifieLe).toEqual(archiveLe);
       });
