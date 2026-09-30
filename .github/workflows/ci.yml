@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   main:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
         with:
@@ -25,7 +25,7 @@ jobs:
           fetch-depth: 0
 
       # Version de pnpm lue dans le champ `packageManager` de package.json.
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
 
       - uses: actions/setup-node@v5
         with:
@@ -36,7 +36,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       # Base = dernier commit de main dont la CI est verte.
-      - uses: nrwl/nx-set-shas@v4
+      - uses: nrwl/nx-set-shas@v5
 
       - name: Formatage
         run: pnpm nx format:check

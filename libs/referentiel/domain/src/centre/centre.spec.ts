@@ -9,7 +9,10 @@ describe('Centre', () => {
 
   describe('creer', () => {
     it("crée un centre ACTIF, avec l'identifiant reçu et ses dates de création", () => {
-      const centre = Centre.creer({ id, nom: Nom.creer("Centre d'Agen") }, maintenant);
+      const centre = Centre.creer(
+        { id, nom: Nom.creer("Centre d'Agen") },
+        maintenant,
+      );
 
       expect(centre.id.equals(id)).toBe(true);
       expect(centre.nom.valeur).toBe("Centre d'Agen");
