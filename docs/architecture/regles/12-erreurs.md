@@ -20,6 +20,17 @@ Chaque erreur connue porte un `code` stable, en majuscules (`CENTRE_ARCHIVED`),
 qui ne change jamais une fois publié. Quand l'erreur existait dans RDC v1, on
 reprend **exactement** son code : le front Angular les utilise déjà.
 
+**Emplacement des fichiers d'erreur (convention RDC v2, option C) :**
+
+| Propriétaire            | Où vivent ses erreurs                                  | Exemple                                                   |
+| ----------------------- | ------------------------------------------------------ | --------------------------------------------------------- |
+| Value object            | Dans **le fichier du value object**                    | `commun/nom.ts` : `Nom`, `NomVide`, `NomTropLong`         |
+| Agrégat ou entité       | Dans un fichier **`<concept>.errors.ts`** à côté       | `centre/centre.errors.ts` : `CentreArchive`               |
+| Application (workflows) | Dans **`errors.ts`** à la racine de la lib application | `application/src/errors.ts` : `CentreDejaExistant`        |
+| Port secondaire         | Dans **le fichier du port**                            | `ports/stockage-images.ts` : `StockageImagesIndisponible` |
+
+Chaque erreur porte un `code` stable et un `name` égal au nom de sa classe.
+
 ## TENETS-ERROR-001 — La propriété d'une erreur suit son sens architectural
 
 `core` · erreur

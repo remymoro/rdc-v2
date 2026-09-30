@@ -21,16 +21,18 @@ apps/
   api-e2e/                               tests HTTP boîte noire (type:e2e)
 libs/
   shared-kernel/                         (context:shared-kernel) : strict minimum
-    domain/                              value objects vraiment transverses (Email, Telephone…)
-    application/                         ports techniques : UnitOfWork, Clock, GenerateurIdentifiants
+    domain/                              créé au premier partage réel (ex. Email utilisé par 2 contextes)
+    application/                         ports techniques communs : UnitOfWork, Clock
     adapters/                            PrismaService, PrismaTransaction, PrismaUnitOfWork, SystemClock
   referentiel/                           (context:referentiel)
     domain/src/
       centre/
         centre.ts                        agrégat + creer() / reconstituer()
-        centre-id.ts, statut-centre.ts   value objects du concept
-        centre.errors.ts                 erreurs métier du concept
+        centre-id.ts, statut-centre.ts   value objects du concept (erreurs dans le même fichier)
+        centre.errors.ts                 erreurs métier de l'agrégat
         centre.spec.ts
+      commun/
+        nom.ts, adresse.ts…              value objects partagés du contexte, avec leurs erreurs
       ports/
         centre.repository.ts             port du repository (abstract class)
         centre.repository.contrat.test-utils.ts   suite de contrat réutilisable (hors build)
