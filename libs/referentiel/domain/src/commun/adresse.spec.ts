@@ -17,6 +17,27 @@ describe('Adresse', () => {
     );
   });
 
+  describe('espaces', () => {
+    it('sont retirés en début et en fin', () => {
+      expect(Adresse.creer('  12 avenue Jean Jaurès  ').valeur).toBe(
+        '12 avenue Jean Jaurès',
+      );
+    });
+
+    it('sont réduits à un seul à l’intérieur', () => {
+      expect(Adresse.creer('12  avenue \t Jean   Jaurès').valeur).toBe(
+        '12 avenue Jean Jaurès',
+      );
+    });
+
+    it('sont normalisés avant de mesurer la longueur', () => {
+      const adresse = Adresse.creer(
+        `  ${'a'.repeat(127)}     ${'b'.repeat(127)}  `,
+      );
+      expect(adresse.valeur).toHaveLength(255);
+    });
+  });
+
   describe('longueur maximale : 255 caractères', () => {
     it('accepte une adresse de 255 caractères', () => {
       expect(Adresse.creer('a'.repeat(255)).valeur).toHaveLength(255);

@@ -25,12 +25,13 @@ export class Adresse {
   private constructor(readonly valeur: string) {}
 
   static creer(valeur: string): Adresse {
-    if (valeur.trim().length === 0) {
+    const adresse = valeur.trim().replace(/\s+/g, ' ');
+    if (adresse.length === 0) {
       throw new AdresseVide();
     }
-    if (valeur.length > Adresse.LONGUEUR_MAXIMALE) {
+    if (adresse.length > Adresse.LONGUEUR_MAXIMALE) {
       throw new AdresseTropLongue(Adresse.LONGUEUR_MAXIMALE);
     }
-    return new Adresse(valeur);
+    return new Adresse(adresse);
   }
 }
