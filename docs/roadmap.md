@@ -16,34 +16,27 @@
 
 ## Pyramide des tests
 
-| Niveau                                     | Où                                | Existe | En CI | Arrive avec                                    |
-| ------------------------------------------ | --------------------------------- | ------ | ----- | ---------------------------------------------- |
-| Domaine (unitaires)                        | `libs/*/domain/**/*.spec.ts`      | ✅     | ✅    | —                                              |
-| Use cases (fakes en mémoire)               | `libs/*/application/**/*.spec.ts` | ✅     | ✅    | —                                              |
-| Contrat d'adapter (en mémoire puis Prisma) | `*.test-utils.ts` + `*.spec.ts`   | ✅     | ✅    | —                                              |
-| Intégration (Prisma + PostgreSQL)          | `*.integration.spec.ts`           | ✅     | ✅    | —                                              |
-| E2E HTTP boîte noire                       | `apps/api-e2e`                    | ⚠️     | ❌    | `POST /api/centres` : remplace l'exemple de Nx |
-
-À faire au passage :
-
-- Supprimer les exemples générés par Nx (`AppController`, `AppService`, test
-  `GET /api` → `Hello API`) quand la première vraie route existe.
-- Ajouter l'étape `pnpm nx affected -t e2e` (et `test-integration`) dans la CI,
-  avec un service PostgreSQL, dès le premier test de ces niveaux (ADR-0004).
+| Niveau                                     | Où                                | Existe | En CI | Arrive avec |
+| ------------------------------------------ | --------------------------------- | ------ | ----- | ----------- |
+| Domaine (unitaires)                        | `libs/*/domain/**/*.spec.ts`      | ✅     | ✅    | —           |
+| Use cases (fakes en mémoire)               | `libs/*/application/**/*.spec.ts` | ✅     | ✅    | —           |
+| Contrat d'adapter (en mémoire puis Prisma) | `*.test-utils.ts` + `*.spec.ts`   | ✅     | ✅    | —           |
+| Intégration (Prisma + PostgreSQL)          | `*.integration.spec.ts`           | ✅     | ✅    | —           |
+| E2E HTTP boîte noire                       | `apps/api-e2e`                    | ✅     | ✅    | —           |
 
 ## Étapes
 
-| Étape | Contenu                                                            | État        |
-| ----- | ------------------------------------------------------------------ | ----------- |
-| 0     | Fondations : Nx, lint d'architecture, CI, règles Tenets, ADR       | ✅ Terminé  |
-| 1     | Référentiel : créer un centre (domaine → use case → Prisma → HTTP) | 🟡 En cours |
-| 2     | Référentiel : cycle de vie d'un centre (désactiver, archiver)      | ⏳          |
-| 3     | Référentiel : magasins et produits                                 | ⏳          |
-| 4     | Identité et accès : bootstrap admin, connexion, rôles              | ⏳          |
-| 5     | Collecte : design doc, puis création et cycle de vie               | ⏳          |
-| 6     | Planification, saisie, bénévoles                                   | ⏳          |
-| 7     | Statistiques (modèle de lecture séparé)                            | ⏳          |
-| 8     | Front Angular 22 dans le workspace (Node ≥ 24.15)                  | ⏳          |
+| Étape | Contenu                                                            | État       |
+| ----- | ------------------------------------------------------------------ | ---------- |
+| 0     | Fondations : Nx, lint d'architecture, CI, règles Tenets, ADR       | ✅ Terminé |
+| 1     | Référentiel : créer un centre (domaine → use case → Prisma → HTTP) | ✅ Terminé |
+| 2     | Référentiel : cycle de vie d'un centre (désactiver, archiver)      | ⏳         |
+| 3     | Référentiel : magasins et produits                                 | ⏳         |
+| 4     | Identité et accès : bootstrap admin, connexion, rôles              | ⏳         |
+| 5     | Collecte : design doc, puis création et cycle de vie               | ⏳         |
+| 6     | Planification, saisie, bénévoles                                   | ⏳         |
+| 7     | Statistiques (modèle de lecture séparé)                            | ⏳         |
+| 8     | Front Angular 22 dans le workspace (Node ≥ 24.15)                  | ⏳         |
 
 L'ordre des étapes 3 à 7 reste à confirmer avec la carte des contextes.
 
@@ -60,12 +53,12 @@ L'ordre des étapes 3 à 7 reste à confirmer avec la carte des contextes.
 | `CreerCentreUseCase` : création, enregistrement, refus des doublons (`CENTRE_ALREADY_EXISTS`) | ✅   |
 | Suite de contrat `CentreRepository` (passée par le fake en mémoire)                           | ✅   |
 | `PrismaCentreRepository` (passe la même suite, sur PostgreSQL, ADR-0008)                      | ✅   |
-| `POST /api/centres`, erreurs HTTP, test E2E                                                   | ⏳   |
+| `POST /api/centres`, filtres d'erreurs, tests E2E (ADR-0009)                                  | ✅   |
 
 Avant la mise en production (ADR-0008) : script de reprise qui calcule
 `cleDoublon` pour les centres de la v1, puis colonne rendue obligatoire. Reste à
 traduire une violation d'unicité de `cleDoublon` en `CentreDejaExistant` (créations
 simultanées, TENETS-ADAPTER-006).
 
-À ne pas oublier pour l'adapter HTTP : un téléphone vide (`""`) signifie « pas de
-téléphone » et doit être converti en absent avant d'appeler le domaine (ADR-0007).
+⚠️ **Avant tout déploiement** : authentification ADMIN sur `POST /api/centres`
+(étape 4, ADR-0009).

@@ -1,8 +1,7 @@
-import axios from 'axios';
-
-module.exports = async function () {
-  // Configure axios for tests to use.
-  const host = process.env.HOST ?? 'localhost';
-  const port = process.env.PORT ?? '3000';
-  axios.defaults.baseURL = `http://${host}:${port}`;
-};
+// Exécuté avant chaque fichier de test : variables du .env de la racine
+// (sans écraser celles déjà définies, par exemple en CI).
+try {
+  process.loadEnvFile();
+} catch {
+  // Pas de fichier .env : variables fournies par l'environnement.
+}

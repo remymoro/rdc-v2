@@ -45,5 +45,6 @@ pnpm verify                      # lint + test + build de tout le workspace
 pnpm nx test referentiel-domain  # un seul projet
 pnpm nx affected -t lint test build
 pnpm nx affected -t test-integration   # PostgreSQL requis
+pnpm e2e                               # E2E HTTP sur rdc_test
 pnpm nx format:write
 ```

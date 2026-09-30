@@ -30,3 +30,10 @@ acceptés. La relecture de cette règle a soulevé trois questions métier.
   de la même façon à l'email s'il est facultatif.
 - Si un centre ouvre en outre-mer ou si un numéro vert devient nécessaire,
   écrire un nouvel ADR qui remplace les points concernés.
+
+## Correction (2026-09-30)
+
+Le point 3 n'est **pas** un écart à la v1 : son DTO `CreerCentreRequest`
+convertit déjà une chaîne vide en absent (`emptyStringToUndefined`). La décision
+reste inchangée ; seule la phrase « s'écarte de la v1 » des conséquences était
+inexacte. Voir aussi ADR-0009.
