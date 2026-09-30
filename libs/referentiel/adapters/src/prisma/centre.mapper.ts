@@ -30,6 +30,8 @@ function versStatutPrisma(statut: StatutCentre): StatutCentrePrisma {
   switch (statut) {
     case StatutCentre.ACTIF:
       return 'ACTIF';
+    case StatutCentre.INACTIF:
+      return 'INACTIF';
     case StatutCentre.ARCHIVE:
       return 'ARCHIVE';
   }

@@ -80,4 +80,20 @@ describe('Centre', () => {
       expect(centre.email).toBeUndefined();
     });
   });
+
+  describe('cycle de vie', () => {
+    const plusTard = new Date('2026-11-15T10:00:00.000Z');
+
+    describe('desactiver', () => {
+      it('passe un centre actif à INACTIF et date la modification', () => {
+        const centre = Centre.creer(donneesObligatoires(), maintenant);
+
+        centre.desactiver(plusTard);
+
+        expect(centre.statut).toBe(StatutCentre.INACTIF);
+        expect(centre.modifieLe).toEqual(plusTard);
+        expect(centre.creeLe).toEqual(maintenant);
+      });
+    });
+  });
 });
