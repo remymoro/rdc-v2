@@ -25,6 +25,19 @@ describe('Ville', () => {
     });
   });
 
+  describe('espaces multiples', () => {
+    it('sont réduits à un seul espace', () => {
+      expect(Ville.creer('Villeneuve  sur \t  Lot').valeur).toBe(
+        'Villeneuve sur Lot',
+      );
+    });
+
+    it('sont réduits avant de mesurer la longueur', () => {
+      const ville = Ville.creer(`${'a'.repeat(50)}     ${'b'.repeat(49)}`);
+      expect(ville.valeur).toHaveLength(100);
+    });
+  });
+
   describe('longueur maximale : 100 caractères', () => {
     it('accepte une ville de 100 caractères', () => {
       expect(Ville.creer('a'.repeat(100)).valeur).toHaveLength(100);

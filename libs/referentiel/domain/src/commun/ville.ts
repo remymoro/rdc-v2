@@ -24,7 +24,7 @@ export class Ville {
   private constructor(readonly valeur: string) {}
 
   static creer(valeur: string): Ville {
-    const ville = valeur.trim();
+    const ville = valeur.trim().replace(/\s+/g, ' ');
     if (ville.length === 0) {
       throw new VilleVide();
     }
