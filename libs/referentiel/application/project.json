@@ -1,0 +1,14 @@
+{
+  "name": "referentiel-application",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/referentiel/application/src",
+  "projectType": "library",
+  "tags": ["context:referentiel", "layer:application"],
+  "targets": {
+    "test": {
+      "options": {
+        "passWithNoTests": true
+      }
+    }
+  }
+}

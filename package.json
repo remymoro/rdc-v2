@@ -1,14 +1,29 @@
 {
-  "name": "@rdc-v2/source",
+  "name": "@rdc/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
   "private": true,
+  "packageManager": "pnpm@10.30.3",
+  "engines": {
+    "node": ">=24.11.0"
+  },
+  "scripts": {
+    "lint": "nx run-many -t lint",
+    "test": "nx run-many -t test",
+    "build": "nx run-many -t build",
+    "format:check": "nx format:check",
+    "verify": "nx run-many -t lint test build",
+    "e2e": "DATABASE_URL=postgresql://rdc:rdc@localhost:5432/rdc_test nx e2e api-e2e"
+  },
   "dependencies": {
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
-    "axios": "^1.6.0",
+    "@prisma/adapter-pg": "~7.10.0",
+    "@prisma/client": "~7.10.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "pg": "^8.23.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.0"
   },
@@ -28,6 +43,9 @@
     "@swc/helpers": "~0.5.18",
     "@types/jest": "~30.0.0",
     "@types/node": "^22.0.0",
+    "@types/pg": "^8.23.1",
+    "axios": "^1.20.0",
+    "dotenv": "^17.4.2",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
     "jest": "~30.3.0",
@@ -35,6 +53,7 @@
     "jest-util": "~30.3.0",
     "nx": "23.2.1",
     "prettier": "~3.6.2",
+    "prisma": "~7.10.0",
     "ts-jest": "^29.4.7",
     "ts-node": "10.9.1",
     "tslib": "^2.3.0",

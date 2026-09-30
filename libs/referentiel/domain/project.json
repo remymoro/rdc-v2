@@ -1,0 +1,14 @@
+{
+  "name": "referentiel-domain",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/referentiel/domain/src",
+  "projectType": "library",
+  "tags": ["context:referentiel", "layer:domain"],
+  "targets": {
+    "test": {
+      "options": {
+        "passWithNoTests": true
+      }
+    }
+  }
+}

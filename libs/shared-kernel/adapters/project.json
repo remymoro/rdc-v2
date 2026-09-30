@@ -1,0 +1,23 @@
+{
+  "name": "shared-kernel-adapters",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared-kernel/adapters/src",
+  "projectType": "library",
+  "tags": ["context:shared-kernel", "layer:adapters"],
+  "targets": {
+    "test": {
+      "options": {
+        "passWithNoTests": true
+      }
+    },
+    "test-integration": {
+      "executor": "@nx/jest:jest",
+      "outputs": [],
+      "options": {
+        "jestConfig": "libs/shared-kernel/adapters/jest.integration.config.cts",
+        "runInBand": true,
+        "passWithNoTests": false
+      }
+    }
+  }
+}

@@ -1,0 +1,379 @@
+// Schéma repris de RDC v1 (commit c9734f4), voir ADR-0008.
+generator client {
+  provider     = "prisma-client"
+  output       = "../libs/shared-kernel/adapters/src/prisma/generated"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── CENTRE ───────────────────────────────────────────────────────────────────
+
+model Centre {
+  id         String       @id @default(uuid())
+  nom        String
+  ville      String
+  codePostal String
+  adresse    String
+  telephone  String?
+  email      String?
+  statut     StatutCentre @default(ACTIF)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  /// Clé de rapprochement (CleDoublonCentre). Facultative tant que les centres
+  /// repris de la v1 n'ont pas été recalculés (ADR-0008).
+  cleDoublon String?      @unique
+
+  responsables             User[]
+  magasins                 Magasin[]
+  benevoles                Benevole[]
+  planningsBenevolesCentre PlanningBenevolesCentre[]
+  planningsChauffeur       PlanningChauffeur[]
+  collectesSaisie          CollecteCentreSaisie[]
+  participationsMagasin    ParticipationMagasin[]
+
+  @@unique([nom, ville, codePostal, adresse])
+}
+
+model Magasin {
+  id         String       @id @default(uuid())
+  nom        String
+  ville      String
+  codePostal String
+  adresse    String
+  telephone  String?
+  email      String?
+  statut     StatutCentre @default(ACTIF)
+  centreId   String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  centre          Centre                @relation(fields: [centreId], references: [id], onDelete: Restrict)
+  images          MagasinImage[]
+  participations  ParticipationMagasin[]
+  slots           Slot[]
+  saisieEntries   SaisieEntry[]
+  planningMagasin PlanningMagasin[]
+
+  @@unique([nom, ville, codePostal, adresse])
+  @@index([centreId])
+}
+
+model MagasinImage {
+  id        String   @id @default(uuid())
+  url       String
+  ordre     Int      @default(0)
+  magasinId String
+  createdAt DateTime @default(now())
+
+  magasin Magasin @relation(fields: [magasinId], references: [id], onDelete: Cascade)
+
+  @@index([magasinId])
+}
+
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+
+model User {
+  id           String                @id @default(uuid())
+  email        String                @unique
+  passwordHash String
+  role         UserRole              @default(RESPONSABLE_CENTRE)
+  centreId     String?
+  isActive     Boolean               @default(true)
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  sessions RefreshTokenSession[]
+  centre   Centre?               @relation(fields: [centreId], references: [id], onDelete: SetNull)
+
+  @@index([centreId])
+}
+
+model RefreshTokenSession {
+  id         String    @id
+  tokenHash  String
+  userId     String
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  replacedBy String?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ─── COLLECTE ─────────────────────────────────────────────────────────────────
+
+model Collecte {
+  id                            String         @id @default(uuid())
+  nom                           String         @unique
+  dateDebut                     DateTime
+  dateFin                       DateTime
+  dateFinSaisie                 DateTime
+  planificationBenevolesOuverte Boolean        @default(false)
+  saisieOuverte                 Boolean        @default(false)
+  statut                        StatutCollecte @default(PREPARATION)
+  enAttenteClotureAdmin         Boolean        @default(false)
+  createdAt                     DateTime       @default(now())
+  updatedAt                     DateTime       @updatedAt
+
+  participations           ParticipationMagasin[]
+  slots                    Slot[]
+  saisieEntries            SaisieEntry[]
+  planningsMagasin         PlanningMagasin[]
+  planningsBenevolesCentre PlanningBenevolesCentre[]
+  planningsChauffeur       PlanningChauffeur[]
+  centresSaisie            CollecteCentreSaisie[]
+}
+
+model ParticipationMagasin {
+  collecteId String
+  magasinId  String
+  centreId   String
+  collecte Collecte @relation(fields: [collecteId], references: [id], onDelete: Cascade)
+  magasin  Magasin  @relation(fields: [magasinId], references: [id], onDelete: Cascade)
+  centre   Centre   @relation(fields: [centreId], references: [id], onDelete: Restrict)
+
+  @@id([collecteId, magasinId])
+  @@index([collecteId])
+  @@index([centreId])
+}
+
+model CollecteCentreSaisie {
+  collecteId        String
+  centreId          String
+  statut            StatutSaisieCentre @default(EN_COURS)
+  saisieTerminee    Boolean   @default(false)
+  termineeAt        DateTime?
+  termineeParUserId String?
+  rouverteAt        DateTime?
+  rouverteParUserId String?
+  raisonReouverture String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  collecte Collecte @relation(fields: [collecteId], references: [id], onDelete: Cascade)
+  centre   Centre   @relation(fields: [centreId], references: [id], onDelete: Cascade)
+
+  @@id([collecteId, centreId])
+  @@index([collecteId])
+  @@index([centreId])
+  @@index([statut])
+  @@index([saisieTerminee])
+}
+
+// ─── PRODUIT (catalogue de référence) ─────────────────────────────────────────
+
+model Produit {
+  id          String   @id @default(uuid())
+  code        String
+  sousFamille String
+  famille     String
+  actif       Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([code])
+  @@index([famille])
+  @@index([actif, code])
+}
+
+// ─── SLOT (planning bénévoles — indépendant de la saisie) ─────────────────────
+
+model Benevole {
+  id             String         @id @default(uuid())
+  centreId       String
+  nom            String
+  prenom         String
+  tel            String?
+  email          String?
+  typeEngagement TypeEngagement @default(BNV_Restos)
+  anonymise      Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  centre Centre @relation(fields: [centreId], references: [id], onDelete: Restrict)
+  slots  Slot[]
+
+  @@unique([centreId, email])
+  @@unique([centreId, tel])
+  @@index([centreId])
+  @@index([nom, prenom])
+  @@index([anonymise])
+  @@index([typeEngagement])
+}
+
+// ─── PLANNING MAGASIN ─────────────────────────────────────────────────────────
+
+model PlanningMagasin {
+  id         String   @id @default(uuid())
+  collecteId String
+  magasinId  String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  collecte Collecte @relation(fields: [collecteId], references: [id], onDelete: Cascade)
+  magasin  Magasin  @relation(fields: [magasinId], references: [id], onDelete: Cascade)
+  slots    Slot[]   @relation("SlotMagasin")
+
+  @@unique([collecteId, magasinId])
+  @@index([collecteId])
+  @@index([magasinId])
+}
+
+// ─── PLANNING BÉNÉVOLES CENTRE ────────────────────────────────────────────────
+
+model PlanningBenevolesCentre {
+  id         String   @id @default(uuid())
+  collecteId String
+  centreId   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  collecte Collecte @relation(fields: [collecteId], references: [id], onDelete: Cascade)
+  centre   Centre   @relation(fields: [centreId], references: [id], onDelete: Cascade)
+  slots    Slot[]   @relation("SlotBenevolesCentre")
+
+  @@unique([collecteId, centreId])
+  @@index([collecteId])
+  @@index([centreId])
+}
+
+// ─── PLANNING CHAUFFEUR ───────────────────────────────────────────────────────
+
+model PlanningChauffeur {
+  id         String   @id @default(uuid())
+  collecteId String
+  centreId   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  collecte Collecte @relation(fields: [collecteId], references: [id], onDelete: Cascade)
+  centre   Centre   @relation(fields: [centreId], references: [id], onDelete: Cascade)
+  slots    Slot[]   @relation("SlotChauffeur")
+
+  @@unique([collecteId, centreId])
+  @@index([collecteId])
+  @@index([centreId])
+}
+
+// ─── SLOT ─────────────────────────────────────────────────────────────────────
+
+model Slot {
+  id                      String     @id @default(uuid())
+  collecteId              String
+  magasinId               String?
+  centreId                String?
+  planningMagasinId       String?
+  planningBenevolesCentreId String?
+  planningChauffeurId     String?
+  benevoleId              String
+  typePlanning            TypePlanning
+  typeEngagementSnapshot  TypeEngagement @default(BNV_Restos)
+  statut                  StatutSlot @default(PLANIFIE)
+  remarque                String?
+  heureDebut              DateTime
+  heureFin                DateTime
+  createdAt               DateTime   @default(now())
+  updatedAt               DateTime   @updatedAt
+
+  collecte              Collecte                 @relation(fields: [collecteId], references: [id], onDelete: Cascade)
+  magasin               Magasin?                 @relation(fields: [magasinId], references: [id], onDelete: Restrict)
+  benevole              Benevole                 @relation(fields: [benevoleId], references: [id], onDelete: Restrict)
+  planningMagasin       PlanningMagasin?         @relation("SlotMagasin", fields: [planningMagasinId], references: [id], onDelete: Cascade)
+  planningBenevolesCentre PlanningBenevolesCentre? @relation("SlotBenevolesCentre", fields: [planningBenevolesCentreId], references: [id], onDelete: Cascade)
+  planningChauffeur     PlanningChauffeur?       @relation("SlotChauffeur", fields: [planningChauffeurId], references: [id], onDelete: Cascade)
+
+  @@index([collecteId])
+  @@index([magasinId])
+  @@index([centreId])
+  @@index([benevoleId])
+  @@index([planningMagasinId])
+  @@index([planningBenevolesCentreId])
+  @@index([planningChauffeurId])
+}
+// ─── SAISIE ───────────────────────────────────────────────────────────────────
+
+model SaisieEntry {
+  id             String            @id @default(uuid())
+  collecteId     String
+  magasinId      String
+  numeroPassage  Int               @default(1)
+  statut         StatutSaisieEntry @default(EN_COURS)
+  totalKg        Decimal           @default(0) @db.Decimal(10, 3)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  collecte Collecte          @relation(fields: [collecteId], references: [id], onDelete: Cascade)
+  magasin  Magasin           @relation(fields: [magasinId], references: [id], onDelete: Cascade)
+  items    SaisieEntryItem[]
+
+  @@index([collecteId, magasinId])
+  @@index([statut])
+}
+
+model SaisieEntryItem {
+  id          String  @id @default(uuid())
+  entryId     String
+  produitRef  String
+  famille     String
+  sousFamille String
+  poidsKg     Decimal @db.Decimal(10, 3)
+
+  entry SaisieEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+
+  @@index([entryId])
+}
+
+// ─── ENUMS ────────────────────────────────────────────────────────────────────
+
+enum TypeEngagement {
+  BNV_Restos
+  BNV_1_jour
+}
+
+enum StatutCentre {
+  ACTIF
+  INACTIF
+  ARCHIVE
+}
+
+// L'attente de clôture n'est pas un statut : c'est le drapeau
+// Collecte.enAttenteClotureAdmin, la collecte restant EN_COURS jusqu'à
+// l'approbation de l'administrateur.
+enum StatutCollecte {
+  PREPARATION
+  EN_COURS
+  TERMINEE
+}
+
+enum StatutSaisieEntry {
+  EN_COURS
+  VALIDEE
+}
+
+enum StatutSaisieCentre {
+  EN_COURS
+  TERMINEE_PAR_CENTRE
+  REOUVERTE_PAR_ADMIN
+}
+
+enum StatutSlot {
+  PLANIFIE
+  ANNULE
+}
+
+enum TypePlanning {
+  MAGASIN
+  BENEVOLES_CENTRE
+  CHAUFFEUR
+}
+
+enum UserRole {
+  ADMIN
+  RESPONSABLE_CENTRE
+}
