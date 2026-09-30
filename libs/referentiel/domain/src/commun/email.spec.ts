@@ -1,4 +1,4 @@
-import { Email, EmailTropLong, EmailVide } from './email';
+import { Email, EmailInvalide, EmailTropLong, EmailVide } from './email';
 
 describe('Email', () => {
   it('accepte un email', () => {
@@ -27,6 +27,31 @@ describe('Email', () => {
     expect(Email.creer('Agen@RestosDuCoeur.ORG').valeur).toBe(
       'agen@restosducoeur.org',
     );
+  });
+
+  describe('format', () => {
+    it.each(['agen@restosducoeur.org', 'prenom.nom@centre.restos.fr'])(
+      'accepte %j',
+      (valeur) => {
+        expect(Email.creer(valeur).valeur).toBe(valeur);
+      },
+    );
+
+    it.each([
+      'agen', // pas de @
+      'agen@restosducoeur', // pas de point dans le domaine
+      '@restosducoeur.org', // rien avant le @
+      'agen@@restosducoeur.org', // deux @
+      'agen @restosducoeur.org', // espace
+    ])('refuse %j', (valeur) => {
+      expect(() => Email.creer(valeur)).toThrow(EmailInvalide);
+    });
+
+    it('expose le code d’erreur de RDC v1', () => {
+      expect(() => Email.creer('agen')).toThrow(
+        expect.objectContaining({ code: 'EMAIL_INVALID' }),
+      );
+    });
   });
 
   describe('longueur maximale : 254 caractères', () => {
