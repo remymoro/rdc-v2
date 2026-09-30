@@ -24,12 +24,13 @@ export class Nom {
   private constructor(readonly valeur: string) {}
 
   static creer(valeur: string): Nom {
-    if (valeur.trim().length === 0) {
+    const nom = valeur.trim();
+    if (nom.length === 0) {
       throw new NomVide();
     }
-    if (valeur.length > Nom.LONGUEUR_MAXIMALE) {
+    if (nom.length > Nom.LONGUEUR_MAXIMALE) {
       throw new NomTropLong(Nom.LONGUEUR_MAXIMALE);
     }
-    return new Nom(valeur);
+    return new Nom(nom);
   }
 }

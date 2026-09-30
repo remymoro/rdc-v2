@@ -11,6 +11,17 @@ describe('Nom', () => {
     );
   });
 
+  describe('espaces en début et en fin', () => {
+    it('sont retirés', () => {
+      expect(Nom.creer('  Centre d’Agen  ').valeur).toBe('Centre d’Agen');
+    });
+
+    it('ne comptent pas dans la longueur maximale', () => {
+      const nom = Nom.creer(`  ${'a'.repeat(100)}  `);
+      expect(nom.valeur).toHaveLength(100);
+    });
+  });
+
   describe('longueur maximale : 100 caractères', () => {
     it('accepte un nom de 100 caractères', () => {
       expect(Nom.creer('a'.repeat(100)).valeur).toHaveLength(100);
