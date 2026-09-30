@@ -7,6 +7,11 @@ DDD + architecture hexagonale de Tenets adaptées à NestJS.
 L'ancien projet (`../rdc`) sert uniquement de référence fonctionnelle : on
 reprend le métier, pas le code.
 
+## Où en est le projet
+
+- `docs/roadmap.md` : étapes, avancement, pyramide des tests. **Commencer par là**
+  pour reprendre le travail, et le mettre à jour quand une fonctionnalité est terminée.
+
 ## Règles d'architecture
 
 - Carte des règles et réflexes essentiels : `docs/architecture/regles/00-index.md`

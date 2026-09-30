@@ -23,6 +23,13 @@ RDC v2 est développé fonctionnalité par fonctionnalité en TDD, chaque étape
   - `application` : use cases avec des adapters en mémoire ;
   - `adapters` : tests de contrat, rejoués contre PostgreSQL (R10) ;
   - `api-e2e` : parcours HTTP boîte noire.
+- **Un niveau de test ne compte que s'il tourne en CI.** Dès qu'un niveau
+  contient un premier test, la CI l'exécute (cible Nx dédiée si besoin :
+  `test-integration`, `e2e`, avec un service PostgreSQL). Un test qui n'est
+  lancé qu'en local n'est pas une garantie.
+- **Chaque niveau arrive avec le code qu'il vérifie**, pas avant : l'état de la
+  pyramide et l'étape où chaque niveau est ajouté sont suivis dans
+  `docs/roadmap.md`.
 
 ## Conséquences
 
