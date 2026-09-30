@@ -8,12 +8,27 @@ export class NomVide extends Error {
   }
 }
 
+/** Erreur métier : un nom ne dépasse pas 100 caractères. */
+export class NomTropLong extends Error {
+  readonly code = 'NOM_TOO_LONG';
+
+  constructor(readonly longueurMaximale: number) {
+    super(`Le nom ne peut pas dépasser ${longueurMaximale} caractères`);
+    this.name = 'NomTropLong';
+  }
+}
+
 export class Nom {
+  static readonly LONGUEUR_MAXIMALE = 100;
+
   private constructor(readonly valeur: string) {}
 
   static creer(valeur: string): Nom {
     if (valeur.trim().length === 0) {
       throw new NomVide();
+    }
+    if (valeur.length > Nom.LONGUEUR_MAXIMALE) {
+      throw new NomTropLong(Nom.LONGUEUR_MAXIMALE);
     }
     return new Nom(valeur);
   }
