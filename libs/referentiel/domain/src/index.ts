@@ -1,2 +1,4 @@
-// API publique de la lib. Les exports arrivent avec la première fonctionnalité (TDD).
-export {};
+export { Centre } from './centre/centre';
+export { CentreId } from './centre/centre-id';
+export { StatutCentre } from './centre/statut-centre';
+export { Nom } from './commun/nom';
