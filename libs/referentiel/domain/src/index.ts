@@ -4,4 +4,9 @@ export { StatutCentre } from './centre/statut-centre';
 export { Nom, NomTropLong, NomVide } from './commun/nom';
 export { CodePostal, CodePostalInvalide } from './commun/code-postal';
 export { Ville, VilleTropLongue, VilleVide } from './commun/ville';
-export { Adresse, AdresseTropLongue, AdresseVide } from './commun/adresse';
+export {
+  Adresse,
+  AdresseAbreviationInterdite,
+  AdresseTropLongue,
+  AdresseVide,
+} from './commun/adresse';
