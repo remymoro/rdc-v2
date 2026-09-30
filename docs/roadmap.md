@@ -49,17 +49,21 @@ L'ordre des étapes 3 à 7 reste à confirmer avec la carte des contextes.
 
 ## Étape 1 — Créer un centre
 
-| Élément                                                         | État |
-| --------------------------------------------------------------- | ---- |
-| `Centre.creer()` : statut `ACTIF`, identifiant, dates           | ✅   |
-| `Nom` : vide (`NOM_EMPTY`), trop long (`NOM_TOO_LONG`), espaces | ✅   |
-| `CentreId` : vide, format UUID, normalisation                   | ✅   |
-| Adresse : code postal, ville, voie sans abréviation             | ⏳   |
-| Téléphone et email facultatifs                                  | ⏳   |
-| `CreerCentreUseCase` : création et enregistrement               | ✅   |
-| Refus des doublons (`CENTRE_ALREADY_EXISTS`)                    | ⏳   |
-| `CentreRepository` + contrat, puis `PrismaCentreRepository`     | ⏳   |
-| `POST /api/centres`, erreurs HTTP, test E2E                     | ⏳   |
+| Élément                                                                                       | État |
+| --------------------------------------------------------------------------------------------- | ---- |
+| `CentreId` : vide, format UUID, normalisation                                                 | ✅   |
+| `Nom`, `Ville` : vide, longueur maximale, espaces                                             | ✅   |
+| `CodePostal` : 5 chiffres ; `Adresse` : abréviations interdites (ADR-0006)                    | ✅   |
+| `Telephone` (01-07, 09, `+33`, ADR-0007) et `Email` facultatifs                               | ✅   |
+| `Centre.creer()` avec l'état initial complet ; `Centre.reconstituer()`                        | ✅   |
+| `CleDoublonCentre` : clé de rapprochement de la v1                                            | ✅   |
+| `CreerCentreUseCase` : création, enregistrement, refus des doublons (`CENTRE_ALREADY_EXISTS`) | ✅   |
+| Suite de contrat `CentreRepository`, puis `PrismaCentreRepository`                            | ⏳   |
+| `POST /api/centres`, erreurs HTTP, test E2E                                                   | ⏳   |
+
+À décider à l'étape Prisma (ADR) : stocker `CleDoublonCentre` dans une colonne
+**unique**, pour une recherche directe et une protection contre deux créations
+simultanées du même centre (l'adapter traduira la violation en `CentreDejaExistant`).
 
 À ne pas oublier pour l'adapter HTTP : un téléphone vide (`""`) signifie « pas de
 téléphone » et doit être converti en absent avant d'appeler le domaine (ADR-0007).
