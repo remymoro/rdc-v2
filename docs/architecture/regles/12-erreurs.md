@@ -13,11 +13,12 @@ HTTP choisit le code de statut. **Pas de hiérarchie globale** `DomainException`
 **Format de réponse HTTP (convention RDC v2, compatible avec le front v1) :**
 
 ```json
-{ "statusCode": 409, "code": "CENTRE_ARCHIVE", "message": "…", "path": "/api/centres/…", "timestamp": "…" }
+{ "statusCode": 409, "code": "CENTRE_ARCHIVED", "message": "…", "path": "/api/centres/…", "timestamp": "…" }
 ```
 
-Chaque erreur connue porte un `code` stable, en majuscules (`CENTRE_ARCHIVE`),
-qui ne change jamais une fois publié.
+Chaque erreur connue porte un `code` stable, en majuscules (`CENTRE_ARCHIVED`),
+qui ne change jamais une fois publié. Quand l'erreur existait dans RDC v1, on
+reprend **exactement** son code : le front Angular les utilise déjà.
 
 ## TENETS-ERROR-001 — La propriété d'une erreur suit son sens architectural
 
@@ -56,7 +57,7 @@ throw new ConflictException('Centre archivé'); // @nestjs/common dans le domain
 
 // ✅ Correct
 export class CentreArchive extends Error {
-  readonly code = 'CENTRE_ARCHIVE';
+  readonly code = 'CENTRE_ARCHIVED';
   constructor(readonly centreId: CentreId) {
     super(`Le centre ${centreId.valeur} est archivé`);
     this.name = 'CentreArchive';
