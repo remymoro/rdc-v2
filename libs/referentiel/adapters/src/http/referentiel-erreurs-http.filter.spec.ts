@@ -87,6 +87,22 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
     );
   });
 
+  // @Catch filtre par instanceof : une sous-classe d'une erreur listée doit
+  // garder le statut de son parent, pas retomber sur un statut par défaut.
+  it.each([
+    ['CentreArchive', class extends CentreArchive {}, 409],
+    ['CentreIntrouvable', class extends CentreIntrouvable {}, 404],
+  ])(
+    'traduit une sous-classe de %s comme son parent',
+    (_, SousClasse, statut) => {
+      const { hote, reponse } = hoteHttp();
+
+      filtre.catch(new SousClasse(unCentreId), hote);
+
+      expect(reponse.status).toHaveBeenCalledWith(statut);
+    },
+  );
+
   // Erreurs de validation métier : 400, comme en v1, avec le code du domaine.
   it.each([
     [new NomVide(), 'NOM_EMPTY'],

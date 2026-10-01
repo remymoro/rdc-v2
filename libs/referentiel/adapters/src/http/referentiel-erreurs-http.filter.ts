@@ -57,15 +57,32 @@ const STATUTS_HTTP = new Map<Type<ErreurConnue>, HttpStatus>([
   [EmailInvalide, HttpStatus.BAD_REQUEST],
 ]);
 
+/**
+ * `@Catch` filtre par `instanceof` : une sous-classe d'une erreur listée arrive
+ * ici. On remonte donc sa chaîne de prototypes jusqu'au type déclaré. Ne rien
+ * trouver serait un bug du filtre : 500, jamais un 400 trompeur.
+ */
+function statutHttp(erreur: ErreurConnue): HttpStatus {
+  for (
+    let type = Object.getPrototypeOf(erreur);
+    type !== null;
+    type = Object.getPrototypeOf(type)
+  ) {
+    const statut = STATUTS_HTTP.get(type.constructor);
+    if (statut !== undefined) {
+      return statut;
+    }
+  }
+  return HttpStatus.INTERNAL_SERVER_ERROR;
+}
+
 @Catch(...STATUTS_HTTP.keys())
 export class ReferentielErreursHttpFilter
   implements ExceptionFilter<ErreurConnue>
 {
   catch(erreur: ErreurConnue, hote: ArgumentsHost): void {
     envoyerErreur(hote, {
-      statut:
-        STATUTS_HTTP.get(erreur.constructor as Type<ErreurConnue>) ??
-        HttpStatus.BAD_REQUEST,
+      statut: statutHttp(erreur),
       nom: erreur.name,
       message: erreur.message,
       code: erreur.code,
