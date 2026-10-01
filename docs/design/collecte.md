@@ -129,7 +129,8 @@ annulée (RDC-COLLECTE-014, TENETS-UOW-003/004).
 L'admin choisit explicitement le magasin. Le use case recharge son état par le
 port consommateur, exige magasin ACTIF et centre ACTIF, détermine la liste de
 son centre de rattachement, calcule l'indicateur de collecte précédente puis
-appelle `liste.ajouterMagasin`. Un doublon est sans effet. Il n'y a pas
+appelle `liste.ajouterMagasin`. Aucun `centreId` fourni par le client ne peut
+contredire ce rattachement. Un doublon est sans effet. Il n'y a pas
 d'abonnement à un événement : RDC-COLLECTE-014 dit que l'admin « peut ajouter »
 et ADR-0003 R13 interdit un événement sans consommateur nécessaire.
 
@@ -426,19 +427,19 @@ Ce sont de nouvelles routes, sans contrainte de compatibilité v1. Le centre
 d'un responsable vient toujours du jeton (RDC-ACCES-002) et les rôles sont
 déclarés par métadonnée au guard unique (RDC-ACCES-003).
 
-| Méthode et route                                                            | Rôle               | Résultat                                      |
-| --------------------------------------------------------------------------- | ------------------ | --------------------------------------------- |
-| `POST /api/collectes/:id/verification/ouvrir`                               | ADMIN              | 201, résumé et listes créées                  |
-| `GET /api/collectes/:id/verification`                                       | ADMIN              | avancement agrégé de tous les centres         |
-| `GET /api/collectes/:id/verification/listes/:centreId`                      | ADMIN              | détail d'une liste                            |
-| `GET /api/collectes/:id/verification/ma-liste`                              | RESPONSABLE_CENTRE | liste du centre du jeton                      |
-| `PUT /api/collectes/:id/verification/ma-liste/reponses/:magasinId`          | RESPONSABLE_CENTRE | 200, réponse mise à jour                      |
-| `POST /api/collectes/:id/verification/ma-liste/transmettre`                 | RESPONSABLE_CENTRE | 200, liste transmise avec `avisCentre?`       |
-| `POST /api/collectes/:id/verification/listes/:centreId/transmettre`         | ADMIN              | 200, transmission exceptionnelle par le siège |
-| `POST /api/collectes/:id/verification/listes/:centreId/renvoyer`            | ADMIN              | 200, liste renvoyée avec `raison`             |
-| `POST /api/collectes/:id/verification/listes/:centreId/inscrire`            | ADMIN              | 200, liste des magasins nouvellement inscrits |
-| `POST /api/collectes/:id/verification/listes/:centreId/magasins/:magasinId` | ADMIN              | 200, magasin ajouté ou no-op                  |
-| `POST /api/collectes/:id/verification/fermer`                               | ADMIN              | 204, vérification et listes figées            |
+| Méthode et route                                                    | Rôle               | Résultat                                        |
+| ------------------------------------------------------------------- | ------------------ | ----------------------------------------------- |
+| `POST /api/collectes/:id/verification/ouvrir`                       | ADMIN              | 201, résumé et listes créées                    |
+| `GET /api/collectes/:id/verification`                               | ADMIN              | avancement agrégé de tous les centres           |
+| `GET /api/collectes/:id/verification/listes/:centreId`              | ADMIN              | détail d'une liste                              |
+| `GET /api/collectes/:id/verification/ma-liste`                      | RESPONSABLE_CENTRE | liste du centre du jeton                        |
+| `PUT /api/collectes/:id/verification/ma-liste/reponses/:magasinId`  | RESPONSABLE_CENTRE | 200, réponse mise à jour                        |
+| `POST /api/collectes/:id/verification/ma-liste/transmettre`         | RESPONSABLE_CENTRE | 200, liste transmise avec `avisCentre?`         |
+| `POST /api/collectes/:id/verification/listes/:centreId/transmettre` | ADMIN              | 200, transmission exceptionnelle par le siège   |
+| `POST /api/collectes/:id/verification/listes/:centreId/renvoyer`    | ADMIN              | 200, liste renvoyée avec `raison`               |
+| `POST /api/collectes/:id/verification/listes/:centreId/inscrire`    | ADMIN              | 200, liste des magasins nouvellement inscrits   |
+| `POST /api/collectes/:id/verification/magasins/:magasinId`          | ADMIN              | 200, ajout à la liste du centre de rattachement |
+| `POST /api/collectes/:id/verification/fermer`                       | ADMIN              | 204, vérification et listes figées              |
 
 L'ADMIN conserve les routes unitaires d'inscription hors liste. Il peut lire ou
 transmettre exceptionnellement une liste mais ne saisit pas une réponse à la
