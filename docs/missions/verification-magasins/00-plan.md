@@ -21,10 +21,10 @@ La vérification vit dans le contexte `collecte`, qui n'existe pas encore
 (étape 5). Elle a besoin de la liste des magasins actifs par centre (contrat
 publié par `referentiel`), et de rôles pour l'HTTP (étape 4).
 
-L'étape 3 (magasins) passe avant le lot 3 : le contrat « magasins actifs par
-centre » s'appuie sur le vrai repository `Magasin`, sans requête provisoire sur
-la table v1. RDC-REF-006 est reportée à l'étape 5 (comme RDC-REF-004) et
-RDC-REF-009 reste ⚠️ ; le reste de l'étape 3 n'est pas bloqué.
+L'étape 3 (magasins) reste bloquée jusqu'aux décisions D-03 et D-04
+(`docs/domaine/a-trancher.md`) : RDC-REF-006 et RDC-REF-009 doivent être
+tranchées avant de créer le vrai repository `Magasin` et le contrat « magasins
+actifs par centre » du lot 3.
 
 ```text
 Lot 1  Design doc collecte + vérification            (doc seulement)
