@@ -49,10 +49,23 @@ contrats inter-contextes. Les lots 2 à 7 seront ajustés d'après ce document.
      unité de travail qui le portent.
 2. **Contrats inter-contextes** (TENETS-CONTEXT-006) :
    - consommé : `referentiel` → « magasins actifs rattachés à chaque centre
-     actif ». Proposer le port (côté `collecte/application`) et son
-     implémentation, publiée par `referentiel` et appuyée sur le repository
-     `Magasin` de l'étape 3, prévue avant le lot 3 (voir `00-plan.md`) ;
+     actif ». Spécifier les **trois pièces** exigées par
+     `10-contextes.md` (TENETS-CONTEXT-002 à 005) :
+     1. le **contrat publié** par `referentiel` : lib
+        `libs/referentiel/contrat` (`scope:published`), types et façade en
+        primitives, sans objet du domaine, implémentée par
+        `referentiel/adapters` ;
+     2. le **port consommateur** de `collecte`, dans son langage et ses types
+        (`domain` ou `application` selon TENETS-CONTEXT-005) ;
+     3. l'**adapter de traduction** dans `collecte/adapters`, seul à importer
+        le contrat publié et à le traduire vers le port.
+
+     Proposer l'ADR qui introduit les libs `contrat` et la contrainte ESLint
+     `scope:published` (importables seulement par des libs `layer:adapters`
+     d'autres contextes) ;
+
    - publiés : les questions de COLLECTE-013 (tableau), avec signature.
+
 3. **Modèle de données** : tables v1 réutilisées telles quelles (ADR-0008) et
    **migrations additives** pour la vérification (tables, colonnes, index,
    contraintes d'unicité, dont une liste unique par collecte × centre). Aucune

@@ -44,7 +44,7 @@ Le cœur métier de la vérification, en TypeScript pur, sans base ni HTTP.
    `ListeDejaTransmise`.
 7. Réponse refusée sur une liste TRANSMISE (`ListeDejaTransmise`).
 8. `renvoyer({ auteur, raison }, maintenant)` : TRANSMISE → RENVOYEE ; raison
-   > = 3 caractères après suppression des espaces (`RaisonRenvoiInvalide`) ;
+   d'au moins 3 caractères après suppression des espaces (`RaisonRenvoiInvalide`) ;
    > `ListeNonTransmise`.
 9. `figer()` (fermeture ou démarrage) : plus aucune réponse, transmission ni
    renvoi (`VerificationFermee`).

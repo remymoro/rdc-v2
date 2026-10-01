@@ -21,8 +21,9 @@ appliquées, les cycles réalisés et la section « Hors périmètre ».
 
 Le temps 1 de la mission : l'admin inscrit, retire ou réassigne des magasins
 en préparation, et peut reprendre en une fois les participants de la collecte
-précédente. Ce lot crée aussi le contrat `referentiel` → `collecte`
-« magasins actifs rattachés à chaque centre actif », réutilisé par le lot 5.
+précédente. Ce lot crée aussi le premier contrat publié entre contextes :
+`referentiel` publie « magasins actifs rattachés à chaque centre actif »,
+`collecte` le consomme par un adapter de traduction. Le lot 5 le réutilise.
 
 ## À lire
 
@@ -37,17 +38,25 @@ précédente. Ce lot crée aussi le contrat `referentiel` → `collecte`
 2. Refus hors PREPARATION.
 3. `retirerMagasin` et `reassignerMagasin` ; magasin non inscrit :
    `MagasinNonInscrit`.
-4. Contrat publié par `referentiel` : requête « magasins actifs par centre
-   actif » (port dans `collecte/application`, implémentation dans
-   `referentiel/adapters` appuyée sur le repository `Magasin` de l'étape 3),
-   avec suite de contrat et fake.
-5. `InscrireMagasinUseCase` : magasin actif connu du référentiel, centre
+4. ADR du contrat publié (proposé par le design doc) : lib
+   `libs/referentiel/contrat` taguée `scope:published` et contrainte ESLint
+   qui ne la laisse importer que par des libs `layer:adapters` d'autres
+   contextes ; un test de lint qui échoue si `collecte/domain` ou
+   `collecte/application` l'importe.
+5. Contrat publié par `referentiel` : façade « magasins actifs par centre
+   actif » en primitives, implémentée par `referentiel/adapters` sur le
+   repository `Magasin` de l'étape 3.
+6. Port consommateur de `collecte`, dans son langage, avec suite de contrat
+   et fake en mémoire.
+7. Adapter de traduction dans `collecte/adapters` : appelle la façade publiée
+   et traduit vers les types du port (TENETS-CONTEXT-004).
+8. `InscrireMagasinUseCase` : magasin actif connu du référentiel, centre
    gestionnaire = centre de rattachement par défaut.
-6. `ReprendreCollectePrecedenteUseCase` (RDC-COLLECTE-019) : participants de
+9. `ReprendreCollectePrecedenteUseCase` (RDC-COLLECTE-019) : participants de
    la dernière collecte TERMINEE encore actifs, sans doublon.
-7. Persistance des participations (table `ParticipationMagasin` v1).
-8. HTTP : routes d'inscription, de retrait, de réassignation et de reprise,
-   et E2E.
+10. Persistance des participations (table `ParticipationMagasin` v1).
+11. HTTP : routes d'inscription, de retrait, de réassignation et de reprise,
+    et E2E.
 
 ## Hors périmètre
 
@@ -56,7 +65,8 @@ déploiement toujours bloqué par `verifierDeploiementAutorise`).
 
 ## Critères d'acceptation
 
-- [ ] `collecte` n'importe rien de `referentiel` : seul le port est partagé
-      par le câblage NestJS (TENETS-CONTEXT-002).
+- [ ] `collecte` n'importe que `@rdc/referentiel-contrat`, et seulement
+      depuis `collecte/adapters` (TENETS-CONTEXT-002 à 004) ; `referentiel`
+      n'importe rien de `collecte`.
 - [ ] RDC-COLLECTE-004 et 019 passent à ✅.
 - [ ] `pnpm agent:gate -- --full` passe.

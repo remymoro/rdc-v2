@@ -28,8 +28,10 @@ l'étape 4 et le périmètre « son centre ».
 2. Routes du responsable : sa liste, répondre, transmettre.
 3. Filtre d'erreurs du contexte : codes et statuts du design doc.
 4. E2E : parcours complet (ouvrir → répondre → transmettre → renvoyer →
-   transmettre → inscrire en lot → démarrer), et un test « refusé » par
-   route : mauvais rôle, autre centre (RDC-ACCES-003).
+   transmettre → inscrire en lot → fermer la vérification), et un test
+   « refusé » par route : mauvais rôle (RDC-ACCES-003), autre centre
+   (RDC-ACCES-002). Le figement au démarrage est couvert par les tests du
+   lot 5 : le démarrage n'a pas de route HTTP.
 
 ## Critères d'acceptation
 

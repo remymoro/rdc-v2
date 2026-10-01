@@ -31,12 +31,12 @@ Lot 1  Design doc collecte + vérification            (doc seulement)
   │
 Lot 2  Créer une collecte                            ← décision D-12
   │                                    Étape 3  Magasins : créer, rattacher, statuts
-  │                                      │      (hors mission, en parallèle des lots 1 et 2)
-  ├── Lot 3  Inscrire les magasins + reprise N-1 ◄──┘ (contrat « magasins actifs par centre »)
-  │
-  └── Lot 4  Domaine : ListeVerification              (parallèle au lot 3)
-        │
-      Lot 5  Use cases de la vérification              (après lots 3 et 4)
+  │                                      │      (hors mission ; bloquée par D-03 et D-04)
+  ├── Lot 2b Démarrer une collecte (rattrapage après la veille)
+  ├── Lot 3  Inscrire les magasins + reprise N-1 ◄──┘ (contrat publié « magasins actifs par centre »)
+  └── Lot 4  Domaine : ListeVerification
+        │      (2b, 3 et 4 en parallèle)
+      Lot 5  Use cases de la vérification              (après lots 2b, 3 et 4)
         │
       Lot 6  Persistance Prisma de la vérification
         │
@@ -49,9 +49,10 @@ Lot 2  Créer une collecte                            ← décision D-12
 | --- | ----------------------------------- | ---------------------------------------- | ----------------------- | --------- |
 | 1   | `lot-1-design-collecte.md`          | `docs/collecte-design`                   | —                       | 🟢 prêt   |
 | 2   | `lot-2-creer-collecte.md`           | `feat/collecte-creer`                    | lot 1 fusionné, D-12    | ⏸ bloqué |
+| 2b  | `lot-2b-demarrer-collecte.md`       | `feat/collecte-demarrer`                 | lot 2                   | ⏸ bloqué |
 | 3   | `lot-3-inscrire-magasins.md`        | `feat/collecte-inscrire-magasins`        | lot 2, étape 3          | ⏸ bloqué |
 | 4   | `lot-4-verification-domaine.md`     | `feat/collecte-verification-domaine`     | lot 2                   | ⏸ bloqué |
-| 5   | `lot-5-verification-use-cases.md`   | `feat/collecte-verification-use-cases`   | lots 3 et 4             | ⏸ bloqué |
+| 5   | `lot-5-verification-use-cases.md`   | `feat/collecte-verification-use-cases`   | lots 2b, 3, 4           | ⏸ bloqué |
 | 6   | `lot-6-verification-persistance.md` | `feat/collecte-verification-persistance` | lot 5                   | ⏸ bloqué |
 | 7   | `lot-7-verification-http.md`        | `feat/collecte-verification-http`        | lot 6, étape 4 terminée | ⏸ bloqué |
 
@@ -59,14 +60,16 @@ Lot 2  Créer une collecte                            ← décision D-12
 
 ## Décisions à prendre avant les lots concernés
 
-| Décision | Question                                                             | Bloque | Proposition                               |
-| -------- | -------------------------------------------------------------------- | ------ | ----------------------------------------- |
-| D-12     | Fuseau de l'année d'une collecte (RDC-COLLECTE-022)                  | lot 2  | Année civile `Europe/Paris`               |
-| V-1      | « Avis » = commentaire global du centre à la transmission ?          | lot 4  | Oui, facultatif                           |
-| V-2      | Transmettre avec des magasins encore « à contacter » ?               | lot 4  | Oui, signalés au siège comme non vérifiés |
-| V-3      | Le siège voit-il l'avancement avant transmission ?                   | lot 5  | Oui, en lecture seule                     |
-| V-4      | Une liste non transmise bloque-t-elle le démarrage ?                 | lot 4  | Non, avertissement seulement              |
-| Client   | Le responsable de centre saisit les réponses dans RDC (COLLECTE-014) | lot 7  | À présenter avant la mise en service      |
+| Décision | Question                                                                        | Bloque              | Proposition                                                                   |
+| -------- | ------------------------------------------------------------------------------- | ------------------- | ----------------------------------------------------------------------------- |
+| D-12     | Fuseau de l'année d'une collecte (RDC-COLLECTE-022)                             | lot 2               | Année civile `Europe/Paris`                                                   |
+| D-03     | Désactiver ou archiver un magasin engagé dans une collecte active (RDC-REF-006) | étape 3, donc lot 3 | Reporter la règle à l'étape 5, comme RDC-REF-004 pour le centre               |
+| D-04     | Enseigne : nom du magasin ou donnée à part (RDC-REF-009)                        | étape 3, donc lot 3 | Garder la convention v1 ; un champ `enseigne` s'ajoutera sans casse si besoin |
+| V-1      | « Avis » = commentaire global du centre à la transmission ?                     | lot 4               | Oui, facultatif                                                               |
+| V-2      | Transmettre avec des magasins encore « à contacter » ?                          | lot 4               | Oui, signalés au siège comme non vérifiés                                     |
+| V-3      | Le siège voit-il l'avancement avant transmission ?                              | lot 5               | Oui, en lecture seule                                                         |
+| V-4      | Une liste non transmise bloque-t-elle le démarrage ?                            | lot 4               | Non, avertissement seulement                                                  |
+| Client   | Le responsable de centre saisit les réponses dans RDC (COLLECTE-014)            | lot 7               | À présenter avant la mise en service                                          |
 
 V-1 à V-4 sont les choix par défaut inscrits dans COLLECTE-016 à 020 : une
 réponse différente modifie la règle avant le lot, pas pendant.

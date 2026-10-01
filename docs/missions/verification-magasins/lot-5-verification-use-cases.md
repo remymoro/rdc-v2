@@ -1,7 +1,7 @@
 # Lot 5 — Use cases de la vérification
 
 - **Branche :** `feat/collecte-verification-use-cases`
-- **Prérequis :** lots 3 et 4 fusionnés ; V-3 confirmée
+- **Prérequis :** lots 2b, 3 et 4 fusionnés ; V-3 confirmée
 
 ## Ordre de mission (à coller dans Codex)
 
@@ -28,14 +28,15 @@ l'étape 4.
 1. `OuvrirVerificationUseCase` : ouvre la vérification et crée les listes
    préremplies (contrat referentiel du lot 3 + participants de la collecte
    précédente), dans une seule unité de travail (RDC-COLLECTE-014).
-2. `RepondreMagasinUseCase` : responsable de son centre seulement, ou admin
-   (RDC-COLLECTE-015, RDC-ACCES-002).
+2. `RepondreMagasinUseCase` : responsable du centre de la liste seulement,
+   l'admin ne saisit pas de réponse (RDC-COLLECTE-015, RDC-ACCES-002).
 3. `TransmettreListeUseCase` (RDC-COLLECTE-020) et `RenvoyerListeUseCase`
    (admin seulement, RDC-COLLECTE-021).
 4. `InscrireEnLotUseCase` : liste TRANSMISE uniquement, sans doublon, centre
    gestionnaire = centre de la liste (RDC-COLLECTE-017).
-5. `FermerVerificationUseCase`, et figement des listes au démarrage
-   (RDC-COLLECTE-018).
+5. `FermerVerificationUseCase`, et figement des listes quand
+   `DemarrerCollecteUseCase` (lot 2b) démarre la collecte, dans la même unité
+   de travail (RDC-COLLECTE-018).
 6. Lectures : avancement de toutes les listes (admin), liste de son centre
    (responsable) (RDC-COLLECTE-016).
 7. Avertissement avant démarrage : listes non transmises, magasins « à
