@@ -131,9 +131,23 @@ L'admin choisit explicitement le magasin. Le use case recharge son état par le
 port consommateur, exige magasin ACTIF et centre ACTIF, détermine la liste de
 son centre de rattachement, calcule l'indicateur de collecte précédente puis
 appelle `liste.ajouterMagasin`. Aucun `centreId` fourni par le client ne peut
-contredire ce rattachement. Un doublon est sans effet. Il n'y a pas
-d'abonnement à un événement : RDC-COLLECTE-014 dit que l'admin « peut ajouter »
-et ADR-0003 R13 interdit un événement sans consommateur nécessaire.
+contredire ce rattachement. Un doublon dans la même liste est sans effet. Il
+n'y a pas d'abonnement à un événement : RDC-COLLECTE-014 dit que l'admin « peut
+ajouter » et ADR-0003 R13 interdit un événement sans consommateur nécessaire.
+
+Un magasin n'a qu'une réponse par collecte, toutes listes confondues. Si le
+magasin figure déjà dans la liste d'un autre centre, typiquement après un
+transfert de rattachement (`transfererVers`) survenu depuis l'ouverture, l'ajout
+est refusé avec `MAGASIN_DEJA_DANS_UNE_LISTE` : RDC-COLLECTE-014 ne prévoit
+l'ajout que d'un magasin créé ou réactivé depuis l'ouverture. Le magasin reste
+dans sa liste d'origine, dont le centre recueille la réponse ; s'il est inscrit
+en lot, l'admin peut ensuite réassigner son centre gestionnaire
+(RDC-COLLECTE-004). Le use case vérifie l'absence du magasin dans les autres
+listes de la collecte, et la contrainte unique (`collecteId`, `magasinId`) de
+`ReponseVerificationMagasin` reste le dernier rempart contre deux ajouts
+concurrents ; sa violation est traduite par l'adapter dans la même erreur
+(TENETS-ADAPTER-006). Le déplacement automatique de la réponse vers la nouvelle
+liste n'est pas retenu (hypothèse V-5).
 
 ### Inscription en lot
 
@@ -294,12 +308,14 @@ model ListeVerification {
   renvois       RenvoiListeVerification[]
 
   @@unique([collecteId, centreId])
+  @@unique([id, collecteId])
   @@index([collecteId, statut])
   @@index([centreId])
 }
 
 model ReponseVerificationMagasin {
   listeId                         String
+  collecteId                      String
   magasinId                       String
   reponse                         ReponseMagasin @default(A_CONTACTER)
   aParticipeCollectePrecedente    Boolean
@@ -309,10 +325,11 @@ model ReponseVerificationMagasin {
   createdAt                       DateTime        @default(now())
   updatedAt                       DateTime        @updatedAt
 
-  liste   ListeVerification @relation(fields: [listeId], references: [id], onDelete: Cascade)
+  liste   ListeVerification @relation(fields: [listeId, collecteId], references: [id, collecteId], onDelete: Cascade)
   magasin Magasin           @relation(fields: [magasinId], references: [id], onDelete: Restrict)
 
   @@id([listeId, magasinId])
+  @@unique([collecteId, magasinId])
   @@index([magasinId])
   @@index([listeId, reponse])
 }
@@ -359,8 +376,10 @@ enum ReponseMagasin {
 Deux migrations additives et séquentielles réalisent ce schéma. Le lot 2 ajoute
 `Collecte.version`, `Collecte.etatVerification` et l'enum `EtatVerification` en
 même temps que le repository Prisma et `POST /api/collectes`. Le lot 6 ajoute
-les quatre tables de vérification, les enums `StatutListeVerification` et
-`ReponseMagasin`, les clés étrangères, index et contraintes d'unicité. Aucune
+les quatre tables de vérification (dont `collecteId` recopié dans chaque
+réponse, garanti cohérent avec sa liste par la clé étrangère composite, pour
+l'unicité d'une réponse par magasin et par collecte), les enums
+`StatutListeVerification` et `ReponseMagasin`, les clés étrangères, index et contraintes d'unicité. Aucune
 migration ne supprime, ne renomme ni ne réinterprète une donnée v1. Les
 back-relations ajoutées à `Centre` et `Magasin` ne créent pas de colonne
 supplémentaire dans leurs tables.
@@ -415,6 +434,7 @@ R6). Les codes v1 sont conservés lorsqu'ils existent.
 | `LISTE_VERIFICATION_NOT_FOUND`, `MAGASIN_HORS_LISTE`                                                                  |  404 | liste ou réponse absente                           |
 | `REPONSE_MAGASIN_INVALIDE`, `RAISON_RENVOI_INVALIDE`                                                                  |  400 | valeur ou raison invalide                          |
 | `LISTE_DEJA_TRANSMISE`, `LISTE_NON_TRANSMISE`                                                                         |  409 | transition de liste invalide                       |
+| `MAGASIN_DEJA_DANS_UNE_LISTE`                                                                                         |  409 | magasin déjà dans la liste d'un autre centre       |
 | `COLLECTE_CONCURRENT_UPDATE`, `LISTE_VERIFICATION_CONCURRENT_UPDATE`                                                  |  409 | version optimiste périmée                          |
 | `FORBIDDEN`                                                                                                           |  403 | rôle ou centre du jeton non autorisé               |
 
@@ -475,7 +495,8 @@ lot 2 livre la première tranche verticale complète et sa migration, puis le lo
 | V-2      | A_CONTACTER autorisé à la transmission      | hypothèse actuelle conservée par RDC-COLLECTE-020                                                  |
 | V-3      | visibilité admin avant transmission         | hypothèse actuelle conservée par RDC-COLLECTE-016                                                  |
 | V-4      | liste incomplète non bloquante              | hypothèse actuelle conservée par RDC-COLLECTE-018                                                  |
+| V-5      | magasin transféré pendant la vérification   | hypothèse : reste dans sa liste d'origine, ajout ailleurs refusé ; à confirmer (RDC-COLLECTE-014)  |
 | Client   | le responsable saisit les réponses dans RDC | à présenter avant le lot 7, sans remettre en cause le domaine tant que COLLECTE-014 reste la règle |
 
-Toute réponse différente sur V-1 à V-4 modifie d'abord la règle métier puis ce
+Toute réponse différente sur V-1 à V-5 modifie d'abord la règle métier puis ce
 design. Aucune règle marquée ⚠️ n'est tranchée par ce document.
