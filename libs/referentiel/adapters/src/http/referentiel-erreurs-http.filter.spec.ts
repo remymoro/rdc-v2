@@ -1,4 +1,5 @@
-import type { ArgumentsHost } from '@nestjs/common';
+import type { ArgumentsHost, Type } from '@nestjs/common';
+import { FILTER_CATCH_EXCEPTIONS } from '@nestjs/common/constants';
 import {
   CentreDejaExistant,
   CentreIntrouvable,
@@ -22,6 +23,7 @@ import {
   VilleTropLongue,
   VilleVide,
 } from '@rdc/referentiel-domain';
+import { CentrePersisteInvalide } from '../prisma/centre-persiste-invalide';
 import { ReferentielErreursHttpFilter } from './referentiel-erreurs-http.filter';
 
 function hoteHttp() {
@@ -118,5 +120,20 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
         message: erreur.message,
       }),
     );
+  });
+
+  // Donnée corrompue en base : pas une erreur de saisie. Le filtre global la
+  // journalise et répond 500 INTERNAL_ERROR (TENETS-VALUE-003, ERROR-007).
+  it('ne capture pas CentrePersisteInvalide, même par sa cause de validation', () => {
+    const typesCaptures: Type<Error>[] = Reflect.getMetadata(
+      FILTER_CATCH_EXCEPTIONS,
+      ReferentielErreursHttpFilter,
+    );
+    const erreur = new CentrePersisteInvalide(unCentreId.valeur, {
+      cause: new TelephoneInvalide(),
+    });
+
+    expect(typesCaptures.length).toBeGreaterThan(0);
+    expect(typesCaptures.some((type) => erreur instanceof type)).toBe(false);
   });
 });

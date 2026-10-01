@@ -1,5 +1,11 @@
-import { Centre, StatutCentre } from '@rdc/referentiel-domain';
+import {
+  AdresseAbreviationInterdite,
+  Centre,
+  StatutCentre,
+  TelephoneInvalide,
+} from '@rdc/referentiel-domain';
 import type { Prisma } from '@rdc/shared-kernel-adapters';
+import { CentrePersisteInvalide } from './centre-persiste-invalide';
 import { versCentre, versLigneCentre } from './centre.mapper';
 
 // Filet local du mapper : la suite de contrat Prisma demande PostgreSQL.
@@ -48,4 +54,35 @@ describe('mapper Centre ↔ ligne Prisma', () => {
     expect(centre.telephone).toBeUndefined();
     expect(centre.email).toBeUndefined();
   });
+
+  // Lignes v1 non reprises (ADR-0008) : échec explicite de l'adapter, pas une
+  // erreur de saisie (TENETS-VALUE-003, ERROR-005).
+  it.each([
+    ['un téléphone en 08', { telephone: '0812345678' }, TelephoneInvalide],
+    [
+      'une adresse abrégée',
+      { adresse: '12 av Jean Jaurès' },
+      AdresseAbreviationInterdite,
+    ],
+  ] as const)(
+    'refuse une ligne avec %s par CentrePersisteInvalide en gardant la cause',
+    (_cas, surcharges, causeAttendue) => {
+      const ligne = uneLigne(surcharges);
+
+      let erreur: unknown;
+      try {
+        versCentre(ligne);
+      } catch (e) {
+        erreur = e;
+      }
+
+      expect(erreur).toBeInstanceOf(CentrePersisteInvalide);
+      const echec = erreur as CentrePersisteInvalide;
+      expect(echec.idLigne).toBe(ligne.id);
+      expect(echec.code).toBe('CENTRE_PERSISTED_INVALID');
+      expect(echec.cause).toBeInstanceOf(causeAttendue);
+      expect(echec.message).not.toContain(ligne.adresse);
+      expect(echec.message).not.toContain(ligne.telephone);
+    },
+  );
 });
