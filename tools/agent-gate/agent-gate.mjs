@@ -19,11 +19,11 @@ export function verifierPolitiqueDepot({
 
   if (branche === 'main') {
     erreurs.push(
-      'La branche protegee main ne peut pas recevoir de travail direct.',
+      'La branche protégée main ne peut pas recevoir de travail direct.',
     );
   } else if (!CONVENTION_BRANCHE.test(branche)) {
     erreurs.push(
-      `Le nom de branche « ${branche} » ne respecte pas type/contexte-fonctionnalite.`,
+      `Le nom de branche « ${branche} » ne respecte pas type/contexte-fonctionnalité.`,
     );
   }
 
@@ -42,13 +42,13 @@ export function verifierPolitiqueDepot({
   );
   if (documentationNonVersionnee.length > 0) {
     erreurs.push(
-      `De la documentation agent est non versionnee : ${documentationNonVersionnee.join(', ')}.`,
+      `De la documentation agent est non versionnée : ${documentationNonVersionnee.join(', ')}.`,
     );
   }
 
   if (fichiersSauvegarde.length > 0) {
     erreurs.push(
-      `Un fichier de sauvegarde parasite est present : ${fichiersSauvegarde.join(', ')}.`,
+      `Un fichier de sauvegarde parasite est présent : ${fichiersSauvegarde.join(', ')}.`,
     );
   }
 
@@ -68,7 +68,7 @@ export function construireEtapes({ complet }) {
         commande: ['pnpm', 'prisma', 'migrate', 'deploy'],
       },
       {
-        nom: "Tests d'integration",
+        nom: "Tests d'intégration",
         commande: ['pnpm', 'nx', 'run-many', '-t', 'test-integration'],
       },
       { nom: 'Tests E2E HTTP', commande: ['pnpm', 'e2e'] },

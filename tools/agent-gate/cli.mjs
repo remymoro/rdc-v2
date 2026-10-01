@@ -14,8 +14,8 @@ const argumentsCli = new Set(process.argv.slice(2));
 if (argumentsCli.has('--help')) {
   console.log(`Usage: pnpm agent:gate [-- --full | --policy-only]
 
-  --full         ajoute migrations, tests d'integration et E2E (PostgreSQL requis)
-  --policy-only  ne lance que les controles rapides de politique du depot`);
+  --full         ajoute migrations, tests d'intégration et E2E (PostgreSQL requis)
+  --policy-only  ne lance que les contrôles rapides de politique du dépôt`);
   process.exit(0);
 }
 
@@ -31,7 +31,7 @@ const sortieGit = (...argumentsGit) => {
   const resultat = executer(['git', ...argumentsGit]);
   if (resultat.status !== 0) {
     throw new Error(
-      resultat.stderr.trim() || 'Impossible de lire le depot Git.',
+      resultat.stderr.trim() || 'Impossible de lire le dépôt Git.',
     );
   }
   return resultat.stdout.trim();
@@ -40,7 +40,7 @@ const sortieGit = (...argumentsGit) => {
 const branche =
   process.env.GITHUB_HEAD_REF ||
   sortieGit('branch', '--show-current') ||
-  'HEAD-detachee';
+  'HEAD-détachée';
 const fichiersNonSuivis = sortieGit(
   'ls-files',
   '--others',
@@ -69,11 +69,11 @@ const erreurs = verifierPolitiqueDepot({
 
 console.log(`\nAgent Gate — branche ${branche}`);
 if (erreurs.length > 0) {
-  console.error('\nFAIL — politique du depot');
+  console.error('\nFAIL — politique du dépôt');
   for (const erreur of erreurs) console.error(`  - ${erreur}`);
   process.exit(1);
 }
-console.log('PASS — politique du depot');
+console.log('PASS — politique du dépôt');
 
 if (!argumentsCli.has('--policy-only')) {
   for (const etape of construireEtapes({
@@ -89,9 +89,9 @@ if (!argumentsCli.has('--policy-only')) {
 }
 
 console.log(`
-PASS — controles automatises
+PASS — contrôles automatisés
 
 Revue humaine encore requise :
   - confirmer le cycle TDD rouge → vert → nettoyage ;
-  - citer les regles TENETS-XXX-NNN et RDC-XXX-NNN concernees ;
-  - mettre a jour la roadmap, le glossaire et les ADR si necessaire.`);
+  - citer les règles TENETS-XXX-NNN et RDC-XXX-NNN concernées ;
+  - mettre à jour la roadmap, le glossaire et les ADR si nécessaire.`);

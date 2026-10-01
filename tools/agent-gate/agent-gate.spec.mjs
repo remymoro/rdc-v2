@@ -21,14 +21,26 @@ describe('verifierPolitiqueDepot', () => {
     fichiersSauvegarde: [],
   };
 
-  it('accepte une branche de travail et une documentation versionnee', () => {
+  it('accepte une branche de travail et une documentation versionnée', () => {
     assert.deepEqual(verifierPolitiqueDepot(etatValide), []);
+  });
+
+  it('accepte tous les types de branche définis par ADR-0010', () => {
+    for (const type of ['feat', 'fix', 'docs', 'chore', 'refactor', 'test']) {
+      assert.deepEqual(
+        verifierPolitiqueDepot({
+          ...etatValide,
+          branche: `${type}/referentiel-cycle-vie`,
+        }),
+        [],
+      );
+    }
   });
 
   it('refuse main et les noms de branche hors convention', () => {
     assert.match(
       verifierPolitiqueDepot({ ...etatValide, branche: 'main' })[0],
-      /branche protegee main/,
+      /branche protégée main/,
     );
     assert.match(
       verifierPolitiqueDepot({ ...etatValide, branche: 'ma-feature' })[0],
@@ -36,7 +48,7 @@ describe('verifierPolitiqueDepot', () => {
     );
   });
 
-  it('refuse une documentation agent absente ou non versionnee', () => {
+  it('refuse une documentation agent absente ou non versionnée', () => {
     const sansGlossaire = etatValide.fichiersPresents.filter(
       (fichier) => fichier !== 'docs/domaine/glossaire.md',
     );
@@ -48,7 +60,7 @@ describe('verifierPolitiqueDepot', () => {
     });
 
     assert.ok(erreurs.some((erreur) => erreur.includes('glossaire.md')));
-    assert.ok(erreurs.some((erreur) => erreur.includes('non versionne')));
+    assert.ok(erreurs.some((erreur) => erreur.includes('non versionnée')));
   });
 
   it('refuse les fichiers de sauvegarde parasites', () => {
@@ -62,21 +74,21 @@ describe('verifierPolitiqueDepot', () => {
 });
 
 describe('construireEtapes', () => {
-  it('execute les controles rapides puis la qualite par defaut', () => {
+  it('exécute les contrôles rapides puis la qualité par défaut', () => {
     assert.deepEqual(construireEtapes({ complet: false }), [
       { nom: 'Formatage', commande: ['pnpm', 'nx', 'format:check'] },
       { nom: 'Lint, tests unitaires et build', commande: ['pnpm', 'verify'] },
     ]);
   });
 
-  it('ajoute migrations, integration et E2E en mode complet', () => {
+  it('ajoute migrations, intégration et E2E en mode complet', () => {
     assert.deepEqual(
       construireEtapes({ complet: true }).map((etape) => etape.nom),
       [
         'Formatage',
         'Lint, tests unitaires et build',
         'Migrations Prisma',
-        "Tests d'integration",
+        "Tests d'intégration",
         'Tests E2E HTTP',
       ],
     );
@@ -84,7 +96,7 @@ describe('construireEtapes', () => {
 });
 
 describe('construireEnvironnement', () => {
-  it('desactive les sockets Nx pour rester compatible avec les agents sandboxes', () => {
+  it('désactive les sockets Nx pour rester compatible avec les agents sandboxés', () => {
     assert.deepEqual(construireEnvironnement({ CI: 'true' }), {
       CI: 'true',
       NX_DAEMON: 'false',

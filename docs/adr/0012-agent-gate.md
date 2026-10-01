@@ -20,7 +20,8 @@ concernées.
    modifie implicitement l'infrastructure locale.
 3. La politique refuse le travail direct sur `main`, un nom de branche hors
    convention, la documentation agent essentielle absente ou non versionnée et
-   les fichiers de sauvegarde parasites.
+   les fichiers de sauvegarde parasites. Les types acceptés sont ceux de
+   l'ADR-0010 : `feat`, `fix`, `docs`, `chore`, `refactor` et `test`.
 4. Le verdict automatisé ne prétend pas prouver la chronologie TDD ni la
    pertinence d'une revue. Le gate rappelle donc les contrôles humains : cycle
    rouge-vert-nettoyage, règles `TENETS-XXX-NNN` et `RDC-XXX-NNN`, documentation
