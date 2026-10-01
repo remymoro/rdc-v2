@@ -26,17 +26,17 @@
 
 ## Étapes
 
-| Étape | Contenu                                                            | État       |
-| ----- | ------------------------------------------------------------------ | ---------- |
-| 0     | Fondations : Nx, lint d'architecture, CI, règles Tenets, ADR       | ✅ Terminé |
-| 1     | Référentiel : créer un centre (domaine → use case → Prisma → HTTP) | ✅ Terminé |
-| 2     | Référentiel : cycle de vie d'un centre (désactiver, archiver)      | ⏳         |
-| 3     | Référentiel : magasins et produits                                 | ⏳         |
-| 4     | Identité et accès : bootstrap admin, connexion, rôles              | ⏳         |
-| 5     | Collecte : design doc, puis création et cycle de vie               | ⏳         |
-| 6     | Planification, saisie, bénévoles                                   | ⏳         |
-| 7     | Statistiques (modèle de lecture séparé)                            | ⏳         |
-| 8     | Front Angular 22 dans le workspace (Node ≥ 24.15)                  | ⏳         |
+| Étape | Contenu                                                            | État        |
+| ----- | ------------------------------------------------------------------ | ----------- |
+| 0     | Fondations : Nx, lint d'architecture, CI, règles Tenets, ADR       | ✅ Terminé  |
+| 1     | Référentiel : créer un centre (domaine → use case → Prisma → HTTP) | ✅ Terminé  |
+| 2     | Référentiel : cycle de vie d'un centre (désactiver, archiver)      | 📝 Spécifié |
+| 3     | Référentiel : magasins et produits                                 | ⏳          |
+| 4     | Identité et accès : bootstrap admin, connexion, rôles              | ⏳          |
+| 5     | Collecte : design doc, puis création et cycle de vie               | ⏳          |
+| 6     | Planification, saisie, bénévoles                                   | ⏳          |
+| 7     | Statistiques (modèle de lecture séparé)                            | ⏳          |
+| 8     | Front Angular 22 dans le workspace (Node ≥ 24.15)                  | ⏳          |
 
 L'ordre des étapes 3 à 7 reste à confirmer avec la carte des contextes.
 
@@ -59,6 +59,23 @@ Avant la mise en production (ADR-0008) : script de reprise qui calcule
 `cleDoublon` pour les centres de la v1, puis colonne rendue obligatoire. Reste à
 traduire une violation d'unicité de `cleDoublon` en `CentreDejaExistant` (créations
 simultanées, TENETS-ADAPTER-006).
+
+## Étape 2 — Cycle de vie d'un centre
+
+Spécification, conception et cycles TDD :
+[`docs/specs/referentiel-cycle-de-vie-centre.md`](specs/referentiel-cycle-de-vie-centre.md) ;
+décisions : ADR-0011 (proposé).
+
+| Élément                                                                      | État |
+| ---------------------------------------------------------------------------- | ---- |
+| Statut `INACTIF` dans le domaine (reconstitution des centres v1)             | ⏳   |
+| `Centre.desactiver()`, `reactiver()`, `archiver()` ; `CentreArchive`         | ⏳   |
+| `CentreRepository.get()`, version optimiste (`ConflitModificationCentre`)    | ⏳   |
+| `DesactiverCentreUseCase`, `ReactiverCentreUseCase`, `ArchiverCentreUseCase` | ⏳   |
+| Migration `version`, `PrismaCentreRepository` (suite de contrat)             | ⏳   |
+| `PATCH /api/centres/:id/{desactiver,reactiver,archiver}`, filtre, E2E        | ⏳   |
+
+À confirmer avant le cycle HTTP : routes et codes d'erreur de la v1.
 
 ⚠️ **Avant tout déploiement** : authentification ADMIN sur `POST /api/centres`
 (étape 4, ADR-0009). En attendant, l'API refuse de démarrer en production
