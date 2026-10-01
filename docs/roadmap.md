@@ -66,10 +66,26 @@ simultanées, TENETS-ADAPTER-006).
 
 ## Étape 2 — Cycle de vie d'un centre
 
-| Élément                                                               | État |
-| --------------------------------------------------------------------- | ---- |
-| Domaine : désactiver un centre actif et dater la modification         | ✅   |
-| Domaine : désactiver un centre déjà inactif sans modifier `modifieLe` | ✅   |
-| Domaine : réactiver un centre inactif et dater la modification        | ✅   |
-| Domaine : refuser d'activer ou désactiver un centre archivé           | ✅   |
-| HTTP : traduire `CentreArchive` en 409 et le couvrir en E2E sur PATCH | ⏭️   |
+| Élément                                                                                              | État |
+| ---------------------------------------------------------------------------------------------------- | ---- |
+| Domaine : désactiver un centre actif et dater la modification                                        | ✅   |
+| Domaine : désactiver un centre déjà inactif sans modifier `modifieLe`                                | ✅   |
+| Domaine : réactiver un centre inactif et dater la modification                                       | ✅   |
+| Domaine : refuser d'activer ou désactiver un centre archivé                                          | ✅   |
+| Domaine : réactiver un centre déjà actif sans modifier `modifieLe`                                   | ✅   |
+| Domaine : archiver un centre actif ou inactif et dater la modification                               | ✅   |
+| Domaine : archiver un centre déjà archivé sans effet (archivage définitif)                           | ✅   |
+| Use cases : désactiver, activer, archiver (`CENTRE_NOT_FOUND` si inconnu)                            | ⏳   |
+| HTTP : `PATCH /api/centres/:id/{desactiver,activer,archiver}`, 204 sans corps (contrat v1, ADR-0009) | ⏳   |
+| HTTP : traduire `CentreArchive` en 409 et le couvrir en E2E sur PATCH                                | ⏳   |
+
+Règles de la v1 reportées (décision du 2026-10-01) :
+
+- **Étape 5 (Collecte)** : refuser de désactiver, réactiver ou archiver un centre
+  gestionnaire de magasins dans une collecte `PREPARATION` ou `EN_COURS`
+  (v1 : 400 `CENTRE_STATUT_MODIFICATION_INTERDITE_COLLECTES_ACTIVES`), via un
+  contrat publié par Collecte (TENETS-CONTEXT-006).
+- **Étape 4 (Identité)** : archiver un centre désactive ses responsables (v1 :
+  même transaction). En v2, plutôt une réaction à un événement « centre archivé »
+  émis par le domaine (TENETS-EVENT-002, AGGREGATE-006) ; l'événement n'est pas
+  créé tant que personne ne le consomme.
