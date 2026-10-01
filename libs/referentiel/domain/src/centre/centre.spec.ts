@@ -130,6 +130,33 @@ describe('Centre', () => {
       });
     });
 
+    describe('archiver', () => {
+      it('passe un centre actif à ARCHIVE et date la modification', () => {
+        const centre = Centre.creer(donneesObligatoires(), maintenant);
+
+        centre.archiver(plusTard);
+
+        expect(centre.statut).toBe(StatutCentre.ARCHIVE);
+        expect(centre.modifieLe).toEqual(plusTard);
+        expect(centre.creeLe).toEqual(maintenant);
+      });
+
+      it('passe un centre inactif à ARCHIVE et date la modification', () => {
+        const desactiveLe = new Date('2026-10-20T14:00:00.000Z');
+        const centre = Centre.reconstituer({
+          ...donneesObligatoires(),
+          statut: StatutCentre.INACTIF,
+          creeLe: maintenant,
+          modifieLe: desactiveLe,
+        });
+
+        centre.archiver(plusTard);
+
+        expect(centre.statut).toBe(StatutCentre.ARCHIVE);
+        expect(centre.modifieLe).toEqual(plusTard);
+      });
+    });
+
     describe('centre archivé', () => {
       it.each([
         {

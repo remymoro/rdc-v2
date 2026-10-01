@@ -108,4 +108,10 @@ export class Centre {
     this.statutActuel = StatutCentre.ACTIF;
     this.derniereModification = maintenant;
   }
+
+  /** Retire définitivement le centre : il ne pourra plus changer d'état. */
+  archiver(maintenant: Date): void {
+    this.statutActuel = StatutCentre.ARCHIVE;
+    this.derniereModification = maintenant;
+  }
 }
