@@ -385,30 +385,32 @@ Les erreurs du domaine portent les codes stables ; l'application ajoute les
 absences et conflits de workflow ; l'adapter choisit le statut HTTP (ADR-0003
 R6). Les codes v1 sont conservés lorsqu'ils existent.
 
-| Code                                                                                                                  | HTTP | Cas                                               |
-| --------------------------------------------------------------------------------------------------------------------- | ---: | ------------------------------------------------- |
-| `COLLECTE_ID_EMPTY`, `COLLECTE_ID_INVALID`                                                                            |  400 | identifiant de collecte invalide                  |
-| `PERIODE_DATE_DEBUT_INVALIDE`, `PERIODE_DATE_DEBUT_PASSEE`, `PERIODE_DATE_FIN_INVALIDE`                               |  400 | période invalide                                  |
-| `COLLECTE_NOT_FOUND`                                                                                                  |  404 | collecte absente                                  |
-| `COLLECTE_ALREADY_EXISTS`, `COLLECTE_ANNEE_DEJA_EXISTANTE`                                                            |  409 | nom ou année déjà pris                            |
-| `COLLECTE_STATUT_INVALIDE`, `COLLECTE_MODIFICATION_INTERDITE`, `COLLECTE_REASSIGNATION_INTERDITE`                     |  409 | transition interdite                              |
-| `COLLECTE_MODIFICATION_INTERDITE_PLANIFICATION_OUVERTE`                                                               |  409 | modification pendant la planification             |
-| `COLLECTE_DEMARRAGE_AVANT_DATE_DEBUT`, `COLLECTE_AUCUN_MAGASIN_INSCRIT`                                               |  409 | collecte non démarrable                           |
-| `COLLECTE_PLANIFICATION_DEJA_OUVERTE`, `COLLECTE_PLANIFICATION_DEJA_FERMEE`, `COLLECTE_PLANIFICATION_STATUT_INVALIDE` |  409 | transition de planification invalide              |
-| `COLLECTE_CLOTURE_NON_DEMANDEE`, `COLLECTE_SAISIES_CENTRES_INCOMPLETES`                                               |  409 | clôture impossible                                |
-| `COLLECTE_STATUT_INVALIDE_POUR_CONFIRMATION`, `COLLECTE_STATUT_INVALIDE_POUR_REOUVERTURE`                             |  403 | opération de saisie non autorisée dans cet état   |
-| `MAGASIN_NOT_FOUND`, `MAGASIN_NON_INSCRIT`                                                                            |  404 | magasin absent du référentiel ou de la collecte   |
-| `MAGASIN_INACTIF`, `CENTRE_ARCHIVE`                                                                                   |  400 | référence non inscriptible selon RDC-COLLECTE-004 |
-| `MAGASIN_A_DES_SLOTS_ACTIFS`                                                                                          |  409 | retrait sans `force` impossible                   |
-| `CENTRE_NON_PARTICIPANT`                                                                                              |  403 | centre hors périmètre de la collecte              |
-| `SAISIE_CENTRE_DEJA_TERMINEE`, `SAISIE_CENTRE_DEJA_ROUVERTE`                                                          |  409 | transition de saisie déjà faite                   |
-| `SAISIE_CENTRE_RAISON_REOUVERTURE_INVALIDE`                                                                           |  400 | raison invalide, sous réserve de D-13             |
-| `VERIFICATION_DEJA_OUVERTE`, `VERIFICATION_TERMINEE`                                                                  |  409 | ouverture répétée ou modification après fermeture |
-| `LISTE_VERIFICATION_NOT_FOUND`, `MAGASIN_HORS_LISTE`                                                                  |  404 | liste ou réponse absente                          |
-| `REPONSE_MAGASIN_INVALIDE`, `RAISON_RENVOI_INVALIDE`                                                                  |  400 | valeur ou raison invalide                         |
-| `LISTE_DEJA_TRANSMISE`, `LISTE_NON_TRANSMISE`                                                                         |  409 | transition de liste invalide                      |
-| `COLLECTE_CONCURRENT_UPDATE`, `LISTE_VERIFICATION_CONCURRENT_UPDATE`                                                  |  409 | version optimiste périmée                         |
-| `FORBIDDEN`                                                                                                           |  403 | rôle ou centre du jeton non autorisé              |
+| Code                                                                                                                  | HTTP | Cas                                                |
+| --------------------------------------------------------------------------------------------------------------------- | ---: | -------------------------------------------------- |
+| `COLLECTE_ID_EMPTY`, `COLLECTE_ID_INVALID`                                                                            |  400 | identifiant de collecte invalide                   |
+| `PERIODE_DATE_DEBUT_INVALIDE`, `PERIODE_DATE_DEBUT_PASSEE`, `PERIODE_DATE_FIN_INVALIDE`                               |  400 | période invalide                                   |
+| `COLLECTE_NOT_FOUND`                                                                                                  |  404 | collecte absente                                   |
+| `COLLECTE_ALREADY_EXISTS`                                                                                             |  409 | nom déjà pris (nouveau code v2)                    |
+| `COLLECTE_ANNEE_DEJA_EXISTANTE`                                                                                       |  400 | année déjà prise (statut v1 conservé)              |
+| `COLLECTE_STATUT_INVALIDE`, `COLLECTE_MODIFICATION_INTERDITE`, `COLLECTE_REASSIGNATION_INTERDITE`                     |  400 | transition interdite (statut v1 conservé)          |
+| `COLLECTE_MODIFICATION_INTERDITE_PLANIFICATION_OUVERTE`                                                               |  400 | modification pendant la planification              |
+| `COLLECTE_DEMARRAGE_AVANT_DATE_DEBUT`, `COLLECTE_AUCUN_MAGASIN_INSCRIT`                                               |  400 | collecte non démarrable (statut v1 conservé)       |
+| `COLLECTE_PLANIFICATION_DEJA_OUVERTE`, `COLLECTE_PLANIFICATION_DEJA_FERMEE`, `COLLECTE_PLANIFICATION_STATUT_INVALIDE` |  400 | transition de planification invalide               |
+| `COLLECTE_CLOTURE_NON_DEMANDEE`, `COLLECTE_SAISIES_CENTRES_INCOMPLETES`                                               |  400 | clôture impossible                                 |
+| `COLLECTE_STATUT_INVALIDE_POUR_CONFIRMATION`, `COLLECTE_STATUT_INVALIDE_POUR_REOUVERTURE`                             |  403 | opération de saisie non autorisée dans cet état    |
+| `MAGASIN_NOT_FOUND`                                                                                                   |  404 | magasin absent du référentiel                      |
+| `MAGASIN_NON_INSCRIT`                                                                                                 |  400 | magasin absent de la collecte (statut v1 conservé) |
+| `MAGASIN_INACTIF`, `CENTRE_ARCHIVE`                                                                                   |  400 | référence non inscriptible selon RDC-COLLECTE-004  |
+| `MAGASIN_A_DES_SLOTS_ACTIFS`                                                                                          |  409 | retrait sans `force` impossible                    |
+| `CENTRE_NON_PARTICIPANT`                                                                                              |  403 | centre hors périmètre de la collecte               |
+| `SAISIE_CENTRE_DEJA_TERMINEE`, `SAISIE_CENTRE_DEJA_ROUVERTE`                                                          |  409 | transition de saisie déjà faite                    |
+| `SAISIE_CENTRE_RAISON_REOUVERTURE_INVALIDE`                                                                           |  400 | raison invalide, sous réserve de D-13              |
+| `VERIFICATION_DEJA_OUVERTE`, `VERIFICATION_TERMINEE`                                                                  |  409 | ouverture répétée ou modification après fermeture  |
+| `LISTE_VERIFICATION_NOT_FOUND`, `MAGASIN_HORS_LISTE`                                                                  |  404 | liste ou réponse absente                           |
+| `REPONSE_MAGASIN_INVALIDE`, `RAISON_RENVOI_INVALIDE`                                                                  |  400 | valeur ou raison invalide                          |
+| `LISTE_DEJA_TRANSMISE`, `LISTE_NON_TRANSMISE`                                                                         |  409 | transition de liste invalide                       |
+| `COLLECTE_CONCURRENT_UPDATE`, `LISTE_VERIFICATION_CONCURRENT_UPDATE`                                                  |  409 | version optimiste périmée                          |
+| `FORBIDDEN`                                                                                                           |  403 | rôle ou centre du jeton non autorisé               |
 
 Les erreurs inattendues restent 500 `INTERNAL_ERROR`. Les limites de longueur
 des commentaires, avis et raisons seront définies avec les value objects du
