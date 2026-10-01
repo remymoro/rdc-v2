@@ -1,6 +1,9 @@
 import { Module, Scope } from '@nestjs/common';
 import {
+  ActiverCentreUseCase,
+  ArchiverCentreUseCase,
   CreerCentreUseCase,
+  DesactiverCentreUseCase,
   GenerateurIdentifiants,
 } from '@rdc/referentiel-application';
 import { CentreRepository } from '@rdc/referentiel-domain';
@@ -45,6 +48,36 @@ import { PrismaCentreRepository } from './prisma/prisma-centre.repository';
           clock,
         ),
       inject: [CentreRepository, GenerateurIdentifiants, UnitOfWork, Clock],
+    },
+    {
+      provide: DesactiverCentreUseCase,
+      scope: Scope.REQUEST,
+      useFactory: (
+        centreRepository: CentreRepository,
+        unitOfWork: UnitOfWork,
+        clock: Clock,
+      ) => new DesactiverCentreUseCase(centreRepository, unitOfWork, clock),
+      inject: [CentreRepository, UnitOfWork, Clock],
+    },
+    {
+      provide: ActiverCentreUseCase,
+      scope: Scope.REQUEST,
+      useFactory: (
+        centreRepository: CentreRepository,
+        unitOfWork: UnitOfWork,
+        clock: Clock,
+      ) => new ActiverCentreUseCase(centreRepository, unitOfWork, clock),
+      inject: [CentreRepository, UnitOfWork, Clock],
+    },
+    {
+      provide: ArchiverCentreUseCase,
+      scope: Scope.REQUEST,
+      useFactory: (
+        centreRepository: CentreRepository,
+        unitOfWork: UnitOfWork,
+        clock: Clock,
+      ) => new ArchiverCentreUseCase(centreRepository, unitOfWork, clock),
+      inject: [CentreRepository, UnitOfWork, Clock],
     },
   ],
 })
