@@ -34,7 +34,7 @@ export class ApprouverClotureCollecteUseCase {}
 ```
 
 **Correction.** Remplacer les termes génériques par le vocabulaire métier accepté
-(voir `docs/domaine/glossaire.md` une fois écrit).
+(voir `docs/domaine/glossaire.md`).
 
 **Vérification en revue.** Comparer les noms du code avec le glossaire et les exemples métier.
 

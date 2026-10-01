@@ -12,6 +12,14 @@ reprend le métier, pas le code.
 - `docs/roadmap.md` : étapes, avancement, pyramide des tests. **Commencer par là**
   pour reprendre le travail, et le mettre à jour quand une fonctionnalité est terminée.
 
+## Métier
+
+- Carte des contextes, invariants essentiels : `docs/domaine/00-index.md`
+- Vocabulaire obligatoire : `docs/domaine/glossaire.md`
+- Avant de modifier `libs/<contexte>/**`, lire `docs/domaine/<contexte>.md`
+  (règles `RDC-<CTX>-NNN`). Une règle marquée ⚠️ n'est pas implémentée avant
+  sa décision dans `docs/domaine/a-trancher.md` (ADR-0011).
+
 ## Règles d'architecture
 
 - Carte des règles et réflexes essentiels : `docs/architecture/regles/00-index.md`
@@ -26,7 +34,8 @@ reprend le métier, pas le code.
 | Un nouveau contexte ou une nouvelle lib | `10-contextes.md`, `15-structure.md`                                                                      |
 
 - Décisions du projet : `docs/adr/` (règles R1 à R15 : ADR-0003).
-- Une revue d'architecture cite toujours l'identifiant `TENETS-XXX-NNN` de la règle.
+- Une revue d'architecture cite toujours l'identifiant `TENETS-XXX-NNN` de la règle,
+  et `RDC-XXX-NNN` pour une règle métier.
 
 ## Non négociable
 
