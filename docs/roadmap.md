@@ -80,6 +80,15 @@ et les routes `PATCH` de cycle de vie (étape 4, ADR-0009). En attendant, l'API 
 | HTTP : `CentreIntrouvable` → 404, `CentreArchive` → 409 (filtre du contexte)                         | ✅                           |
 | E2E : 204, 400 id mal formé, 404 centre inconnu, 409 centre archivé                                  | ✅ écrit, ⏳ exécution en CI |
 
+Concurrence : deux écritures simultanées sur un centre ne sont pas détectées,
+« le dernier qui écrit gagne » comme en v1 (un seul administrateur, ADR-0013) ;
+à revoir à l'étape 4 si un second rôle peut modifier un centre.
+
+Données v1 invalides : une ligne qui ne respecte plus les value objects
+(téléphone en 08, adresse abrégée…) lève `CentrePersisteInvalide` à la relecture,
+donc un 500, y compris sur un simple `PATCH`. Le script de reprise de l'ADR-0008
+doit aussi normaliser téléphones et adresses avant la mise en production.
+
 Règles de la v1 reportées (décision du 2026-10-01) :
 
 - **Étape 5 (Collecte)** : refuser de désactiver, réactiver ou archiver un centre
