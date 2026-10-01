@@ -31,8 +31,8 @@ identifiants vers les autres agrégats et contextes (TENETS-AGGREGATE-005).
   TERMINEE et ses dates de création et modification ;
 - l'ouverture de la planification et le drapeau `enAttenteClotureAdmin` ;
 - ses `ParticipationMagasin` (`magasinId`, `centreGestionnaireId`) ;
-- l'état de la vérification : FERMEE avant la première ouverture, OUVERTE, puis
-  TERMINEE après fermeture explicite ou démarrage ;
+- l'état de la vérification : NON_OUVERTE avant la première ouverture, OUVERTE,
+  puis FERMEE après fermeture explicite ou démarrage ;
 - une version technique de concurrence optimiste.
 
 La racine impose les transitions et les invariants portant sur ses membres :
@@ -111,7 +111,7 @@ unique et appellent `commit()` en dernier (TENETS-UOW-001 à 006).
 
 ### Ouvrir la vérification
 
-1. Charger `Collecte`, puis vérifier PREPARATION et vérification FERMEE.
+1. Charger `Collecte`, puis vérifier PREPARATION et vérification NON_OUVERTE.
 2. Lire par le port `CandidatsVerification` tous les magasins actifs rattachés
    aux centres actifs.
 3. Charger la dernière collecte TERMINEE par date de début et ses participations.
@@ -269,7 +269,7 @@ Les modèles et colonnes v1 restent en place, y compris `dateFinSaisie` et
 ```prisma
 model Collecte {
   // colonnes v1 inchangées
-  etatVerification EtatVerification @default(FERMEE)
+  etatVerification EtatVerification @default(NON_OUVERTE)
   version           Int              @default(0)
   listesVerification ListeVerification[]
 }
@@ -336,9 +336,9 @@ model RenvoiListeVerification {
 }
 
 enum EtatVerification {
-  FERMEE
+  NON_OUVERTE
   OUVERTE
-  TERMINEE
+  FERMEE
 }
 
 enum StatutListeVerification {
@@ -405,7 +405,7 @@ R6). Les codes v1 sont conservés lorsqu'ils existent.
 | `CENTRE_NON_PARTICIPANT`                                                                                              |  403 | centre hors périmètre de la collecte               |
 | `SAISIE_CENTRE_DEJA_TERMINEE`, `SAISIE_CENTRE_DEJA_ROUVERTE`                                                          |  409 | transition de saisie déjà faite                    |
 | `SAISIE_CENTRE_RAISON_REOUVERTURE_INVALIDE`                                                                           |  400 | raison invalide, sous réserve de D-13              |
-| `VERIFICATION_DEJA_OUVERTE`, `VERIFICATION_TERMINEE`                                                                  |  409 | ouverture répétée ou modification après fermeture  |
+| `VERIFICATION_DEJA_OUVERTE`, `VERIFICATION_FERMEE`                                                                    |  409 | ouverture répétée ou modification après fermeture  |
 | `LISTE_VERIFICATION_NOT_FOUND`, `MAGASIN_HORS_LISTE`                                                                  |  404 | liste ou réponse absente                           |
 | `REPONSE_MAGASIN_INVALIDE`, `RAISON_RENVOI_INVALIDE`                                                                  |  400 | valeur ou raison invalide                          |
 | `LISTE_DEJA_TRANSMISE`, `LISTE_NON_TRANSMISE`                                                                         |  409 | transition de liste invalide                       |
@@ -444,7 +444,7 @@ place du centre.
 
 | Lot | Contenu après design                                                                                                                                                                               | Prérequis                                             |
 | --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| 2   | Créer `collecte` domain/application, `Collecte`, période, repository en mémoire et décision D-12 ; inclure l'état FERMEE de vérification et la version.                                            | lot 1 fusionné, D-12                                  |
+| 2   | Créer `collecte` domain/application, `Collecte`, période, repository en mémoire et décision D-12 ; inclure l'état NON_OUVERTE de vérification et la version.                                       | lot 1 fusionné, D-12                                  |
 | 3   | Participations, reprise précédente, contrat publié `referentiel`, ports et adapter de traduction ; Prisma de `Collecte` peut être livré ici ou au lot 6, mais une seule migration additive finale. | lot 2, étape 3, ADR-0014 accepté                      |
 | 4   | Domaine `ListeVerification`, historique, gel, version et suites de contrat en mémoire.                                                                                                             | lot 2                                                 |
 | 2b  | Démarrer une collecte et figer atomiquement les listes ; tâche planifiée.                                                                                                                          | lots 2 et 4                                           |
