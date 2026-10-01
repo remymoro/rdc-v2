@@ -30,7 +30,7 @@ repository `Magasin`.
 ```text
 Lot 1  Design doc collecte + vérification            (doc seulement)
   │
-Lot 2  Créer une collecte                            ← décision D-12
+Lot 2  Créer une collecte                            (D-12 décidée : Europe/Paris)
   │                                    Étape 3  Magasins : créer, rattacher, statuts
   │                                      │      (hors mission, en parallèle des lots 1 et 2)
   ├── Lot 2b Démarrer une collecte (rattrapage après la veille)
@@ -49,7 +49,7 @@ Lot 2  Créer une collecte                            ← décision D-12
 | Lot | Brief                               | Branche                                  | Prérequis               | État      |
 | --- | ----------------------------------- | ---------------------------------------- | ----------------------- | --------- |
 | 1   | `lot-1-design-collecte.md`          | `docs/collecte-design`                   | —                       | 🟢 prêt   |
-| 2   | `lot-2-creer-collecte.md`           | `feat/collecte-creer`                    | lot 1 fusionné, D-12    | ⏸ bloqué |
+| 2   | `lot-2-creer-collecte.md`           | `feat/collecte-creer`                    | lot 1 fusionné          | ⏸ bloqué |
 | 2b  | `lot-2b-demarrer-collecte.md`       | `feat/collecte-demarrer`                 | lot 2                   | ⏸ bloqué |
 | 3   | `lot-3-inscrire-magasins.md`        | `feat/collecte-inscrire-magasins`        | lot 2, étape 3          | ⏸ bloqué |
 | 4   | `lot-4-verification-domaine.md`     | `feat/collecte-verification-domaine`     | lot 2                   | ⏸ bloqué |
@@ -63,7 +63,6 @@ Lot 2  Créer une collecte                            ← décision D-12
 
 | Décision | Question                                                             | Bloque | Proposition                               |
 | -------- | -------------------------------------------------------------------- | ------ | ----------------------------------------- |
-| D-12     | Fuseau de l'année d'une collecte (RDC-COLLECTE-022)                  | lot 2  | Année civile `Europe/Paris`               |
 | V-1      | « Avis » = commentaire global du centre à la transmission ?          | lot 4  | Oui, facultatif                           |
 | V-2      | Transmettre avec des magasins encore « à contacter » ?               | lot 4  | Oui, signalés au siège comme non vérifiés |
 | V-3      | Le siège voit-il l'avancement avant transmission ?                   | lot 5  | Oui, en lecture seule                     |

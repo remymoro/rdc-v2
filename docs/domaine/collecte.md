@@ -396,14 +396,15 @@ recopiées dans plusieurs use cases et un service de présentation (audit C-04).
 
 ## RDC-COLLECTE-022 — Une seule collecte par année
 
-`core` · erreur · ⚠️ fuseau de l'année à trancher (D-12)
+`core` · erreur · ⏳ à implémenter (lot 2) · D-12 décidée (ADR-0016)
 
 **Règle.** La date de début détermine l'année de la collecte. Créer ou modifier
 une collecte vers une année déjà occupée est refusé avec
 `COLLECTE_ANNEE_DEJA_EXISTANTE`. Cette unicité rend possible la comparaison
 N/N-1. La v1 n'emploie toutefois pas le même fuseau partout : le use case utilise
-`getFullYear()` et le repository construit des bornes UTC ; la v2 doit fixer une
-référence unique (D-12).
+`getFullYear()` et le repository construit des bornes UTC. **Décision D-12 :**
+la v2 prend l'année civile Europe/Paris de la date de début, avec une seule
+fonction pour l'unicité et les statistiques N/N-1 (ADR-0016).
 
 **Source v1.**
 `apps/api/src/application/use-cases/collecte/creer-collecte.usecase.ts:24-33` ;
