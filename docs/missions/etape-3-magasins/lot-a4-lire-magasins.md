@@ -22,7 +22,7 @@ commit par cycle au format feat(referentiel): …. Termine par
   `GET /api/magasins/:id`, réponse `MagasinDto` (mêmes champs et même ordre de
   tri que la v1, à vérifier dans le repository v1).
 - Lectures par des requêtes dédiées, pas par le repository d'agrégat
-  (TENETS-REPO, lecture séparée).
+  (TENETS-PORT-002).
 - En v1, un responsable ne voit que les magasins de son centre. Ce filtre
   dépend du jeton : il arrive à l'étape 4. Le noter dans la PR, ne pas le
   simuler.

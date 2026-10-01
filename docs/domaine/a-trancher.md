@@ -251,8 +251,8 @@ repository recherche entre deux bornes construites avec `Date.UTC`. Une date
 proche du changement d'année peut donc être classée différemment selon le fuseau
 du processus.
 
-**À décider.** Année civile `Europe/Paris` (usage métier) ou année UTC, appliquée
-de façon identique à la validation d'unicité et aux statistiques N/N-1.
+**Options étudiées.** Année civile `Europe/Paris` (usage métier, retenue) ou
+année UTC.
 
 **Sources v1.**
 `apps/api/src/application/use-cases/collecte/creer-collecte.usecase.ts:24-33` ;

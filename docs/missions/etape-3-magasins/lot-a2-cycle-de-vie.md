@@ -38,7 +38,10 @@ l'étape 5) : aucune vérification de collecte ici.
 
 ## Critères d'acceptation
 
-- [ ] Concurrence : « dernier qui écrit gagne », comme le centre (ADR-0013),
-      cité dans la PR.
+- [ ] Concurrence : ADR-0013 ne couvre que `Centre`. La PR ajoute un ADR
+      (statut « proposé ») qui décide la stratégie pour `Magasin`
+      (TENETS-AGGREGATE-007). Proposition : même « dernier qui écrit gagne »,
+      car seul l'administrateur du siège modifie un magasin, comme un centre.
+      L'utilisateur l'accepte avant la fusion.
 - [ ] RDC-REF-002 passe à ✅ pour le magasin.
 - [ ] `pnpm agent:gate -- --full` passe.

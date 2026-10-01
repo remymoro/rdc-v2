@@ -49,7 +49,8 @@ Le lot 3 de `verification-magasins` attend A1 et A2 (magasin et statut).
   et l'API refuse toujours de démarrer en production
   (`verifierDeploiementAutorise`, ADR-0009).
 - **Contrat publié vers `collecte`** : livré par le lot 3 de
-  `verification-magasins` (ADR-0014).
+  `verification-magasins` (ADR-0014, proposé dans la PR du lot 1,
+  branche `docs/collecte-design`, pas encore sur `main`).
 
 ## Contrat HTTP de la v1 à conserver (ADR-0009)
 

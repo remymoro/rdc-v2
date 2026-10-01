@@ -42,11 +42,19 @@ les règles RDC-… et TENETS-… appliquées et liste les cycles réalisés.
 - Le centre doit exister (`CENTRE_NOT_FOUND`, 404) et être ACTIF
   (`CENTRE_NON_ACTIF`, 409, RDC-REF-010).
 - **Doublon** : `MAGASIN_ALREADY_EXISTS` (409). La v1 vérifie le doublon par
-  centre dans le use case, mais la base impose l'unicité sur nom, ville, code
+  centre dans le use case, mais sa base impose l'unicité sur nom, ville, code
   postal et adresse **sans** le centre
-  (`../rdc/apps/api/prisma/schema.prisma`, `@@unique` de `Magasin`). C'est la
-  base qui fait foi : la clé de doublon est globale, comme `CleDoublonCentre`
-  (RDC-REF-001). Le signaler dans la PR.
+  (`../rdc/apps/api/prisma/schema.prisma`, `@@unique` de `Magasin`). La v2 garde
+  une clé **globale**, comme pour le centre (RDC-REF-001). Le signaler dans la PR.
+- **La clé normalisée est imposée par la base**, pas seulement par le
+  pré-contrôle du use case : deux créations simultanées passeraient toutes deux
+  le pré-contrôle. Même mécanisme que `Centre.cleDoublon`
+  (`prisma/migrations/20260930170000_ajouter_cle_doublon_centre`) : colonne
+  `Magasin.cleDoublon String? @unique`, migration additive, et violation
+  d'unicité Prisma (P2002) traduite en `MagasinDejaExistant`
+  (TENETS-ADAPTER-006). Le calcul de la clé pour les magasins repris de la v1
+  rejoint le script de reprise prévu par ADR-0008 pour les centres ; le noter
+  dans la feuille de route.
 - Pas de champ `enseigne` (D-04).
 
 ## Cycles TDD (dans l'ordre)
@@ -63,13 +71,17 @@ les règles RDC-… et TENETS-… appliquées et liste les cycles réalisés.
 7. `CreerMagasinUseCase` : centre introuvable, centre non actif, doublon,
    succès ; tout dans l'unité de travail. Le centre est lu par le
    `CentreRepository` existant (même contexte, pas de contrat publié).
-8. `PrismaMagasinRepository` sur la table `Magasin` v1 : passe la même suite
-   de contrat (ADR-0003 R10), test d'intégration.
-9. `POST /api/centres/:centreId/magasins` : DTO de forme seulement
-   (TENETS-VALIDATE-002), chaîne vide = champ absent pour téléphone et email
-   (ADR-0007), réponse `MagasinDto` v1 avec `images: []`, filtre d'erreurs du
-   contexte.
-10. E2E : 201, 400 (requête mal formée, règle métier), 404 centre inconnu,
+8. Migration additive `Magasin.cleDoublon` (unique, facultative pour les
+   lignes v1).
+9. `PrismaMagasinRepository` sur la table `Magasin` : passe la même suite
+   de contrat (ADR-0003 R10), test d'intégration, dont deux créations
+   simultanées de même clé : une seule réussit, l'autre lève
+   `MagasinDejaExistant` (P2002 traduite).
+10. `POST /api/centres/:centreId/magasins` : DTO de forme seulement
+    (TENETS-VALIDATE-002), chaîne vide = champ absent pour téléphone et email
+    (ADR-0007), réponse `MagasinDto` v1 avec `images: []`, filtre d'erreurs du
+    contexte.
+11. E2E : 201, 400 (requête mal formée, règle métier), 404 centre inconnu,
     409 centre inactif, 409 doublon.
 
 ## Hors périmètre

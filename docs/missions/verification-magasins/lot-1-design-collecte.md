@@ -86,8 +86,8 @@ contrats inter-contextes. Les lots 2 à 7 seront ajustés d'après ce document.
 
 - Planification, saisie des poids, statistiques : seulement les contrats que
   `collecte` leur publie.
-- Toute règle ⚠️ (D-07, D-12, D-13) : la signaler comme hypothèse ouverte, ne
-  pas la trancher.
+- Toute règle ⚠️ (D-07, D-13) : la signaler comme hypothèse ouverte, ne pas
+  la trancher. D-12 est décidée (année civile Europe/Paris) : l'appliquer.
 
 ## Critères d'acceptation
 

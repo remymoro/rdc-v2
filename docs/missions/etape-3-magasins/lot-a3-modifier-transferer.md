@@ -31,7 +31,7 @@ un commit par cycle au format feat(referentiel): …. Termine par
 - Une modification identique ne change pas `modifieLe`.
 - La v1 clone le magasin et restaure l'état en cas d'erreur
   (`clone`, `copierEtatDepuis`) : **ne pas reprendre ce mécanisme**. Valider
-  toutes les entrées avant de muter l'agrégat (TENETS-AGGREGATE-001).
+  toutes les entrées avant de muter l'agrégat (TENETS-VALIDATE-001).
 
 ## Cycles TDD
 
