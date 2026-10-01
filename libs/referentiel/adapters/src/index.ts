@@ -3,6 +3,11 @@ export {
   CreerCentreRequete,
   versCreerCentreCommande,
 } from './http/creer-centre.requete';
+export {
+  versActiverCentreCommande,
+  versArchiverCentreCommande,
+  versDesactiverCentreCommande,
+} from './http/cycle-de-vie-centre.requete';
 export { GenerateurIdentifiantsUuid } from './identifiants/generateur-identifiants-uuid';
 export { PrismaCentreRepository } from './prisma/prisma-centre.repository';
 export { ReferentielErreursHttpFilter } from './http/referentiel-erreurs-http.filter';
