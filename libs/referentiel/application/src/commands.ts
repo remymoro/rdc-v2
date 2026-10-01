@@ -15,3 +15,8 @@ export interface DesactiverCentreCommande {
 export interface ActiverCentreCommande {
   readonly centreId: CentreId;
 }
+
+/** Archivage définitif d'un centre. */
+export interface ArchiverCentreCommande {
+  readonly centreId: CentreId;
+}
