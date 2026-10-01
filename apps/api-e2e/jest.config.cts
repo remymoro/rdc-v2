@@ -5,6 +5,9 @@ module.exports = {
   globalTeardown: '<rootDir>/src/support/global-teardown.ts',
   setupFiles: ['<rootDir>/src/support/test-setup.ts'],
   testEnvironment: 'node',
+  // Une seule base rdc_test partagée : chaque fichier vide les tables, donc les
+  // fichiers ne doivent pas s'exécuter en parallèle.
+  maxWorkers: 1,
   transform: {
     '^.+\\.[tj]s$': [
       'ts-jest',

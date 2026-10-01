@@ -1,15 +1,23 @@
 import {
   Centre,
+  CentreId,
   CentreRepository,
   CleDoublonCentre,
 } from '@rdc/referentiel-domain';
 import { PrismaTransaction } from '@rdc/shared-kernel-adapters';
-import { versLigneCentre } from './centre.mapper';
+import { versCentre, versLigneCentre } from './centre.mapper';
 
 /** Adapter secondaire : implémente le port avec Prisma (TENETS-ADAPTER-004). */
 export class PrismaCentreRepository extends CentreRepository {
   constructor(private readonly transaction: PrismaTransaction) {
     super();
+  }
+
+  async get(id: CentreId): Promise<Centre | null> {
+    const ligne = await this.transaction.client.centre.findUnique({
+      where: { id: id.valeur },
+    });
+    return ligne === null ? null : versCentre(ligne);
   }
 
   async save(centre: Centre): Promise<void> {

@@ -19,7 +19,7 @@ vérifiée par un outil vaut mieux qu'une règle écrite.
 | **R1** | Un contexte métier n'importe que lui-même et le `shared-kernel`                                                                                                       | `@nx/enforce-module-boundaries`, tags `context:*`                 |
 | **R2** | `domain` et `application` n'importent ni NestJS, ni Prisma, ni Express, ni rxjs… Les ports sont des `abstract class` (jeton d'injection), jamais des jetons en chaîne | `bannedExternalImports` + tags `layer:*`                          |
 | **R3** | `domain` et `application` ne lisent jamais l'horloge : `now: Date` en paramètre ou port `Clock`                                                                       | `no-restricted-syntax` (`new Date()` sans argument, `Date.now()`) |
-| **R4** | La CI exécute formatage, lint, tests et build des projets touchés, plus `pnpm audit` (bloquant dès `high`)                                                            | `.github/workflows/ci.yml`                                        |
+| **R4** | La CI exécute formatage, lint, vérification des types (`typecheck`), tests et build des projets touchés, plus `pnpm audit` (bloquant dès `high`)                      | `.github/workflows/ci.yml`                                        |
 | **R5** | Aucun fichier de plus de 500 lignes utiles                                                                                                                            | `max-lines`                                                       |
 
 ### Portées par le TDD et la relecture

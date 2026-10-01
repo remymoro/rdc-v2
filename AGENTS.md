@@ -43,7 +43,7 @@ reprend le métier, pas le code.
 ```bash
 pnpm install
 docker compose up -d postgres && pnpm prisma generate && pnpm prisma migrate deploy
-pnpm verify                      # lint + test + build de tout le workspace
+pnpm verify                      # lint + typecheck + test + build de tout le workspace
 pnpm nx test referentiel-domain  # un seul projet
 pnpm nx affected -t lint test build
 pnpm nx affected -t test-integration   # PostgreSQL requis

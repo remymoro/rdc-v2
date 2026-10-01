@@ -61,5 +61,41 @@ traduire une violation d'unicité de `cleDoublon` en `CentreDejaExistant` (créa
 simultanées, TENETS-ADAPTER-006).
 
 ⚠️ **Avant tout déploiement** : authentification ADMIN sur `POST /api/centres`
-(étape 4, ADR-0009). En attendant, l'API refuse de démarrer en production
+et les routes `PATCH` de cycle de vie (étape 4, ADR-0009). En attendant, l'API refuse de démarrer en production
 (`verifierDeploiementAutorise`) : à supprimer à l'étape 4.
+
+## Étape 2 — Cycle de vie d'un centre
+
+| Élément                                                                                              | État |
+| ---------------------------------------------------------------------------------------------------- | ---- |
+| Domaine : désactiver un centre actif et dater la modification                                        | ✅   |
+| Domaine : désactiver un centre déjà inactif sans modifier `modifieLe`                                | ✅   |
+| Domaine : réactiver un centre inactif et dater la modification                                       | ✅   |
+| Domaine : refuser d'activer ou désactiver un centre archivé                                          | ✅   |
+| Domaine : réactiver un centre déjà actif sans modifier `modifieLe`                                   | ✅   |
+| Domaine : archiver un centre actif ou inactif et dater la modification                               | ✅   |
+| Domaine : archiver un centre déjà archivé sans effet (archivage définitif)                           | ✅   |
+| Use cases : désactiver, activer, archiver (`CENTRE_NOT_FOUND` si inconnu)                            | ✅   |
+| HTTP : `PATCH /api/centres/:id/{desactiver,activer,archiver}`, 204 sans corps (contrat v1, ADR-0009) | ✅   |
+| HTTP : `CentreIntrouvable` → 404, `CentreArchive` → 409 (filtre du contexte)                         | ✅   |
+| E2E : 204, 400 id mal formé, 404 centre inconnu, 409 centre archivé                                  | ✅   |
+
+Concurrence : deux écritures simultanées sur un centre ne sont pas détectées,
+« le dernier qui écrit gagne » comme en v1 (un seul administrateur, ADR-0013) ;
+à revoir à l'étape 4 si un second rôle peut modifier un centre.
+
+Données v1 invalides : une ligne qui ne respecte plus les value objects
+(téléphone en 08, adresse abrégée…) lève `CentrePersisteInvalide` à la relecture,
+donc un 500, y compris sur un simple `PATCH`. Le script de reprise de l'ADR-0008
+doit aussi normaliser téléphones et adresses avant la mise en production.
+
+Règles de la v1 reportées (décision du 2026-10-01) :
+
+- **Étape 5 (Collecte)** : refuser de désactiver, réactiver ou archiver un centre
+  gestionnaire de magasins dans une collecte `PREPARATION` ou `EN_COURS`
+  (v1 : 400 `CENTRE_STATUT_MODIFICATION_INTERDITE_COLLECTES_ACTIVES`), via un
+  contrat publié par Collecte (TENETS-CONTEXT-006).
+- **Étape 4 (Identité)** : archiver un centre désactive ses responsables (v1 :
+  même transaction). En v2, plutôt une réaction à un événement « centre archivé »
+  émis par le domaine (TENETS-EVENT-002, AGGREGATE-006) ; l'événement n'est pas
+  créé tant que personne ne le consomme.

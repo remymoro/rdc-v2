@@ -12,7 +12,7 @@
     "test": "nx run-many -t test",
     "build": "nx run-many -t build",
     "format:check": "nx format:check",
-    "verify": "nx run-many -t lint test build",
+    "verify": "nx run-many -t lint typecheck test build",
     "e2e": "DATABASE_URL=postgresql://rdc:rdc@localhost:5432/rdc_test nx e2e api-e2e"
   },
   "dependencies": {

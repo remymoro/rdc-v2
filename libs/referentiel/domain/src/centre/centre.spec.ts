@@ -5,6 +5,7 @@ import { Nom } from '../commun/nom';
 import { Telephone } from '../commun/telephone';
 import { Ville } from '../commun/ville';
 import { Centre } from './centre';
+import { CentreArchive } from './centre.errors';
 import { CentreId } from './centre-id';
 import { StatutCentre } from './statut-centre';
 
@@ -78,6 +79,148 @@ describe('Centre', () => {
       expect(centre.modifieLe).toEqual(modifieLe);
       expect(centre.telephone?.valeur).toBe('+33553123456');
       expect(centre.email).toBeUndefined();
+    });
+  });
+
+  describe('cycle de vie', () => {
+    const plusTard = new Date('2026-11-15T10:00:00.000Z');
+
+    describe('desactiver', () => {
+      it('passe un centre actif à INACTIF et date la modification', () => {
+        const centre = Centre.creer(donneesObligatoires(), maintenant);
+
+        centre.desactiver(plusTard);
+
+        expect(centre.statut).toBe(StatutCentre.INACTIF);
+        expect(centre.modifieLe).toEqual(plusTard);
+        expect(centre.creeLe).toEqual(maintenant);
+      });
+
+      it('est sans effet pour un centre déjà inactif', () => {
+        const premiereDesactivation = new Date('2026-10-20T14:00:00.000Z');
+        const centre = Centre.reconstituer({
+          ...donneesObligatoires(),
+          statut: StatutCentre.INACTIF,
+          creeLe: maintenant,
+          modifieLe: premiereDesactivation,
+        });
+
+        centre.desactiver(plusTard);
+
+        expect(centre.statut).toBe(StatutCentre.INACTIF);
+        expect(centre.modifieLe).toEqual(premiereDesactivation);
+      });
+    });
+
+    describe('activer', () => {
+      it('repasse un centre inactif à ACTIF et date la modification', () => {
+        const desactiveLe = new Date('2026-10-20T14:00:00.000Z');
+        const centre = Centre.reconstituer({
+          ...donneesObligatoires(),
+          statut: StatutCentre.INACTIF,
+          creeLe: maintenant,
+          modifieLe: desactiveLe,
+        });
+
+        centre.activer(plusTard);
+
+        expect(centre.statut).toBe(StatutCentre.ACTIF);
+        expect(centre.modifieLe).toEqual(plusTard);
+      });
+
+      it('est sans effet pour un centre déjà actif', () => {
+        const derniereActivation = new Date('2026-10-20T14:00:00.000Z');
+        const centre = Centre.reconstituer({
+          ...donneesObligatoires(),
+          statut: StatutCentre.ACTIF,
+          creeLe: maintenant,
+          modifieLe: derniereActivation,
+        });
+
+        centre.activer(plusTard);
+
+        expect(centre.statut).toBe(StatutCentre.ACTIF);
+        expect(centre.modifieLe).toEqual(derniereActivation);
+      });
+    });
+
+    describe('archiver', () => {
+      it('passe un centre actif à ARCHIVE et date la modification', () => {
+        const centre = Centre.creer(donneesObligatoires(), maintenant);
+
+        centre.archiver(plusTard);
+
+        expect(centre.statut).toBe(StatutCentre.ARCHIVE);
+        expect(centre.modifieLe).toEqual(plusTard);
+        expect(centre.creeLe).toEqual(maintenant);
+      });
+
+      it('passe un centre inactif à ARCHIVE et date la modification', () => {
+        const desactiveLe = new Date('2026-10-20T14:00:00.000Z');
+        const centre = Centre.reconstituer({
+          ...donneesObligatoires(),
+          statut: StatutCentre.INACTIF,
+          creeLe: maintenant,
+          modifieLe: desactiveLe,
+        });
+
+        centre.archiver(plusTard);
+
+        expect(centre.statut).toBe(StatutCentre.ARCHIVE);
+        expect(centre.modifieLe).toEqual(plusTard);
+      });
+
+      it('est sans effet pour un centre déjà archivé', () => {
+        const archiveLe = new Date('2026-10-20T14:00:00.000Z');
+        const centre = Centre.reconstituer({
+          ...donneesObligatoires(),
+          statut: StatutCentre.ARCHIVE,
+          creeLe: maintenant,
+          modifieLe: archiveLe,
+        });
+
+        centre.archiver(plusTard);
+
+        expect(centre.statut).toBe(StatutCentre.ARCHIVE);
+        expect(centre.modifieLe).toEqual(archiveLe);
+      });
+    });
+
+    describe('centre archivé', () => {
+      it.each([
+        {
+          action: "l'activer",
+          executer: (centre: Centre) => centre.activer(plusTard),
+        },
+        {
+          action: 'le désactiver',
+          executer: (centre: Centre) => centre.desactiver(plusTard),
+        },
+      ])('refuse de $action avec CENTRE_ARCHIVED', ({ executer }) => {
+        const archiveLe = new Date('2026-10-20T14:00:00.000Z');
+        const centre = Centre.reconstituer({
+          ...donneesObligatoires(),
+          statut: StatutCentre.ARCHIVE,
+          creeLe: maintenant,
+          modifieLe: archiveLe,
+        });
+
+        let erreur: unknown;
+        try {
+          executer(centre);
+        } catch (cause) {
+          erreur = cause;
+        }
+
+        expect(erreur).toBeInstanceOf(CentreArchive);
+        expect(erreur).toMatchObject({ code: 'CENTRE_ARCHIVED', centreId: id });
+        // Message affiché tel quel par le front : lisible, sans identifiant technique.
+        expect(erreur).toMatchObject({
+          message: 'Ce centre est archivé : il ne peut plus être modifié.',
+        });
+        expect(centre.statut).toBe(StatutCentre.ARCHIVE);
+        expect(centre.modifieLe).toEqual(archiveLe);
+      });
     });
   });
 });

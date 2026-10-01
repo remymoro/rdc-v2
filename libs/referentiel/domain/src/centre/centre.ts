@@ -4,6 +4,7 @@ import { Email } from '../commun/email';
 import { Nom } from '../commun/nom';
 import { Telephone } from '../commun/telephone';
 import { Ville } from '../commun/ville';
+import { CentreArchive } from './centre.errors';
 import { CentreId } from './centre-id';
 import { StatutCentre } from './statut-centre';
 
@@ -36,10 +37,18 @@ export class Centre {
     readonly ville: Ville,
     readonly telephone: Telephone | undefined,
     readonly email: Email | undefined,
-    readonly statut: StatutCentre,
+    private statutActuel: StatutCentre,
     readonly creeLe: Date,
-    readonly modifieLe: Date,
+    private derniereModification: Date,
   ) {}
+
+  get statut(): StatutCentre {
+    return this.statutActuel;
+  }
+
+  get modifieLe(): Date {
+    return this.derniereModification;
+  }
 
   /** Nouveau centre : le statut initial est décidé ici (TENETS-LIFECYCLE-004). */
   static creer(nouveau: NouveauCentre, maintenant: Date): Centre {
@@ -74,5 +83,43 @@ export class Centre {
       etat.creeLe,
       etat.modifieLe,
     );
+  }
+
+  /** Met le centre en pause : il ne participe plus aux nouvelles opérations. */
+  desactiver(maintenant: Date): void {
+    if (this.statutActuel === StatutCentre.ARCHIVE) {
+      throw new CentreArchive(this.id);
+    }
+
+    if (this.statutActuel === StatutCentre.INACTIF) {
+      return;
+    }
+
+    this.statutActuel = StatutCentre.INACTIF;
+    this.derniereModification = maintenant;
+  }
+
+  /** Remet en service un centre précédemment désactivé. */
+  activer(maintenant: Date): void {
+    if (this.statutActuel === StatutCentre.ARCHIVE) {
+      throw new CentreArchive(this.id);
+    }
+
+    if (this.statutActuel === StatutCentre.ACTIF) {
+      return;
+    }
+
+    this.statutActuel = StatutCentre.ACTIF;
+    this.derniereModification = maintenant;
+  }
+
+  /** Retire définitivement le centre : il ne pourra plus changer d'état. */
+  archiver(maintenant: Date): void {
+    if (this.statutActuel === StatutCentre.ARCHIVE) {
+      return;
+    }
+
+    this.statutActuel = StatutCentre.ARCHIVE;
+    this.derniereModification = maintenant;
   }
 }

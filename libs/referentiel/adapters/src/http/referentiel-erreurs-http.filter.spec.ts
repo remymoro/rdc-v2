@@ -1,9 +1,15 @@
-import type { ArgumentsHost } from '@nestjs/common';
-import { CentreDejaExistant } from '@rdc/referentiel-application';
+import type { ArgumentsHost, Type } from '@nestjs/common';
+import { FILTER_CATCH_EXCEPTIONS } from '@nestjs/common/constants';
+import {
+  CentreDejaExistant,
+  CentreIntrouvable,
+} from '@rdc/referentiel-application';
 import {
   AdresseAbreviationInterdite,
   AdresseTropLongue,
   AdresseVide,
+  CentreArchive,
+  CentreId,
   CentreIdInvalide,
   CentreIdVide,
   CodePostalInvalide,
@@ -17,6 +23,7 @@ import {
   VilleTropLongue,
   VilleVide,
 } from '@rdc/referentiel-domain';
+import { CentrePersisteInvalide } from '../prisma/centre-persiste-invalide';
 import { ReferentielErreursHttpFilter } from './referentiel-erreurs-http.filter';
 
 function hoteHttp() {
@@ -32,6 +39,7 @@ function hoteHttp() {
 
 describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
   const filtre = new ReferentielErreursHttpFilter();
+  const unCentreId = CentreId.creer('0b8f5c3e-2d4a-4f6b-9c1d-7e8f9a0b1c2d');
 
   it('traduit un doublon en 409 CENTRE_ALREADY_EXISTS', () => {
     const { hote, reponse } = hoteHttp();
@@ -47,6 +55,53 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
       }),
     );
   });
+
+  it('traduit un centre inconnu en 404 CENTRE_NOT_FOUND', () => {
+    const { hote, reponse } = hoteHttp();
+
+    filtre.catch(new CentreIntrouvable(unCentreId), hote);
+
+    expect(reponse.status).toHaveBeenCalledWith(404);
+    expect(reponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statusCode: 404,
+        error: 'CentreIntrouvable',
+        message: 'Le centre demandé est introuvable.',
+        code: 'CENTRE_NOT_FOUND',
+      }),
+    );
+  });
+
+  it('traduit un centre archivé en 409 CENTRE_ARCHIVED', () => {
+    const { hote, reponse } = hoteHttp();
+
+    filtre.catch(new CentreArchive(unCentreId), hote);
+
+    expect(reponse.status).toHaveBeenCalledWith(409);
+    expect(reponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statusCode: 409,
+        error: 'CentreArchive',
+        code: 'CENTRE_ARCHIVED',
+      }),
+    );
+  });
+
+  // @Catch filtre par instanceof : une sous-classe d'une erreur listée doit
+  // garder le statut de son parent, pas retomber sur un statut par défaut.
+  it.each([
+    ['CentreArchive', class extends CentreArchive {}, 409],
+    ['CentreIntrouvable', class extends CentreIntrouvable {}, 404],
+  ])(
+    'traduit une sous-classe de %s comme son parent',
+    (_, SousClasse, statut) => {
+      const { hote, reponse } = hoteHttp();
+
+      filtre.catch(new SousClasse(unCentreId), hote);
+
+      expect(reponse.status).toHaveBeenCalledWith(statut);
+    },
+  );
 
   // Erreurs de validation métier : 400, comme en v1, avec le code du domaine.
   it.each([
@@ -81,5 +136,20 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
         message: erreur.message,
       }),
     );
+  });
+
+  // Donnée corrompue en base : pas une erreur de saisie. Le filtre global la
+  // journalise et répond 500 INTERNAL_ERROR (TENETS-VALUE-003, ERROR-007).
+  it('ne capture pas CentrePersisteInvalide, même par sa cause de validation', () => {
+    const typesCaptures: Type<Error>[] = Reflect.getMetadata(
+      FILTER_CATCH_EXCEPTIONS,
+      ReferentielErreursHttpFilter,
+    );
+    const erreur = new CentrePersisteInvalide(unCentreId.valeur, {
+      cause: new TelephoneInvalide(),
+    });
+
+    expect(typesCaptures.length).toBeGreaterThan(0);
+    expect(typesCaptures.some((type) => erreur instanceof type)).toBe(false);
   });
 });
