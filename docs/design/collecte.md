@@ -354,10 +354,14 @@ enum ReponseMagasin {
 }
 ```
 
-La migration ajoute les deux colonnes de `Collecte`, quatre tables, trois enums,
-les clés étrangères, index et contraintes d'unicité. Elle ne supprime, ne
-renomme et ne réinterprète aucune donnée v1. Les back-relations ajoutées à
-`Centre` et `Magasin` ne créent pas de colonne supplémentaire dans leurs tables.
+Deux migrations additives et séquentielles réalisent ce schéma. Le lot 2 ajoute
+`Collecte.version`, `Collecte.etatVerification` et l'enum `EtatVerification` en
+même temps que le repository Prisma et `POST /api/collectes`. Le lot 6 ajoute
+les quatre tables de vérification, les enums `StatutListeVerification` et
+`ReponseMagasin`, les clés étrangères, index et contraintes d'unicité. Aucune
+migration ne supprime, ne renomme ni ne réinterprète une donnée v1. Les
+back-relations ajoutées à `Centre` et `Magasin` ne créent pas de colonne
+supplémentaire dans leurs tables.
 
 ## Concurrence
 
@@ -442,20 +446,20 @@ place du centre.
 
 ## Découpage des lots corrigé
 
-| Lot | Contenu après design                                                                                                                                                                               | Prérequis                                             |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| 2   | Créer `collecte` domain/application, `Collecte`, période, repository en mémoire et décision D-12 ; inclure l'état NON_OUVERTE de vérification et la version.                                       | lot 1 fusionné, D-12                                  |
-| 3   | Participations, reprise précédente, contrat publié `referentiel`, ports et adapter de traduction ; Prisma de `Collecte` peut être livré ici ou au lot 6, mais une seule migration additive finale. | lot 2, étape 3, ADR-0014 accepté                      |
-| 4   | Domaine `ListeVerification`, historique, gel, version et suites de contrat en mémoire.                                                                                                             | lot 2                                                 |
-| 2b  | Démarrer une collecte et figer atomiquement les listes ; tâche planifiée.                                                                                                                          | lots 2 et 4                                           |
-| 5   | Use cases ouvrir/répondre/transmettre/renvoyer/fermer/inscrire en lot, lectures, UoW et tests de concurrence applicatifs.                                                                          | lots 2b, 3 et 4                                       |
-| 6   | Schéma et migration additive, repositories Prisma, contrats d'adapter et tests d'intégration de concurrence.                                                                                       | lot 5, ADR-0015 accepté                               |
-| 7   | Routes, guards, filtres d'erreurs et E2E.                                                                                                                                                          | lot 6, étape 4 terminée, décision client COLLECTE-014 |
+| Lot | Contenu après design                                                                                                                                                                       | Prérequis                                             |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------- |
+| 2   | Tranche complète « créer une collecte » : domain/application, `Collecte`, période, repositories mémoire et Prisma, migration `version` + `etatVerification`, `POST /api/collectes` et E2E. | lot 1 fusionné, D-12                                  |
+| 3   | Participations, reprise précédente, contrat publié `referentiel`, ports et adapter de traduction ; extension du repository Prisma existant.                                                | lot 2, étape 3, ADR-0014 accepté                      |
+| 4   | Domaine `ListeVerification`, historique, gel, version et suites de contrat en mémoire.                                                                                                     | lot 2                                                 |
+| 2b  | Démarrer une collecte et figer atomiquement les listes ; tâche planifiée.                                                                                                                  | lots 2 et 4                                           |
+| 5   | Use cases ouvrir/répondre/transmettre/renvoyer/fermer/inscrire en lot, lectures, UoW et tests de concurrence applicatifs.                                                                  | lots 2b, 3 et 4                                       |
+| 6   | Tables de la vérification, migration additive, repository Prisma de `ListeVerification`, contrats d'adapter et tests d'intégration de concurrence.                                         | lot 5, ADR-0015 accepté                               |
+| 7   | Routes de la vérification, guards, filtres d'erreurs et E2E.                                                                                                                               | lot 6, étape 4 terminée, décision client COLLECTE-014 |
 
 Le lot 2b n'est donc plus parallèle au lot 4. Les lots 3 et 4 restent
-parallélisables après le lot 2. Pour éviter deux migrations concurrentes, les
-lots 2 à 5 travaillent avec les fakes en mémoire ; le lot 6 applique en une
-fois les ajouts Prisma présentés ici.
+parallélisables après le lot 2. Les migrations ne sont pas concurrentes : le
+lot 2 livre la première tranche verticale complète et sa migration, puis le lot
+6 ajoute seulement la persistance propre à la vérification.
 
 ## Hypothèses ouvertes et portes de décision
 
