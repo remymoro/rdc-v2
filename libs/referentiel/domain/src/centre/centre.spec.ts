@@ -155,6 +155,21 @@ describe('Centre', () => {
         expect(centre.statut).toBe(StatutCentre.ARCHIVE);
         expect(centre.modifieLe).toEqual(plusTard);
       });
+
+      it('est sans effet pour un centre déjà archivé', () => {
+        const archiveLe = new Date('2026-10-20T14:00:00.000Z');
+        const centre = Centre.reconstituer({
+          ...donneesObligatoires(),
+          statut: StatutCentre.ARCHIVE,
+          creeLe: maintenant,
+          modifieLe: archiveLe,
+        });
+
+        centre.archiver(plusTard);
+
+        expect(centre.statut).toBe(StatutCentre.ARCHIVE);
+        expect(centre.modifieLe).toEqual(archiveLe);
+      });
     });
 
     describe('centre archivé', () => {
