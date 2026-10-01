@@ -105,6 +105,10 @@ export class Centre {
       throw new CentreArchive(this.id);
     }
 
+    if (this.statutActuel === StatutCentre.ACTIF) {
+      return;
+    }
+
     this.statutActuel = StatutCentre.ACTIF;
     this.derniereModification = maintenant;
   }

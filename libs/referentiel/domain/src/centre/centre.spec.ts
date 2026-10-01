@@ -97,7 +97,6 @@ describe('Centre', () => {
       });
 
       it('est sans effet pour un centre déjà inactif', () => {
-        // Date distincte de creeLe et de plusTard : aucune confusion possible.
         const premiereDesactivation = new Date('2026-10-20T14:00:00.000Z');
         const centre = Centre.reconstituer({
           ...donneesObligatoires(),
@@ -127,6 +126,21 @@ describe('Centre', () => {
 
         expect(centre.statut).toBe(StatutCentre.ACTIF);
         expect(centre.modifieLe).toEqual(plusTard);
+      });
+
+      it('est sans effet pour un centre déjà actif', () => {
+        const derniereActivation = new Date('2026-10-20T14:00:00.000Z');
+        const centre = Centre.reconstituer({
+          ...donneesObligatoires(),
+          statut: StatutCentre.ACTIF,
+          creeLe: maintenant,
+          modifieLe: derniereActivation,
+        });
+
+        centre.activer(plusTard);
+
+        expect(centre.statut).toBe(StatutCentre.ACTIF);
+        expect(centre.modifieLe).toEqual(derniereActivation);
       });
     });
 
