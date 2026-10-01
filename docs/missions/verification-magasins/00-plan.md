@@ -59,12 +59,12 @@ listes, et l'API ne peut pas être déployée avant l'étape 4
 | --- | ----------------------------------- | ---------------------------------------- | --------------------------------- | ---------------- |
 | 1   | `lot-1-design-collecte.md`          | `docs/collecte-design`                   | —                                 | ✅ fusionné (#9) |
 | 2   | `lot-2-creer-collecte.md`           | `feat/collecte-creer`                    | lot 1 fusionné                    | 🟢 prêt          |
-| 3   | `lot-3-inscrire-magasins.md`        | `feat/collecte-inscrire-magasins`        | lot 2, étape 3 (A1, A2), ADR-0014 | ⏸ bloqué         |
-| 4   | `lot-4-verification-domaine.md`     | `feat/collecte-verification-domaine`     | lot 2, V-1, V-2, V-4              | ⏸ bloqué         |
-| 2b  | `lot-2b-demarrer-collecte.md`       | `feat/collecte-demarrer`                 | lots 2 et 4                       | ⏸ bloqué         |
-| 5   | `lot-5-verification-use-cases.md`   | `feat/collecte-verification-use-cases`   | lots 2b, 3, 4, V-3                | ⏸ bloqué         |
-| 6   | `lot-6-verification-persistance.md` | `feat/collecte-verification-persistance` | lot 5, ADR-0015                   | ⏸ bloqué         |
-| 7   | `lot-7-verification-http.md`        | `feat/collecte-verification-http`        | lot 6, étape 4 terminée, client   | ⏸ bloqué         |
+| 3   | `lot-3-inscrire-magasins.md`        | `feat/collecte-inscrire-magasins`        | lot 2, étape 3 (A1, A2), ADR-0014 | ⏸ bloqué        |
+| 4   | `lot-4-verification-domaine.md`     | `feat/collecte-verification-domaine`     | lot 2, V-1, V-2, V-4              | ⏸ bloqué        |
+| 2b  | `lot-2b-demarrer-collecte.md`       | `feat/collecte-demarrer`                 | lots 2 et 4                       | ⏸ bloqué        |
+| 5   | `lot-5-verification-use-cases.md`   | `feat/collecte-verification-use-cases`   | lots 2b, 3, 4, V-3                | ⏸ bloqué        |
+| 6   | `lot-6-verification-persistance.md` | `feat/collecte-verification-persistance` | lot 5, ADR-0015                   | ⏸ bloqué        |
+| 7   | `lot-7-verification-http.md`        | `feat/collecte-verification-http`        | lot 6, étape 4 terminée, client   | ⏸ bloqué        |
 
 États : 🟢 prêt · 🔵 en cours (Codex) · 🟣 en revue (Claude) · ✅ fusionné · ⏸ bloqué.
 
