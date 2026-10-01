@@ -1,9 +1,12 @@
 import { Centre } from '../centre/centre';
 import { CentreId } from '../centre/centre-id';
 import { CleDoublonCentre } from '../centre/cle-doublon-centre';
+import { StatutCentre } from '../centre/statut-centre';
 import { Adresse } from '../commun/adresse';
 import { CodePostal } from '../commun/code-postal';
+import { Email } from '../commun/email';
 import { Nom } from '../commun/nom';
+import { Telephone } from '../commun/telephone';
 import { Ville } from '../commun/ville';
 import type { CentreRepository } from './centre.repository';
 
@@ -66,11 +69,70 @@ export function verifierContratCentreRepository(
       const cle = CleDoublonCentre.depuis(autreCentre);
       expect(await contexte.repository.existsByCleDoublon(cle)).toBe(false);
     });
+
+    it('relit un centre enregistré à l’identique', async () => {
+      const centre = unCentre({
+        telephone: '05 53 00 00 00',
+        email: 'agen@restosducoeur.org',
+      });
+      await contexte.repository.save(centre);
+
+      const relu = await contexte.repository.get(centre.id);
+
+      expect(relu).toBeInstanceOf(Centre);
+      expect(relu).toEqual(centre);
+    });
+
+    it('relit un centre sans téléphone ni email', async () => {
+      const centre = unCentre();
+      await contexte.repository.save(centre);
+
+      const relu = await contexte.repository.get(centre.id);
+
+      expect(relu?.telephone).toBeUndefined();
+      expect(relu?.email).toBeUndefined();
+    });
+
+    it('renvoie null pour un identifiant inconnu', async () => {
+      await contexte.repository.save(unCentre());
+
+      const inconnu = CentreId.creer('0b6e3f7a-9c2d-4e1f-8a5b-6c7d8e9f0a1b');
+      expect(await contexte.repository.get(inconnu)).toBeNull();
+    });
+
+    it('relit un centre modifié puis réenregistré avec son nouvel état', async () => {
+      const centre = unCentre();
+      await contexte.repository.save(centre);
+
+      centre.desactiver(new Date('2026-10-02T14:30:00.000Z'));
+      await contexte.repository.save(centre);
+
+      const relu = await contexte.repository.get(centre.id);
+      expect(relu?.statut).toBe(StatutCentre.INACTIF);
+      expect(relu?.creeLe).toEqual(new Date('2026-10-01T09:00:00.000Z'));
+      expect(relu?.modifieLe).toEqual(new Date('2026-10-02T14:30:00.000Z'));
+    });
+
+    it('ne voit pas une modification qui n’a pas été enregistrée', async () => {
+      const centre = unCentre();
+      await contexte.repository.save(centre);
+
+      centre.archiver(new Date('2026-10-02T14:30:00.000Z'));
+
+      const relu = await contexte.repository.get(centre.id);
+      expect(relu?.statut).toBe(StatutCentre.ACTIF);
+    });
   });
 }
 
 function unCentre(
-  surcharges: Partial<{ nom: string; adresse: string; ville: string }> = {},
+  surcharges: Partial<{
+    nom: string;
+    adresse: string;
+    ville: string;
+    telephone: string;
+    email: string;
+  }> = {},
 ): Centre {
   return Centre.creer(
     {
@@ -79,6 +141,10 @@ function unCentre(
       adresse: Adresse.creer(surcharges.adresse ?? '12 avenue Jean Jaurès'),
       codePostal: CodePostal.creer('47000'),
       ville: Ville.creer(surcharges.ville ?? 'Agen'),
+      ...(surcharges.telephone && {
+        telephone: Telephone.creer(surcharges.telephone),
+      }),
+      ...(surcharges.email && { email: Email.creer(surcharges.email) }),
     },
     new Date('2026-10-01T09:00:00.000Z'),
   );

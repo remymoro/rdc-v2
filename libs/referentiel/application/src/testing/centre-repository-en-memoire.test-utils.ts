@@ -1,5 +1,6 @@
 import {
   Centre,
+  CentreId,
   CentreRepository,
   CleDoublonCentre,
 } from '@rdc/referentiel-domain';
@@ -13,12 +14,17 @@ export class CentreRepositoryEnMemoire extends CentreRepository {
   constructor(centresExistants: Centre[] = []) {
     super();
     centresExistants.forEach((centre) =>
-      this.centres.set(centre.id.valeur, centre),
+      this.centres.set(centre.id.valeur, copie(centre)),
     );
   }
 
+  async get(id: CentreId): Promise<Centre | null> {
+    const centre = this.centres.get(id.valeur);
+    return centre === undefined ? null : copie(centre);
+  }
+
   async save(centre: Centre): Promise<void> {
-    this.centres.set(centre.id.valeur, centre);
+    this.centres.set(centre.id.valeur, copie(centre));
   }
 
   async existsByCleDoublon(cle: CleDoublonCentre): Promise<boolean> {
@@ -29,6 +35,25 @@ export class CentreRepositoryEnMemoire extends CentreRepository {
   }
 
   centresEnregistres(): Centre[] {
-    return [...this.centres.values()];
+    return [...this.centres.values()].map(copie);
   }
+}
+
+/**
+ * Comme une base, le fake garde l'état enregistré et non l'objet reçu : une
+ * modification non suivie de save() reste invisible.
+ */
+function copie(centre: Centre): Centre {
+  return Centre.reconstituer({
+    id: centre.id,
+    nom: centre.nom,
+    adresse: centre.adresse,
+    codePostal: centre.codePostal,
+    ville: centre.ville,
+    telephone: centre.telephone,
+    email: centre.email,
+    statut: centre.statut,
+    creeLe: new Date(centre.creeLe.getTime()),
+    modifieLe: new Date(centre.modifieLe.getTime()),
+  });
 }
