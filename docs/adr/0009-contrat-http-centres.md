@@ -30,10 +30,29 @@ NestJS. Le front n'utilise que les champs `message` et `code` des erreurs.
 5. **Tests E2E** en boîte noire (`apps/api-e2e`) sur la base `rdc_test` :
    `pnpm e2e` en local, étape `nx affected -t e2e` en CI.
 
+### Complément du 2026-10-01 — cycle de vie d'un centre (étape 2)
+
+Même décision (contrat v1 conservé) appliquée aux trois routes de la v1 ; pas
+de nouvel ADR, aucune option nouvelle n'est tranchée :
+
+- `PATCH /api/centres/:id/desactiver`, `PATCH /api/centres/:id/activer`,
+  `PATCH /api/centres/:id/archiver` ; corps ignoré (le front envoie `{}`) ;
+  succès **204 sans corps**.
+- `:id` validé par le value object `CentreId` dans l'adapter (pas de
+  `ParseUUIDPipe`, comme en v1) : id vide ou mal formé → 400 `CENTRE_ID_EMPTY`
+  ou `CENTRE_ID_INVALID`.
+- Centre inconnu → 404 `CENTRE_NOT_FOUND` « Le centre demandé est introuvable. »
+- Activer ou désactiver un centre archivé → 409 `CENTRE_ARCHIVED`.
+- Désactiver un centre inactif, activer un centre actif ou archiver un centre
+  archivé est sans effet → 204.
+- Mêmes réserves : routes non protégées jusqu'à l'étape 4 (réservées à l'ADMIN
+  en v1).
+
 ## Conséquences
 
-- ⚠️ **Aucun déploiement de la v2 avant l'étape 4** : la route doit être
-  réservée à l'ADMIN, avec un test « refusé » (ADR-0003, R11).
+- ⚠️ **Aucun déploiement de la v2 avant l'étape 4** : les routes de création
+  et de cycle de vie doivent être réservées à l'ADMIN, avec un test « refusé »
+  (ADR-0003, R11).
 - Règle appliquée par le code : `verifierDeploiementAutorise` (`apps/api/src/securite`)
   fait échouer le démarrage de l'API quand `NODE_ENV=production`. L'étape 4 le
   supprime en même temps qu'elle ajoute le contrôle ADMIN.

@@ -61,23 +61,24 @@ traduire une violation d'unicité de `cleDoublon` en `CentreDejaExistant` (créa
 simultanées, TENETS-ADAPTER-006).
 
 ⚠️ **Avant tout déploiement** : authentification ADMIN sur `POST /api/centres`
-(étape 4, ADR-0009). En attendant, l'API refuse de démarrer en production
+et les routes `PATCH` de cycle de vie (étape 4, ADR-0009). En attendant, l'API refuse de démarrer en production
 (`verifierDeploiementAutorise`) : à supprimer à l'étape 4.
 
 ## Étape 2 — Cycle de vie d'un centre
 
-| Élément                                                                                              | État |
-| ---------------------------------------------------------------------------------------------------- | ---- |
-| Domaine : désactiver un centre actif et dater la modification                                        | ✅   |
-| Domaine : désactiver un centre déjà inactif sans modifier `modifieLe`                                | ✅   |
-| Domaine : réactiver un centre inactif et dater la modification                                       | ✅   |
-| Domaine : refuser d'activer ou désactiver un centre archivé                                          | ✅   |
-| Domaine : réactiver un centre déjà actif sans modifier `modifieLe`                                   | ✅   |
-| Domaine : archiver un centre actif ou inactif et dater la modification                               | ✅   |
-| Domaine : archiver un centre déjà archivé sans effet (archivage définitif)                           | ✅   |
-| Use cases : désactiver, activer, archiver (`CENTRE_NOT_FOUND` si inconnu)                            | ⏳   |
-| HTTP : `PATCH /api/centres/:id/{desactiver,activer,archiver}`, 204 sans corps (contrat v1, ADR-0009) | ⏳   |
-| HTTP : traduire `CentreArchive` en 409 et le couvrir en E2E sur PATCH                                | ⏳   |
+| Élément                                                                                              | État                         |
+| ---------------------------------------------------------------------------------------------------- | ---------------------------- |
+| Domaine : désactiver un centre actif et dater la modification                                        | ✅                           |
+| Domaine : désactiver un centre déjà inactif sans modifier `modifieLe`                                | ✅                           |
+| Domaine : réactiver un centre inactif et dater la modification                                       | ✅                           |
+| Domaine : refuser d'activer ou désactiver un centre archivé                                          | ✅                           |
+| Domaine : réactiver un centre déjà actif sans modifier `modifieLe`                                   | ✅                           |
+| Domaine : archiver un centre actif ou inactif et dater la modification                               | ✅                           |
+| Domaine : archiver un centre déjà archivé sans effet (archivage définitif)                           | ✅                           |
+| Use cases : désactiver, activer, archiver (`CENTRE_NOT_FOUND` si inconnu)                            | ✅                           |
+| HTTP : `PATCH /api/centres/:id/{desactiver,activer,archiver}`, 204 sans corps (contrat v1, ADR-0009) | ✅                           |
+| HTTP : `CentreIntrouvable` → 404, `CentreArchive` → 409 (filtre du contexte)                         | ✅                           |
+| E2E : 204, 400 id mal formé, 404 centre inconnu, 409 centre archivé                                  | ✅ écrit, ⏳ exécution en CI |
 
 Règles de la v1 reportées (décision du 2026-10-01) :
 
