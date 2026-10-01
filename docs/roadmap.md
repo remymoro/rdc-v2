@@ -66,19 +66,19 @@ et les routes `PATCH` de cycle de vie (étape 4, ADR-0009). En attendant, l'API 
 
 ## Étape 2 — Cycle de vie d'un centre
 
-| Élément                                                                                              | État                         |
-| ---------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Domaine : désactiver un centre actif et dater la modification                                        | ✅                           |
-| Domaine : désactiver un centre déjà inactif sans modifier `modifieLe`                                | ✅                           |
-| Domaine : réactiver un centre inactif et dater la modification                                       | ✅                           |
-| Domaine : refuser d'activer ou désactiver un centre archivé                                          | ✅                           |
-| Domaine : réactiver un centre déjà actif sans modifier `modifieLe`                                   | ✅                           |
-| Domaine : archiver un centre actif ou inactif et dater la modification                               | ✅                           |
-| Domaine : archiver un centre déjà archivé sans effet (archivage définitif)                           | ✅                           |
-| Use cases : désactiver, activer, archiver (`CENTRE_NOT_FOUND` si inconnu)                            | ✅                           |
-| HTTP : `PATCH /api/centres/:id/{desactiver,activer,archiver}`, 204 sans corps (contrat v1, ADR-0009) | ✅                           |
-| HTTP : `CentreIntrouvable` → 404, `CentreArchive` → 409 (filtre du contexte)                         | ✅                           |
-| E2E : 204, 400 id mal formé, 404 centre inconnu, 409 centre archivé                                  | ✅ écrit, ⏳ exécution en CI |
+| Élément                                                                                              | État |
+| ---------------------------------------------------------------------------------------------------- | ---- |
+| Domaine : désactiver un centre actif et dater la modification                                        | ✅   |
+| Domaine : désactiver un centre déjà inactif sans modifier `modifieLe`                                | ✅   |
+| Domaine : réactiver un centre inactif et dater la modification                                       | ✅   |
+| Domaine : refuser d'activer ou désactiver un centre archivé                                          | ✅   |
+| Domaine : réactiver un centre déjà actif sans modifier `modifieLe`                                   | ✅   |
+| Domaine : archiver un centre actif ou inactif et dater la modification                               | ✅   |
+| Domaine : archiver un centre déjà archivé sans effet (archivage définitif)                           | ✅   |
+| Use cases : désactiver, activer, archiver (`CENTRE_NOT_FOUND` si inconnu)                            | ✅   |
+| HTTP : `PATCH /api/centres/:id/{desactiver,activer,archiver}`, 204 sans corps (contrat v1, ADR-0009) | ✅   |
+| HTTP : `CentreIntrouvable` → 404, `CentreArchive` → 409 (filtre du contexte)                         | ✅   |
+| E2E : 204, 400 id mal formé, 404 centre inconnu, 409 centre archivé                                  | ✅   |
 
 Concurrence : deux écritures simultanées sur un centre ne sont pas détectées,
 « le dernier qui écrit gagne » comme en v1 (un seul administrateur, ADR-0013) ;
