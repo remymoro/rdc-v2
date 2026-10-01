@@ -1,7 +1,7 @@
 # Lot 2 — Créer une collecte (fondation du contexte `collecte`)
 
 - **Branche :** `feat/collecte-creer`
-- **Prérequis :** lot 1 fusionné ; décision D-12 (fuseau de l'année) prise
+- **Prérequis :** lot 1 fusionné (D-12 décidée : année civile Europe/Paris)
 - **À réviser après le lot 1 :** oui, ce brief suit le découpage actuel
 
 ## Ordre de mission (à coller dans Codex)
@@ -38,7 +38,9 @@ l'étape 1 (même structure, même démarche).
    refusé, fin <= début refusée, fin à minuit = journée entière, une seule
    fonction de fin de journée (RDC-COLLECTE-006).
 4. `PeriodeCollecte.reconstituer` : n'applique pas « début non passé ».
-5. Année de la collecte selon D-12 (RDC-COLLECTE-022).
+5. Année de la collecte : année civile Europe/Paris de la date de début
+   (D-12, RDC-COLLECTE-022), une seule fonction, testée sur un début au
+   1er janvier à 0 h 30 heure de Paris (31 décembre en UTC).
 6. `Collecte.creer` : statut PREPARATION, planification fermée, vérification
    fermée, aucune participation, `creeLe = modifieLe = maintenant`.
 7. `CreerCollecteUseCase` : refus nom existant (`CollecteDejaExistante`,

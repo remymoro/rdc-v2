@@ -26,7 +26,7 @@ règle concernée (état ⏳), et écrire un ADR si elle s'écarte de la v1.
 | D-09 | Changement de mot de passe en libre-service | RDC-ACCES-009                    | 4              |
 | D-10 | Centre crédité des poids                    | RDC-STATS-006                    | 7              |
 | D-11 | Référence produit libre ou catalogue        | RDC-SAISIE-005                   | 6              |
-| D-12 | Fuseau de l'année d'une collecte            | RDC-COLLECTE-022                 | 5              |
+| D-12 | ✅ Décidée : année civile Europe/Paris      | RDC-COLLECTE-022                 | —              |
 | D-13 | Raison de réouverture réellement saisie     | RDC-COLLECTE-010                 | 5              |
 
 ## D-01 — Ordre des étapes
@@ -239,6 +239,12 @@ inconnus.
 `libs/domain/src/produit/value-objects/reference-produit.vo.ts:3-20`.
 
 ## D-12 — Quel fuseau définit l'année d'une collecte ?
+
+**Décision (2026-10-01).** Année civile **Europe/Paris** : l'année d'une
+collecte est celle de sa date de début, lue à l'heure de Paris. La même fonction
+sert à l'unicité annuelle (RDC-COLLECTE-022) et aux statistiques N/N-1. Les
+bornes d'une année en base sont le 1er janvier à 0 h, heure de Paris, converties
+en UTC, et non `Date.UTC`.
 
 **Constat.** Les use cases v1 utilisent `dateDebut.getFullYear()` alors que le
 repository recherche entre deux bornes construites avec `Date.UTC`. Une date
