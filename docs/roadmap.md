@@ -40,6 +40,14 @@
 
 L'ordre des étapes 3 à 7 reste à confirmer avec la carte des contextes.
 
+## Outillage transverse
+
+| Élément                                                                  | État |
+| ------------------------------------------------------------------------ | ---- |
+| Agent Gate local : politique, formatage, lint, tests et build (ADR-0012) | ✅   |
+| Agent Gate complet : migrations, tests d'intégration et E2E (ADR-0012)   | ✅   |
+| Revue humaine : preuves TDD et règles `TENETS-…` / `RDC-…` citées        | ⏳   |
+
 ## Étape 1 — Créer un centre
 
 | Élément                                                                                       | État |

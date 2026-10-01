@@ -4,7 +4,7 @@
 - **Branche relue :** `docs/domaine-connaissance-metier` (travail non commité)
 - **Relecteurs :** Claude Code (agent principal + 2 sous-agents en lecture seule,
   comparaison avec le code v1 de `../rdc`)
-- **Statut :** `corrections_documentaires_appliquees` — Agent Gate restant
+- **Statut :** `corrigee`
 
 ## Mise à jour du 2026-10-01 — rangement fait par Claude Code
 
@@ -328,7 +328,7 @@ dans la règle.
 - [x] B1 à B9 ajoutés, chacun avec source `chemin:ligne` vérifiée
 - [x] C1 à C10 corrigés
 - [x] D-10, D-11, D-12 et D-13 ajoutés dans `a-trancher.md` et liés à leurs règles ⚠️
-- [ ] Points E traités — documentation faite, Agent Gate restant
+- [x] Points E traités
 - [x] Aucun identifiant `RDC-…` renuméroté ; nouveaux numéros uniques
-- [ ] `pnpm nx format:write` puis `pnpm agent:gate` vert
-- [ ] Un commit par sujet (doc métier, puis Agent Gate) sur deux branches
+- [x] `pnpm nx format:write` puis `pnpm agent:gate` vert
+- [x] Un commit par sujet (doc métier, puis Agent Gate) sur deux branches

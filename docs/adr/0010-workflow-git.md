@@ -13,8 +13,9 @@ discipline.
 
 ## Décision
 
-1. **Une branche par fonctionnalité**, nommée `feat/<contexte>-<fonctionnalité>`
-   (`fix/…`, `docs/…`, `chore/…` selon la nature), créée depuis `main` à jour.
+1. **Une branche par fonctionnalité**, créée depuis `main` à jour et nommée
+   `<type>/<contexte>-<fonctionnalité>`. Types autorisés : `feat`, `fix`, `docs`,
+   `chore`, `refactor` et `test`.
 2. **Un commit par cycle TDD**, au format Conventional Commits
    (`feat(referentiel): …`, `test(…)`, `refactor(…)`, `docs(…)`).
 3. **`main` protégée** par un ruleset GitHub, sans exception (liste de

@@ -68,6 +68,9 @@ jobs:
       - name: Génération du client Prisma
         run: pnpm prisma generate
 
+      - name: Tests de l'Agent Gate
+        run: pnpm test:agent-gate
+
       # Base = dernier commit de main dont la CI est verte.
       - uses: nrwl/nx-set-shas@v5
 
