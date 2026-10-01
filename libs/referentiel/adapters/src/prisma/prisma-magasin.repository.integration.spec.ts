@@ -13,6 +13,7 @@ import { verifierContratMagasinRepository } from '@rdc/referentiel-domain/testin
 import {
   creerPrismaClient,
   PrismaTransaction,
+  PrismaUnitOfWork,
 } from '@rdc/shared-kernel-adapters';
 import { PrismaCentreRepository } from './prisma-centre.repository';
 import { PrismaMagasinRepository } from './prisma-magasin.repository';
@@ -64,6 +65,18 @@ describe('PrismaMagasinRepository — créations simultanées (TENETS-ADAPTER-00
 
   afterAll(viderLaBase);
 
+  /** Comme en production : une PrismaUnitOfWork par requête. */
+  async function enregistrerDansUneTransaction(
+    magasin: Magasin,
+  ): Promise<void> {
+    const transaction = new PrismaTransaction(prisma);
+    const unitOfWork = new PrismaUnitOfWork(prisma, transaction);
+    await unitOfWork.run(async () => {
+      await new PrismaMagasinRepository(transaction).save(magasin);
+      await unitOfWork.commit();
+    });
+  }
+
   function unMagasin(id: string, nom: string): Magasin {
     return Magasin.creer(
       {
@@ -81,20 +94,12 @@ describe('PrismaMagasinRepository — créations simultanées (TENETS-ADAPTER-00
   it('laisse passer une seule de deux créations de même clé ; l’autre lève MagasinDejaExistant', async () => {
     // Deux transactions qui ont chacune passé le pré-contrôle du use case.
     const resultats = await Promise.allSettled([
-      prisma.$transaction((tx) => {
-        const transaction = new PrismaTransaction(prisma);
-        transaction.ouvrir(tx);
-        return new PrismaMagasinRepository(transaction).save(
-          unMagasin('3b8a5d6e-0f12-4f7a-9c1e-7f1c9d7e2d4b', 'Leclerc Agen Sud'),
-        );
-      }),
-      prisma.$transaction((tx) => {
-        const transaction = new PrismaTransaction(prisma);
-        transaction.ouvrir(tx);
-        return new PrismaMagasinRepository(transaction).save(
-          unMagasin('5c9b6e7f-1a23-4b8c-8d2f-8a2d0e8f3e5c', 'LECLERC AGEN-SUD'),
-        );
-      }),
+      enregistrerDansUneTransaction(
+        unMagasin('3b8a5d6e-0f12-4f7a-9c1e-7f1c9d7e2d4b', 'Leclerc Agen Sud'),
+      ),
+      enregistrerDansUneTransaction(
+        unMagasin('5c9b6e7f-1a23-4b8c-8d2f-8a2d0e8f3e5c', 'LECLERC AGEN-SUD'),
+      ),
     ]);
 
     const reussites = resultats.filter((r) => r.status === 'fulfilled');
