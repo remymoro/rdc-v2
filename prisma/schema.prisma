@@ -49,6 +49,9 @@ model Magasin {
   centreId   String
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
+  /// Clé de rapprochement (CleDoublonMagasin). Facultative tant que les
+  /// magasins repris de la v1 n'ont pas été recalculés (ADR-0008).
+  cleDoublon String?      @unique
 
   centre          Centre                @relation(fields: [centreId], references: [id], onDelete: Restrict)
   images          MagasinImage[]
