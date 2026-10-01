@@ -11,6 +11,7 @@ export {
   MagasinIdVide,
 } from './magasin/magasin-id';
 export { StatutCentre } from './centre/statut-centre';
+export { StatutMagasin } from './magasin/statut-magasin';
 export { Nom, NomTropLong, NomVide } from './commun/nom';
 export { CodePostal, CodePostalInvalide } from './commun/code-postal';
 export { Ville, VilleTropLongue, VilleVide } from './commun/ville';
