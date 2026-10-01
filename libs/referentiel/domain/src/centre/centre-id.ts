@@ -1,5 +1,4 @@
-const FORMAT_UUID =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+import { FORMAT_UUID } from '../commun/format-uuid';
 
 /** Erreur métier : l'identifiant d'un centre est obligatoire. */
 export class CentreIdVide extends Error {
