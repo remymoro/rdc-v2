@@ -39,8 +39,10 @@ et la revue Copilot exigée par le ruleset non plus. Le brief demandait une PR
 avec la section « Description de la PR ». Le commit `Docs: concevoir…` ne suit
 pas la convention `docs(<portée>): …` (ADR-0010 §2).
 
-**Correction.** Reformuler le message (`docs(collecte): concevoir le contexte
-collecte et sa vérification`) puis ouvrir la PR selon le brief.
+**Correction.** Ouvrir la PR selon le brief, avec un titre au format
+`docs(collecte): concevoir le contexte collecte et sa vérification`. Ne pas
+réécrire l'historique de la branche : les commits de correction suivent la
+convention.
 
 ### B-2 — Statuts HTTP différents de la v1 sans ADR
 
