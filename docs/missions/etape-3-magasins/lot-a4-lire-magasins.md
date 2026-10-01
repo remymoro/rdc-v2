@@ -31,7 +31,9 @@ commit par cycle au format feat(referentiel): …. Termine par
 
 1. Requêtes de lecture et leur fake en mémoire.
 2. Use cases de lecture ; `MAGASIN_NOT_FOUND` pour le détail.
-3. HTTP et E2E.
+3. Adaptateurs de requête Prisma et tests d'intégration : mapping des champs v1
+   et ordre de tri v1.
+4. HTTP et E2E sur les lectures persistées.
 
 ## Critères d'acceptation
 

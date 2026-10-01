@@ -404,7 +404,7 @@ une collecte vers une année déjà occupée est refusé avec
 N/N-1. La v1 n'emploie toutefois pas le même fuseau partout : le use case utilise
 `getFullYear()` et le repository construit des bornes UTC. **Décision D-12 :**
 la v2 prend l'année civile Europe/Paris de la date de début, avec une seule
-fonction pour l'unicité et les statistiques N/N-1.
+fonction pour l'unicité et les statistiques N/N-1 (ADR-0016).
 
 **Source v1.**
 `apps/api/src/application/use-cases/collecte/creer-collecte.usecase.ts:24-33` ;

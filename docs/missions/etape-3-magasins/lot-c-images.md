@@ -66,8 +66,12 @@ pull request titrée « feat(referentiel): images d'un magasin ».
    dont l'effacement du fichier échoue (204, orphelin journalisé).
 5. `NettoyerImagesOrphelinesUseCase` : supprime les orphelins de plus d'une
    heure, garde les autres, relancé deux fois sans effet de plus ; exécuté au
-   démarrage de l'API.
-6. HTTP et E2E : 201 ; 413 `IMAGE_TROP_VOLUMINEUSE` (fichier de 5 Mo + 1
+   démarrage de l'API. Un échec de suppression est journalisé et réessayé au
+   prochain démarrage.
+6. Tests de nettoyage : conserve les fichiers récents et référencés, supprime
+   les orphelins anciens, puis réessaie un orphelin dont la suppression avait
+   échoué au démarrage précédent.
+7. HTTP et E2E : 201 ; 413 `IMAGE_TROP_VOLUMINEUSE` (fichier de 5 Mo + 1
    octet) ; 400 `IMAGE_FORMAT_NON_SUPPORTE` (PDF annoncé `image/jpeg`) ; 400
    `MAGASIN_IMAGE_INTROUVABLE` ; 404 magasin inconnu.
 

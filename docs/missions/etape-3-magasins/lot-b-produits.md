@@ -27,8 +27,9 @@ pull request titrée « feat(referentiel): catalogue des produits ».
   Reprendre corps, réponses et codes de
   `../rdc/apps/api/src/presentation/http/controllers/produit.controller.ts` et
   de ses DTO.
-- La référence d'une pesée reste libre (D-11) : le catalogue n'est pas
-  consulté par la saisie à ce stade.
+- D-11 reste à décider : ce lot ne tranche pas si la référence d'une pesée est
+  libre ou issue du catalogue. Le catalogue de produits est indépendant ; ne
+  pas modifier ni préjuger la règle de saisie.
 
 ## Cycles TDD
 

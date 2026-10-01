@@ -24,19 +24,20 @@ A1  Créer un magasin                   (domaine → HTTP, comme le centre)
  ├── A3  Modifier et transférer       (PATCH, transfert vers un autre centre)
  └── A4  Lire les magasins            (liste, liste d'un centre, détail)
 B   Catalogue des produits             (indépendant des lots A)
-C   Images d'un magasin                (après A1 ; port de stockage)
+C   Images d'un magasin                (après A1 et confirmation du stockage)
 ```
 
-| Lot | Brief                           | Branche                              | Prérequis | État      |
-| --- | ------------------------------- | ------------------------------------ | --------- | --------- |
-| A1  | `lot-a1-creer-magasin.md`       | `feat/referentiel-creer-magasin`     | —         | 🟢 prêt   |
-| A2  | `lot-a2-cycle-de-vie.md`        | `feat/referentiel-cycle-vie-magasin` | A1        | ⏸ bloqué |
-| A3  | `lot-a3-modifier-transferer.md` | `feat/referentiel-modifier-magasin`  | A1        | ⏸ bloqué |
-| A4  | `lot-a4-lire-magasins.md`       | `feat/referentiel-lire-magasins`     | A1        | ⏸ bloqué |
-| B   | `lot-b-produits.md`             | `feat/referentiel-produits`          | —         | 🟢 prêt   |
-| C   | `lot-c-images.md`               | `feat/referentiel-images-magasin`    | A1        | ⏸ bloqué |
+| Lot | Brief                           | Branche                              | Prérequis                     | État      |
+| --- | ------------------------------- | ------------------------------------ | ----------------------------- | --------- |
+| A1  | `lot-a1-creer-magasin.md`       | `feat/referentiel-creer-magasin`     | —                             | 🟢 prêt   |
+| A2  | `lot-a2-cycle-de-vie.md`        | `feat/referentiel-cycle-vie-magasin` | A1                            | ⏸ bloqué |
+| A3  | `lot-a3-modifier-transferer.md` | `feat/referentiel-modifier-magasin`  | A1                            | ⏸ bloqué |
+| A4  | `lot-a4-lire-magasins.md`       | `feat/referentiel-lire-magasins`     | A1                            | ⏸ bloqué |
+| B   | `lot-b-produits.md`             | `feat/referentiel-produits`          | —                             | 🟢 prêt   |
+| C   | `lot-c-images.md`               | `feat/referentiel-images-magasin`    | A1 + stockage confirmé        | ⏸ bloqué |
 
 A2, A3 et A4 peuvent avancer en parallèle après A1 ; A1 et B dès maintenant.
+Le lot C attend aussi la confirmation du lieu de stockage après le rendez-vous NAS.
 Le lot 3 de `verification-magasins` attend A1 et A2 (magasin et statut).
 
 ## Ce qui ne fait pas partie de l'étape 3
