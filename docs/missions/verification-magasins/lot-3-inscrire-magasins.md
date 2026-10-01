@@ -1,8 +1,9 @@
 # Lot 3 — Inscrire les magasins et reprendre la collecte précédente
 
 - **Branche :** `feat/collecte-inscrire-magasins`
-- **Prérequis :** lot 2 fusionné ; étape 3 (magasins) fusionnée
-- **À réviser après le lot 1 :** oui
+- **Prérequis :** lot 2 fusionné ; étape 3, lots A1 et A2 (magasin et
+  statut) fusionnés ; ADR-0014 accepté par l'utilisateur
+- **Révisé après le lot 1 :** le 2026-10-01 (contrat et ports du design)
 
 ## Ordre de mission (à coller dans Codex)
 
@@ -27,7 +28,9 @@ précédente. Ce lot crée aussi le premier contrat publié entre contextes :
 
 ## À lire
 
-- `docs/design/collecte.md` (contrats inter-contextes)
+- `docs/design/collecte.md` : « Contrat consommé depuis `referentiel` »,
+  « Erreurs et statuts HTTP visés »
+- ADR-0014 (contrats publiés)
 - RDC-COLLECTE-004, 013, 019 ; RDC-REF-005, RDC-REF-010
 - `docs/architecture/regles/10-contextes.md` (CONTEXT-002 à 006)
 
@@ -38,33 +41,41 @@ précédente. Ce lot crée aussi le premier contrat publié entre contextes :
 2. Refus hors PREPARATION.
 3. `retirerMagasin` et `reassignerMagasin` ; magasin non inscrit :
    `MagasinNonInscrit`.
-4. ADR du contrat publié (proposé par le design doc) : lib
-   `libs/referentiel/contrat` taguée `scope:published` et contrainte ESLint
-   qui ne la laisse importer que par des libs `layer:adapters` d'autres
+4. Mise en œuvre d'ADR-0014 : lib `libs/referentiel/contrat` taguée
+   `context:referentiel`, `layer:published`, `scope:published`, et contrainte
+   ESLint qui ne la laisse importer que par des libs `layer:adapters` d'autres
    contextes ; un test de lint qui échoue si `collecte/domain` ou
    `collecte/application` l'importe.
-5. Contrat publié par `referentiel`, en primitives, implémenté par
-   `referentiel/adapters` sur les repositories de l'étape 3 :
-   - `etatMagasin(magasinId)` → statut du magasin, centre de rattachement et
-     statut de ce centre (ACTIF / INACTIF / ARCHIVE), ou absent ;
-   - `statutCentre(centreId)` → ACTIF / INACTIF / ARCHIVE, ou absent ;
-   - `magasinsActifsParCentre()` → pour le préremplissage du lot 5.
+5. Façade publiée `ReferentielPublic`, en primitives, implémentée par
+   `referentiel/adapters` sur les repositories de l'étape 3 (signatures du
+   design) :
+   - `obtenirMagasin(id)` → statut du magasin, centre de rattachement et
+     statut de ce centre (ACTIF / INACTIF / ARCHIVE), ou `null` ;
+   - `obtenirCentre(id)` → identifiant et statut du centre, ou `null` ;
+   - `listerCentresAvecMagasins()` → tous les centres et leurs magasins, sans
+     filtre, pour le préremplissage du lot 5.
 
    Les statuts exposés permettent à `collecte` d'appliquer RDC-COLLECTE-004 :
    magasin ACTIF, centre INACTIF accepté, centre ARCHIVE refusé, à
    l'inscription comme à la réassignation.
 
-6. Port consommateur de `collecte`, dans son langage, avec suite de contrat
-   et fake en mémoire.
-7. Adapter de traduction dans `collecte/adapters` : appelle la façade publiée
-   et traduit vers les types du port (TENETS-CONTEXT-004).
-8. `InscrireMagasinUseCase` et `ReassignerMagasinUseCase` : magasin ACTIF
-   (`MAGASIN_INACTIF`), centre gestionnaire non archivé (`CENTRE_ARCHIVE`,
-   400), centre INACTIF accepté ; centre gestionnaire = centre de rattachement
-   par défaut (RDC-COLLECTE-004).
+6. Ports consommateurs de `collecte/application`, dans son langage, chacun
+   avec suite de contrat et fake en mémoire : `MagasinsInscriptibles`,
+   `CentresGestionnaires` (centre cible d'une réassignation) et
+   `CandidatsVerification` (magasins actifs des centres actifs, filtre
+   exprimé côté `collecte`).
+7. Adapters de traduction dans `collecte/adapters` : seuls à importer
+   `@rdc/referentiel-contrat`, ils traduisent chaînes et statuts vers
+   `MagasinId`, `CentreId` et les types du port (TENETS-CONTEXT-004).
+8. `InscrireMagasinUseCase` et `ReassignerMagasinUseCase` : magasin absent
+   (`MAGASIN_NOT_FOUND`, 404), magasin ACTIF (`MAGASIN_INACTIF`), centre
+   gestionnaire non archivé (`CENTRE_ARCHIVE`, 400), centre INACTIF accepté ;
+   centre cible absent (`CENTRE_NOT_FOUND`, 404) ; centre gestionnaire =
+   centre de rattachement par défaut (RDC-COLLECTE-004).
 9. `ReprendreCollectePrecedenteUseCase` (RDC-COLLECTE-019) : participants de
    la dernière collecte TERMINEE encore actifs, sans doublon.
-10. Persistance des participations (table `ParticipationMagasin` v1).
+10. Persistance des participations (table `ParticipationMagasin` v1), en
+    étendant le `PrismaCollecteRepository` du lot 2.
 11. HTTP : routes d'inscription, de retrait, de réassignation et de reprise,
     et E2E.
 

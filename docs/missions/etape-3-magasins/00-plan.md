@@ -28,13 +28,13 @@ B   Catalogue des produits             (indépendant des lots A)
 C   Images d'un magasin                (après A1 et confirmation du lieu NAS)
 ```
 
-| Lot | Brief                           | Branche                              | Prérequis                          | État      |
-| --- | ------------------------------- | ------------------------------------ | ---------------------------------- | --------- |
-| A1  | `lot-a1-creer-magasin.md`       | `feat/referentiel-creer-magasin`     | —                                  | 🟢 prêt   |
+| Lot | Brief                           | Branche                              | Prérequis                          | État     |
+| --- | ------------------------------- | ------------------------------------ | ---------------------------------- | -------- |
+| A1  | `lot-a1-creer-magasin.md`       | `feat/referentiel-creer-magasin`     | —                                  | 🟢 prêt  |
 | A2  | `lot-a2-cycle-de-vie.md`        | `feat/referentiel-cycle-vie-magasin` | A1                                 | ⏸ bloqué |
 | A3  | `lot-a3-modifier-transferer.md` | `feat/referentiel-modifier-magasin`  | A1                                 | ⏸ bloqué |
 | A4  | `lot-a4-lire-magasins.md`       | `feat/referentiel-lire-magasins`     | A1                                 | ⏸ bloqué |
-| B   | `lot-b-produits.md`             | `feat/referentiel-produits`          | —                                  | 🟢 prêt   |
+| B   | `lot-b-produits.md`             | `feat/referentiel-produits`          | —                                  | 🟢 prêt  |
 | C   | `lot-c-images.md`               | `feat/referentiel-images-magasin`    | A1 + lieu de stockage NAS confirmé | ⏸ bloqué |
 
 A2, A3 et A4 peuvent avancer en parallèle après A1 ; A1 et B dès maintenant.
@@ -51,8 +51,8 @@ Le lot 3 de `verification-magasins` attend A1 et A2 (magasin et statut).
   et l'API refuse toujours de démarrer en production
   (`verifierDeploiementAutorise`, ADR-0009).
 - **Contrat publié vers `collecte`** : livré par le lot 3 de
-  `verification-magasins` (ADR-0014, proposé dans la PR du lot 1,
-  branche `docs/collecte-design`, pas encore sur `main`).
+  `verification-magasins` (ADR-0014, proposé ; design fusionné par la PR #9,
+  qui ajoute aussi `obtenirCentre` au contrat).
 
 ## Contrat HTTP de la v1 à conserver (ADR-0009)
 
