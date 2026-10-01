@@ -5,6 +5,8 @@ export { CentreRepository } from './ports/centre.repository';
 export { CleDoublonCentre } from './centre/cle-doublon-centre';
 export type { IdentiteCentre } from './centre/cle-doublon-centre';
 export { CentreId, CentreIdInvalide, CentreIdVide } from './centre/centre-id';
+export { Magasin } from './magasin/magasin';
+export type { EtatMagasin, NouveauMagasin } from './magasin/magasin';
 export {
   MagasinId,
   MagasinIdInvalide,

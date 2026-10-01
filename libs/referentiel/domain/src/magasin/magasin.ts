@@ -23,6 +23,13 @@ export interface NouveauMagasin {
   readonly email?: Email;
 }
 
+/** État persisté complet d'un magasin existant (TENETS-LIFECYCLE-005). */
+export interface EtatMagasin extends NouveauMagasin {
+  readonly statut: StatutMagasin;
+  readonly creeLe: Date;
+  readonly modifieLe: Date;
+}
+
 export class Magasin {
   private constructor(
     readonly id: MagasinId,
@@ -60,6 +67,26 @@ export class Magasin {
       StatutMagasin.ACTIF,
       maintenant,
       maintenant,
+    );
+  }
+
+  /**
+   * Magasin existant, relu depuis la base : l'état persisté est restitué tel
+   * quel, sans statut initial ni date par défaut (TENETS-LIFECYCLE-005).
+   */
+  static reconstituer(etat: EtatMagasin): Magasin {
+    return new Magasin(
+      etat.id,
+      etat.nom,
+      etat.adresse,
+      etat.codePostal,
+      etat.ville,
+      etat.centreId,
+      etat.telephone,
+      etat.email,
+      etat.statut,
+      etat.creeLe,
+      etat.modifieLe,
     );
   }
 }

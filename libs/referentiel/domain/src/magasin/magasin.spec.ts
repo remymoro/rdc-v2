@@ -67,4 +67,27 @@ describe('Magasin', () => {
       expect(magasin.email).toBeUndefined();
     });
   });
+
+  describe('reconstituer', () => {
+    it("restitue l'état persisté tel quel, sans valeur par défaut", () => {
+      const creeLe = new Date('2024-03-01T08:00:00.000Z');
+      const modifieLe = new Date('2025-06-15T14:30:00.000Z');
+
+      const magasin = Magasin.reconstituer({
+        ...donneesObligatoires(),
+        telephone: Telephone.creer('05 53 98 76 54'),
+        statut: StatutMagasin.ARCHIVE,
+        creeLe,
+        modifieLe,
+      });
+
+      expect(magasin.id.equals(id)).toBe(true);
+      expect(magasin.centreId.equals(centreId)).toBe(true);
+      expect(magasin.statut).toBe(StatutMagasin.ARCHIVE);
+      expect(magasin.creeLe).toEqual(creeLe);
+      expect(magasin.modifieLe).toEqual(modifieLe);
+      expect(magasin.telephone?.valeur).toBe('+33553987654');
+      expect(magasin.email).toBeUndefined();
+    });
+  });
 });
