@@ -161,8 +161,9 @@ et une sous-famille non vides, et un indicateur actif. On désactive un
 produit, on ne le supprime pas. La reconstitution accepte les anciens formats
 de code (données historiques importées).
 
-**Pourquoi.** Les pesées copient la référence du produit (RDC-SAISIE-005) ; le
-catalogue peut donc évoluer sans fausser l'historique.
+**Pourquoi.** Une ligne de pesée conserve sa propre référence, saisie par le
+client et non contrôlée contre le catalogue en v1 (D-11, RDC-SAISIE-005). Le
+catalogue peut donc évoluer sans modifier l'historique.
 
 **Source v1.** `libs/domain/src/produit/produit.entity.ts:27-66,91-128` ;
 `libs/domain/src/produit/value-objects/code-produit.vo.ts:6-27`.
@@ -191,6 +192,10 @@ INACTIF ou ARCHIVE est refusé avec `CENTRE_NON_ACTIF` (409). Cette règle porte
 sur les **nouveaux rattachements** ; l'inscription à une collecte suit la règle
 distincte RDC-COLLECTE-004.
 
+**Exception v1.** Le planning magasin peut créer implicitement un bénévole dans
+le centre gestionnaire sans vérifier que ce centre est ACTIF. La v2 doit appliquer
+`CENTRE_NON_ACTIF` à ce parcours aussi, selon la décision D-05.
+
 **Pourquoi.** Un centre inactif conserve son historique, mais ne reçoit plus de
 nouvelle activité opérationnelle.
 
@@ -199,4 +204,5 @@ nouvelle activité opérationnelle.
 `apps/api/src/application/use-cases/magasin/modifier-magasin.usecase.ts:58-65` ;
 `apps/api/src/application/use-cases/benevole/creer-benevole.usecase.ts:46-53` ;
 `apps/api/src/application/use-cases/planning-benevoles-centre/planifier-benevoles-centre.usecase.ts:58-63` ;
-`apps/api/src/application/use-cases/planning-chauffeur/planifier-chauffeur.usecase.ts:76-81`.
+`apps/api/src/application/use-cases/planning-chauffeur/planifier-chauffeur.usecase.ts:76-81` ;
+`apps/api/src/application/use-cases/planning-magasin/planifier-benevoles-magasin.usecase.ts:122-126,181-192`.

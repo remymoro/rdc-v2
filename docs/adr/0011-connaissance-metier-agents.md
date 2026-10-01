@@ -22,7 +22,7 @@ ne connaît pas les règles en invente.
    - un fichier par contexte (`referentiel.md`, `collecte.md`…) : règles métier
      au format des règles Tenets, avec un identifiant stable `RDC-<CTX>-NNN`,
      un état v2 (✅ ⏳ 🔁 ⚠️) et la source dans la v1 ;
-   - `a-trancher.md` : contradictions v1 à faire décider (D-01 à D-09).
+   - `a-trancher.md` : contradictions v1 à faire décider (D-01 à D-13).
 2. **Identifiants** : jamais renumérotés ni réutilisés, comme `TENETS-XXX-NNN`.
    Une revue cite la règle métier `RDC-…` à côté de la règle d'architecture.
 3. **Livraison aux agents** : même mécanisme que l'ADR-0005. Le lien

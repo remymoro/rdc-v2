@@ -81,5 +81,5 @@ implicitement dans le centre gestionnaire. La v2 doit décider si cette créatio
 reste permise hors du parcours bénévole (voir RDC-PLANIF-006).
 
 **Source v1.**
-`apps/api/src/application/use-cases/planning-magasin/planifier-benevoles-magasin.usecase.ts:114-125,152-185` ;
-`apps/api/src/application/use-cases/planning-chauffeur/planifier-chauffeur.usecase.ts:127-139,165-190`.
+`apps/api/src/application/use-cases/planning-magasin/planifier-benevoles-magasin.usecase.ts:152-193` ;
+`apps/api/src/application/use-cases/planning-chauffeur/planifier-chauffeur.usecase.ts:165-206`.

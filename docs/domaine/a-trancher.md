@@ -137,7 +137,13 @@ reprise des données (enseigne = nom actuel).
 **Constat.** En v1, saisir une personne inconnue dans un planning magasin ou
 chauffeur crée un bénévole (`findOrCreate`) dans le centre concerné, hors du
 parcours bénévole (audit B-03). Le rapprochement se fait par email, puis
-téléphone, puis homonyme unique.
+téléphone, puis homonyme unique. Le planning magasin crée ce bénévole sans
+vérifier que le centre gestionnaire est ACTIF, contrairement aux autres nouveaux
+rattachements (`CENTRE_NON_ACTIF`, RDC-REF-010).
+
+**Sources v1.**
+`apps/api/src/application/use-cases/planning-magasin/planifier-benevoles-magasin.usecase.ts:122-126,181-192` ;
+`apps/api/src/application/use-cases/planning-chauffeur/planifier-chauffeur.usecase.ts:165-206`.
 
 **Options.** (a) Le planning n'accepte que des bénévoles existants. (b) La
 création reste possible depuis le planning, mais passe par le use case de
@@ -188,17 +194,24 @@ est exposée sur Internet, le libre-service redevient nécessaire.
 
 ## D-10 — Quel centre est crédité des poids ?
 
-**Constat.** La synthèse v1 attribue les poids au centre gestionnaire de la
-participation (`ParticipationMagasin.centreId`), cohérent avec RDC-SAISIE-006.
-La comparaison annuelle et certaines séries journalières utilisent au contraire
-le centre de rattachement permanent (`Magasin.centreId`).
+**Constat.** La v1 attribue tantôt les poids au centre gestionnaire de la
+participation (`ParticipationMagasin.centreId`), tantôt au centre de rattachement
+permanent (`Magasin.centreId`). L'incohérence existe jusque dans la même fonction
+`fetch()` : le total par centre passe par la participation, tandis que sa série
+journalière passe par le magasin. Les statistiques dédiées à un centre reviennent
+à la participation ; la comparaison annuelle utilise le rattachement permanent.
 
 **À décider.** Retenir le centre gestionnaire, le centre de rattachement, ou
 présenter explicitement les deux axes. La décision doit être identique dans tous
 les écrans et exports.
 
 **Sources v1.**
-`apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:505-572,665-684` ;
+`apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:1040-1072`
+(synthèse par participation) ;
+`apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:665-684`
+(série journalière par magasin) ;
+`apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:1836-1853`
+(statistiques d'un centre par participation) ;
 `apps/api/src/infrastructure/queries/comparaison-annuelle.prisma.query.ts:186-204`.
 
 ## D-11 — Référence produit libre ou catalogue obligatoire ?
@@ -227,6 +240,7 @@ de façon identique à la validation d'unicité et aux statistiques N/N-1.
 
 **Sources v1.**
 `apps/api/src/application/use-cases/collecte/creer-collecte.usecase.ts:24-33` ;
+`apps/api/src/application/use-cases/collecte/modifier-collecte.usecase.ts:36-43` ;
 `apps/api/src/infrastructure/repositories/collecte.prisma.repository.ts:145-157`.
 
 ## D-13 — La raison de réouverture doit-elle être saisie ?

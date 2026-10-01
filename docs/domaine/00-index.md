@@ -94,7 +94,7 @@ collecte.
 1. Collecte : PREPARATION → EN_COURS → TERMINEE, sans retour (RDC-COLLECTE-001).
 2. La clôture d'une collecte est toujours décidée par l'admin, et seulement quand tous les centres ont terminé leur saisie (RDC-COLLECTE-005).
 3. Seul l'admin inscrit les magasins, en préparation ; inscrire = accord du magasin obtenu, la participation n'a pas de statut (RDC-COLLECTE-004, 017) ; l'accord est recueilli par la vérification que le siège ouvre et que chaque centre lui transmet (RDC-COLLECTE-014, 020).
-4. On ne pèse que dans la fenêtre de saisie, ou après une réouverture motivée par l'admin (RDC-SAISIE-001, RDC-COLLECTE-010).
+4. On ne pèse que dans la fenêtre de saisie, ou après une réouverture tracée par l'admin ; la saisie obligatoire de sa raison reste à décider (RDC-SAISIE-001, RDC-COLLECTE-010, D-13).
 5. Un poids est strictement positif et n'est jamais arrondi vers le bas (RDC-SAISIE-002).
 6. Un bénévole n'est jamais sur deux créneaux qui se chevauchent, tous plannings confondus (RDC-PLANIF-003).
 7. Un créneau est inclus dans la période de la collecte, et n'est modifiable que si la planification est ouverte (RDC-PLANIF-001/002).

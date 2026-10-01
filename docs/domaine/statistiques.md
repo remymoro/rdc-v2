@@ -111,20 +111,30 @@ les pesées** sont comptées, validées ou non. À confirmer.
 `core` · erreur · ⚠️ à trancher (D-10)
 
 **Règle.** RDC-SAISIE-006 attribue une pesée au centre gestionnaire de la
-participation. La v1 est incohérente : certaines synthèses utilisent
-`ParticipationMagasin.centreId`, tandis que la comparaison annuelle et certaines
-séries journalières utilisent `Magasin.centreId`, le rattachement permanent. La
-v2 doit choisir un seul axe et l'appliquer à tous les écrans et exports.
+participation. La v1 est incohérente jusque dans la même fonction `fetch()` : le
+total par centre utilise `ParticipationMagasin.centreId`, mais sa série
+journalière utilise `Magasin.centreId`, le rattachement permanent. Les
+statistiques dédiées à un centre reviennent à la participation ; la comparaison
+annuelle utilise le rattachement permanent. La v2 doit choisir un seul axe et
+l'appliquer à tous les écrans et exports.
 
 **Source v1.**
-`apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:505-572` ;
-`apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:665-684` ;
+`apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:1040-1072`
+(synthèse par participation) ;
+`apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:665-684`
+(série journalière par magasin) ;
+`apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:1836-1853`
+(statistiques d'un centre par participation) ;
 `apps/api/src/infrastructure/queries/comparaison-annuelle.prisma.query.ts:186-204`.
 
-**Axes temporels v1.** L'année d'une collecte vient de `dateDebut` via
-`EXTRACT(YEAR ...)`. Le jour d'une pesée vient de `SaisieEntry.createdAt`,
-converti de UTC vers `Europe/Paris` avant extraction.
+## Axes temporels observés en v1
+
+L'année d'une collecte vient de `dateDebut`. Elle est calculée à la fois en
+TypeScript avec `getFullYear()` et en SQL avec `EXTRACT(YEAR ...)`. Le jour d'une
+pesée vient de `SaisieEntry.createdAt`, converti de UTC vers `Europe/Paris` avant
+extraction.
 
 **Source v1.**
+`apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:309-313` ;
 `apps/api/src/infrastructure/queries/comparaison-annuelle.prisma.query.ts:186-228` ;
 `apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:634-684`.

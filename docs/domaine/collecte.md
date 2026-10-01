@@ -236,6 +236,11 @@ pas consultée pour autoriser une pesée. La fenêtre est recalculée depuis
 client prévoit au contraire une `dateFinSaisie` distincte et postérieure à
 `dateFin` (D-07).
 
+**Piège v1.** `FenetreSaisieCollecte.saisieEstOuverte()` n'est jamais appelée par
+le code applicatif. Si elle l'était, elle n'autoriserait la pesée que le dernier
+jour : à la création comme à la modification, `dateDebutSaisie` et
+`dateFinSaisie` reçoivent toutes deux `dateFin`.
+
 **Pourquoi.** Deux sources de vérité finissent par diverger.
 
 ```ts
@@ -254,7 +259,8 @@ métier.
 **Source v1.**
 `libs/domain/src/collecte/aggregates/collecte.aggregate.ts:448-451` ;
 `libs/domain/src/services/saisie-collecte.service.ts:20-30` ;
-`libs/domain/src/collecte/value-objects/fenetre-saisie-collecte.vo.ts:59-70`.
+`libs/domain/src/collecte/value-objects/fenetre-saisie-collecte.vo.ts:44-46,59-70` ;
+`libs/domain/src/collecte/aggregates/collecte.aggregate.ts:129-132,245-248`.
 
 ## RDC-COLLECTE-008 — Ouvrir et fermer la planification
 
@@ -290,7 +296,8 @@ déclaration, pas une saisie de données. L'auteur et la date sont enregistrés.
 Déclarer deux fois est un conflit (`SAISIE_CENTRE_DEJA_TERMINEE`). Le centre doit
 gérer au moins un magasin de la collecte, sinon `CENTRE_NON_PARTICIPANT` est
 renvoyé. Sans ligne persistée, son état implicite est EN_COURS et la ligne est
-créée au premier acte.
+créée au premier acte. Hors du statut EN_COURS, l'opération est refusée en 403
+avec `COLLECTE_STATUT_INVALIDE_POUR_CONFIRMATION`.
 
 **Pourquoi.** Sinon, une saisie rouverte tardivement ne pourrait plus être
 reconfirmée, et la collecte ne pourrait jamais être clôturée.

@@ -93,12 +93,15 @@ passe ni l'état d'un compte existant.
 
 `pragmatic` · erreur · 🔁 reportée à l'étape 4 (décision du 2026-10-01)
 
-**Règle.** Quand un centre est archivé, ses responsables sont désactivés dans la
-même transaction. La v1 ne révoque pas explicitement leurs sessions : le prochain
-rafraîchissement échoue car l'utilisateur est inactif, mais le jeton d'accès déjà
-émis reste valable jusqu'à 15 minutes. La v2 vise une révocation explicite en
-réaction à l'événement « centre archivé » (TENETS-EVENT-002), créé seulement
-quand ce consommateur existe (ADR-0003 R13).
+**Comportement v1.** Quand un centre est archivé, ses responsables sont
+désactivés dans la même transaction. Leurs sessions ne sont pas révoquées : le
+prochain rafraîchissement échoue car l'utilisateur est inactif, mais le jeton
+d'accès déjà émis reste valable jusqu'à 15 minutes.
+
+**Règle v2.** À l'étape 4, l'archivage d'un centre déclenche l'événement « centre
+archivé ». En réaction, Identité et accès désactive ses responsables **et révoque
+leurs sessions** (TENETS-EVENT-002). L'événement est créé avec ce consommateur
+(ADR-0003 R13).
 
 Le refus de désactiver un responsable dont le centre participe à une collecte
 active est reporté à l'étape 5, car il dépend du contrat publié par collecte.

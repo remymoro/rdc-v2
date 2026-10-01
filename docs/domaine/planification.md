@@ -25,6 +25,8 @@ plannings ; seul le code d'erreur change de préfixe en v1 (`PLANNING_MAGASIN_`,
 de la collecte soit ouverte (RDC-COLLECTE-008), information lue dans le
 contrat publié par `collecte`. Créer une affectation de planning centre ou
 chauffeur exige aussi que le centre soit ACTIF (RDC-REF-010).
+Le retrait d'un magasin d'une collecte annule ses créneaux lorsque l'admin le
+confirme avec `force=true` (RDC-COLLECTE-004).
 
 **Pourquoi.** L'admin décide quand les centres peuvent engager des bénévoles.
 
@@ -90,7 +92,7 @@ await this.unitOfWork.run(async () => {
 
 **Vérification en revue.** Test de chevauchement entre deux plannings,
 d'homonymie et de créneaux contigus. Codes v1 :
-`*_BENEVOLE_DEJA_PLANIFIE` et `*_BENEVOLE_DEJA_PLANIFIE_AILLEURS`. En v1, la
+`*_DEJA_PLANIFIE` et `*_DEJA_PLANIFIE_AILLEURS`. En v1, la
 lecture se faisait hors transaction (audit C-03) : double affectation possible
 sous concurrence.
 
@@ -130,7 +132,7 @@ fichier.
 `libs/domain/src/planning/benevoles-centre/aggregates/planning-benevoles-centre.aggregate.ts:86-146`
 et `libs/domain/src/planning/chauffeur/aggregates/planning-chauffeur.aggregate.ts:108-168`.
 
-## RDC-PLANIF-006 — Un planning référence des bénévoles existants
+## RDC-PLANIF-006 — Un planning référence des bénévoles existants — v2 : selon D-05
 
 `pragmatic` · avertissement · ⚠️ à trancher (D-05)
 
@@ -144,8 +146,8 @@ magasin dans la collecte.
 empêche d'informer la personne et de l'anonymiser (audit B-03).
 
 **Source v1.**
-`apps/api/src/application/use-cases/planning-magasin/planifier-benevoles-magasin.usecase.ts:114-125,152-185` ;
-`apps/api/src/application/use-cases/planning-chauffeur/planifier-chauffeur.usecase.ts:127-139,165-190`.
+`apps/api/src/application/use-cases/planning-magasin/planifier-benevoles-magasin.usecase.ts:152-193` ;
+`apps/api/src/application/use-cases/planning-chauffeur/planifier-chauffeur.usecase.ts:165-206`.
 
 ## RDC-PLANIF-007 — Un bénévole du planning centre appartient à ce centre
 
