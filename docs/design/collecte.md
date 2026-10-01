@@ -201,8 +201,14 @@ type CentreAvecMagasinsPublic = {
   magasins: readonly MagasinPublic[];
 };
 
+type CentrePublic = {
+  id: string;
+  statut: StatutReferentielPublic;
+};
+
 abstract class ReferentielPublic {
   abstract obtenirMagasin(id: string): Promise<(MagasinPublic & { centreStatut: StatutReferentielPublic }) | null>;
+  abstract obtenirCentre(id: string): Promise<CentrePublic | null>;
   abstract listerCentresAvecMagasins(): Promise<readonly CentreAvecMagasinsPublic[]>;
 }
 ```
@@ -212,17 +218,27 @@ magasin : le contrat expose les deux statuts nécessaires à RDC-COLLECTE-004,
 014 et 019, et `collecte` exprime dans son propre langage les filtres propres à
 chaque workflow.
 
-Dans `collecte/application`, deux ports consommateurs décrivent ces besoins :
+Dans `collecte/application`, trois ports consommateurs décrivent ces besoins :
 
 ```ts
 abstract class MagasinsInscriptibles {
   abstract obtenir(magasinId: MagasinId): Promise<EtatMagasinPourCollecte | null>;
 }
 
+abstract class CentresGestionnaires {
+  abstract obtenir(centreId: CentreId): Promise<EtatCentrePourCollecte | null>;
+}
+
 abstract class CandidatsVerification {
   abstract listerActifsParCentreActif(): Promise<readonly CandidatsDUnCentre[]>;
 }
 ```
+
+`CentresGestionnaires` sert à `ReassignerMagasinUseCase` : le centre cible est
+quelconque, et RDC-COLLECTE-004 accepte un centre INACTIF mais refuse un centre
+ARCHIVE (`CENTRE_ARCHIVE`) ; un centre inconnu donne `CENTRE_NOT_FOUND`. Son
+adapter s'appuie sur `obtenirCentre`, et non sur la liste filtrée des centres
+actifs de `CandidatsVerification`.
 
 Ces ports sont applicatifs : ils servent à valider des références externes et
 à orchestrer, pas à exécuter un comportement pur de l'agrégat
@@ -424,6 +440,7 @@ R6). Les codes v1 sont conservés lorsqu'ils existent.
 | `COLLECTE_CLOTURE_NON_DEMANDEE`, `COLLECTE_SAISIES_CENTRES_INCOMPLETES`                                               |  400 | clôture impossible                                 |
 | `COLLECTE_STATUT_INVALIDE_POUR_CONFIRMATION`, `COLLECTE_STATUT_INVALIDE_POUR_REOUVERTURE`                             |  403 | opération de saisie non autorisée dans cet état    |
 | `MAGASIN_NOT_FOUND`                                                                                                   |  404 | magasin absent du référentiel                      |
+| `CENTRE_NOT_FOUND`                                                                                                    |  404 | centre cible absent du référentiel                 |
 | `MAGASIN_NON_INSCRIT`                                                                                                 |  400 | magasin absent de la collecte (statut v1 conservé) |
 | `MAGASIN_INACTIF`, `CENTRE_ARCHIVE`                                                                                   |  400 | référence non inscriptible selon RDC-COLLECTE-004  |
 | `MAGASIN_A_DES_SLOTS_ACTIFS`                                                                                          |  409 | retrait sans `force` impossible                    |
