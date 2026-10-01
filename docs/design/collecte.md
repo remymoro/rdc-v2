@@ -15,8 +15,9 @@ statistiques restent hors du contexte : `collecte` leur publie seulement les
 réponses définies par RDC-COLLECTE-013.
 
 Les tables de RDC v1 sont conservées sans suppression ni renommage
-(ADR-0008). La vérification est additive. Les décisions D-07, D-12 et D-13
-restent ouvertes et aucune variante n'est choisie ici.
+(ADR-0008). La vérification est additive. Les décisions D-07 et D-13 restent
+ouvertes et aucune variante n'est choisie ici. D-12 est décidée depuis : année
+civile Europe/Paris de la date de début.
 
 ## Modèle et frontières transactionnelles
 
@@ -97,10 +98,10 @@ avec `Collecte` dans une unité de travail ; aucun agrégat ne charge un autre
 | RDC-COLLECTE-019 | Use case charge la dernière `Collecte` TERMINEE, valide les magasins actuels via le port et inscrit dans la collecte en PREPARATION.                           |
 | RDC-COLLECTE-020 | `ListeVerification.transmettre`, avec historique de l'auteur, de la date et de l'avis.                                                                         |
 | RDC-COLLECTE-021 | `ListeVerification.renvoyer`, avec historique de l'auteur, de la date et de la raison.                                                                         |
-| RDC-COLLECTE-022 | Use cases et repository garantissent l'unicité annuelle ; calcul de l'année hors implémentation tant que D-12 est ouverte.                                     |
+| RDC-COLLECTE-022 | Use cases et repository garantissent l'unicité annuelle ; année civile Europe/Paris de la date de début (D-12 décidée).                                        |
 
-Les règles 007, 010 pour le caractère obligatoire de la raison, et 022 pour le
-fuseau sont conçues mais non implémentables avant D-07, D-13 et D-12. D-03
+Les règles 007 et 010, pour le caractère obligatoire de la raison, sont
+conçues mais non implémentables avant D-07 et D-13. D-03
 conditionne en plus le futur comportement de `referentiel` quand un magasin
 participe à une collecte active ; ce design ne choisit ni blocage ni retrait.
 
@@ -396,7 +397,7 @@ R6). Les codes v1 sont conservés lorsqu'ils existent.
 | `PERIODE_DATE_DEBUT_INVALIDE`, `PERIODE_DATE_DEBUT_PASSEE`, `PERIODE_DATE_FIN_INVALIDE`                               |  400 | période invalide                                   |
 | `COLLECTE_NOT_FOUND`                                                                                                  |  404 | collecte absente                                   |
 | `COLLECTE_ALREADY_EXISTS`                                                                                             |  409 | nom déjà pris (nouveau code v2)                    |
-| `COLLECTE_ANNEE_DEJA_EXISTANTE`                                                                                       |  400 | année déjà prise (statut v1 conservé)              |
+| `COLLECTE_ANNEE_DEJA_EXISTANTE`                                                                                       |  409 | année déjà prise (statut v1 conservé)              |
 | `COLLECTE_STATUT_INVALIDE`, `COLLECTE_MODIFICATION_INTERDITE`, `COLLECTE_REASSIGNATION_INTERDITE`                     |  400 | transition interdite (statut v1 conservé)          |
 | `COLLECTE_MODIFICATION_INTERDITE_PLANIFICATION_OUVERTE`                                                               |  400 | modification pendant la planification              |
 | `COLLECTE_DEMARRAGE_AVANT_DATE_DEBUT`, `COLLECTE_AUCUN_MAGASIN_INSCRIT`                                               |  400 | collecte non démarrable (statut v1 conservé)       |
@@ -449,7 +450,7 @@ place du centre.
 
 | Lot | Contenu après design                                                                                                                                                                       | Prérequis                                             |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------- |
-| 2   | Tranche complète « créer une collecte » : domain/application, `Collecte`, période, repositories mémoire et Prisma, migration `version` + `etatVerification`, `POST /api/collectes` et E2E. | lot 1 fusionné, D-12                                  |
+| 2   | Tranche complète « créer une collecte » : domain/application, `Collecte`, période, repositories mémoire et Prisma, migration `version` + `etatVerification`, `POST /api/collectes` et E2E. | lot 1 fusionné                                        |
 | 3   | Participations, reprise précédente, contrat publié `referentiel`, ports et adapter de traduction ; extension du repository Prisma existant.                                                | lot 2, étape 3, ADR-0014 accepté                      |
 | 4   | Domaine `ListeVerification`, historique, gel, version et suites de contrat en mémoire.                                                                                                     | lot 2                                                 |
 | 2b  | Démarrer une collecte et figer atomiquement les listes ; tâche planifiée.                                                                                                                  | lots 2 et 4                                           |
@@ -468,7 +469,7 @@ lot 2 livre la première tranche verticale complète et sa migration, puis le lo
 | -------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | D-03     | blocage ou retrait d'un magasin actif       | extension du contrat publié de `collecte`, sans choix dans ce lot                                  |
 | D-07     | fenêtre de saisie                           | bloque RDC-COLLECTE-007 et le calcul de `centrePeutPeser`                                          |
-| D-12     | fuseau de l'année                           | bloque création/modification et lot 2                                                              |
+| D-12     | fuseau de l'année                           | ✅ décidée : année civile Europe/Paris, appliquée dès le lot 2                                     |
 | D-13     | raison réellement saisie                    | bloque la forme finale de RDC-COLLECTE-010                                                         |
 | V-1      | avis global facultatif                      | hypothèse actuelle conservée par RDC-COLLECTE-020                                                  |
 | V-2      | A_CONTACTER autorisé à la transmission      | hypothèse actuelle conservée par RDC-COLLECTE-020                                                  |
