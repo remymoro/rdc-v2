@@ -1,4 +1,8 @@
-import type { CentreId, NouveauCentre } from '@rdc/referentiel-domain';
+import type {
+  CentreId,
+  NouveauCentre,
+  NouveauMagasin,
+} from '@rdc/referentiel-domain';
 
 /**
  * Création d'un centre : tout l'état initial sauf l'identifiant, généré par
@@ -20,3 +24,9 @@ export interface ActiverCentreCommande {
 export interface ArchiverCentreCommande {
   readonly centreId: CentreId;
 }
+
+/**
+ * Création d'un magasin dans un centre : tout l'état initial sauf
+ * l'identifiant, généré par le use case (ADR-0003, R8).
+ */
+export type CreerMagasinCommande = Omit<NouveauMagasin, 'id'>;
