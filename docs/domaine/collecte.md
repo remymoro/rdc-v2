@@ -453,7 +453,11 @@ chaque centre actif, avec **tous les magasins actifs rattachés** au centre
 (contrat publié par `referentiel`). Chaque magasin a la réponse « à contacter »
 et l'indication « a participé à la collecte précédente ». Tant que la
 vérification est ouverte, l'admin peut ajouter à une liste un magasin créé ou
-réactivé depuis.
+réactivé depuis. Un magasin n'a qu'une réponse par collecte : transféré vers un
+autre centre depuis l'ouverture, il reste dans sa liste d'origine et ne peut
+pas être ajouté à une autre (`MAGASIN_DEJA_DANS_UNE_LISTE`) ; l'admin peut
+réassigner son centre gestionnaire après l'inscription (RDC-COLLECTE-004).
+Décidé le 2026-10-01 (V-5).
 
 **Pourquoi.** C'est le siège qui lance la campagne. Un nouveau magasin entre
 automatiquement dans la liste, et un magasin qui a sauté une année n'est pas
