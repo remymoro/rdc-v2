@@ -2,7 +2,8 @@
 
 - **Ouverte le :** 2026-10-01
 - **Règles :** RDC-REF-001 à 010 (`docs/domaine/referentiel.md`), sauf
-  RDC-REF-006 (reportée à l'étape 5, D-03) et RDC-REF-009 (statistiques, D-04)
+  RDC-REF-004 (reportée à l'étape 5), RDC-REF-006 (reportée à l'étape 5, D-03)
+  et RDC-REF-009 (statistiques, D-04)
 - **Exécutant :** Codex, un lot = une branche = une pull request
 - **Orchestration et relecture :** Claude Code
 - **Modèle à imiter :** la création et le cycle de vie d'un centre (étapes 1
@@ -24,17 +25,17 @@ A1  Créer un magasin                   (domaine → HTTP, comme le centre)
  ├── A3  Modifier et transférer       (PATCH, transfert vers un autre centre)
  └── A4  Lire les magasins            (liste, liste d'un centre, détail)
 B   Catalogue des produits             (indépendant des lots A)
-C   Images d'un magasin                (après A1 et confirmation du stockage)
+C   Images d'un magasin                (après A1 et confirmation du lieu NAS)
 ```
 
-| Lot | Brief                           | Branche                              | Prérequis                     | État      |
-| --- | ------------------------------- | ------------------------------------ | ----------------------------- | --------- |
-| A1  | `lot-a1-creer-magasin.md`       | `feat/referentiel-creer-magasin`     | —                             | 🟢 prêt   |
-| A2  | `lot-a2-cycle-de-vie.md`        | `feat/referentiel-cycle-vie-magasin` | A1                            | ⏸ bloqué |
-| A3  | `lot-a3-modifier-transferer.md` | `feat/referentiel-modifier-magasin`  | A1                            | ⏸ bloqué |
-| A4  | `lot-a4-lire-magasins.md`       | `feat/referentiel-lire-magasins`     | A1                            | ⏸ bloqué |
-| B   | `lot-b-produits.md`             | `feat/referentiel-produits`          | —                             | 🟢 prêt   |
-| C   | `lot-c-images.md`               | `feat/referentiel-images-magasin`    | A1 + stockage confirmé        | ⏸ bloqué |
+| Lot | Brief                           | Branche                              | Prérequis                          | État      |
+| --- | ------------------------------- | ------------------------------------ | ---------------------------------- | --------- |
+| A1  | `lot-a1-creer-magasin.md`       | `feat/referentiel-creer-magasin`     | —                                  | 🟢 prêt   |
+| A2  | `lot-a2-cycle-de-vie.md`        | `feat/referentiel-cycle-vie-magasin` | A1                                 | ⏸ bloqué |
+| A3  | `lot-a3-modifier-transferer.md` | `feat/referentiel-modifier-magasin`  | A1                                 | ⏸ bloqué |
+| A4  | `lot-a4-lire-magasins.md`       | `feat/referentiel-lire-magasins`     | A1                                 | ⏸ bloqué |
+| B   | `lot-b-produits.md`             | `feat/referentiel-produits`          | —                                  | 🟢 prêt   |
+| C   | `lot-c-images.md`               | `feat/referentiel-images-magasin`    | A1 + lieu de stockage NAS confirmé | ⏸ bloqué |
 
 A2, A3 et A4 peuvent avancer en parallèle après A1 ; A1 et B dès maintenant.
 Le lot C attend aussi la confirmation du lieu de stockage après le rendez-vous NAS.

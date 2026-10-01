@@ -46,9 +46,9 @@ pull request titrée « feat(referentiel): images d'un magasin ».
     pas touché. Si la suppression du fichier échoue, il reste orphelin ; la
     réponse HTTP reste 204, l'échec est journalisé.
   - **Nettoyage** : un use case supprime les fichiers d'images sans ligne en
-    base. Il s'exécute au démarrage de l'API (le NAS est éteint hors saison),
-    est idempotent, et ignore les fichiers de moins d'une heure pour ne pas
-    effacer un ajout en cours.
+    base. Il s'exécute au démarrage de l'API puis toutes les heures (le NAS est
+    éteint hors saison), est idempotent, et ignore les fichiers de moins d'une
+    heure pour ne pas effacer un ajout en cours.
 - Contrat v1 : `POST /api/magasins/:id/images` (multipart),
   `DELETE /api/magasins/:id/images/:imageId` ; URL publique comme en v1.
 
@@ -66,11 +66,12 @@ pull request titrée « feat(referentiel): images d'un magasin ».
    dont l'effacement du fichier échoue (204, orphelin journalisé).
 5. `NettoyerImagesOrphelinesUseCase` : supprime les orphelins de plus d'une
    heure, garde les autres, relancé deux fois sans effet de plus ; exécuté au
-   démarrage de l'API. Un échec de suppression est journalisé et réessayé au
-   prochain démarrage.
+   démarrage de l'API puis toutes les heures. Un échec de suppression est
+   journalisé et réessayé à la prochaine exécution.
 6. Tests de nettoyage : conserve les fichiers récents et référencés, supprime
-   les orphelins anciens, puis réessaie un orphelin dont la suppression avait
-   échoué au démarrage précédent.
+   les orphelins anciens, puis réessaie à l'exécution suivante un orphelin dont
+   la suppression avait échoué ; couvre un orphelin créé après le démarrage et
+   supprimé par un passage horaire après avoir dépassé une heure.
 7. HTTP et E2E : 201 ; 413 `IMAGE_TROP_VOLUMINEUSE` (fichier de 5 Mo + 1
    octet) ; 400 `IMAGE_FORMAT_NON_SUPPORTE` (PDF annoncé `image/jpeg`) ; 400
    `MAGASIN_IMAGE_INTROUVABLE` ; 404 magasin inconnu.
