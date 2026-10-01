@@ -84,9 +84,10 @@ Relations à respecter (TENETS-CONTEXT-002 à 006) :
 - `statistiques` lit tout et n'écrit rien.
 
 Ordre de construction proposé : referentiel → identite-acces → collecte →
-benevoles → planification → saisie → statistiques. Il diffère de la feuille de
-route : collecte vient avant bénévoles, car planification et saisie dépendent
-de ses contrats. Voir `a-trancher.md` (D-01).
+benevoles → planification → saisie → statistiques. La feuille de route regroupe
+bénévoles, planification et saisie dans l'étape 6 ; leur ordre interne reste à
+trancher (D-01), car planification dépend de bénévoles et saisie des contrats de
+collecte.
 
 ## Les 10 invariants métier à ne jamais casser
 

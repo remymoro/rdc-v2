@@ -23,7 +23,8 @@ plannings ; seul le code d'erreur change de préfixe en v1 (`PLANNING_MAGASIN_`,
 
 **Règle.** Créer, annuler ou supprimer un créneau exige que la planification
 de la collecte soit ouverte (RDC-COLLECTE-008), information lue dans le
-contrat publié par `collecte`.
+contrat publié par `collecte`. Créer une affectation de planning centre ou
+chauffeur exige aussi que le centre soit ACTIF (RDC-REF-010).
 
 **Pourquoi.** L'admin décide quand les centres peuvent engager des bénévoles.
 
@@ -35,7 +36,7 @@ if (!contexte.planificationOuverte) throw new PlanificationFermee(collecteId);
 
 **Vérification en revue.** Code v1 : `PLANIFICATION_BENEVOLES_FERMEE`.
 
-**Source v1.** `services/planification-collecte.service.ts#assertPlanningModifiable`.
+**Source v1.** `libs/domain/src/services/planification-collecte.service.ts:6-14`.
 
 ## RDC-PLANIF-002 — Un créneau est valide et inclus dans la période de la collecte
 
@@ -56,7 +57,9 @@ if (!contexte.periode.couvre(creneau)) throw new CreneauHorsPeriode();
 **Vérification en revue.** Codes v1 : `SLOT_HORS_PERIODE_COLLECTE`,
 `MAGASIN_NON_INSCRIT`. Un test par type de planning.
 
-**Source v1.** `shared/value-objects/creneau-horaire.vo.ts`, `periode-collecte.vo.ts#couvreCreneau`.
+**Source v1.** `libs/domain/src/shared/value-objects/creneau-horaire.vo.ts:12-40` ;
+`libs/domain/src/collecte/value-objects/periode-collecte.vo.ts:70-89` ;
+`libs/domain/src/services/planification-collecte.service.ts:16-55`.
 
 ## RDC-PLANIF-003 — Un bénévole n'est jamais sur deux créneaux qui se chevauchent
 
@@ -66,7 +69,8 @@ if (!contexte.periode.couvre(creneau)) throw new CreneauHorsPeriode();
 même planning **et de tous les autres plannings de la collecte** (magasins,
 centre, chauffeurs). Sont considérés comme le même bénévole : même identifiant,
 **ou** même nom et prénom (rapprochement volontairement large, homonymes
-compris). Les créneaux ANNULE sont ignorés.
+compris). Les créneaux ANNULE sont ignorés. Le chevauchement utilise des bornes
+strictes : deux créneaux bout à bout sont autorisés.
 
 **Pourquoi.** Un bénévole ne peut pas être à deux endroits à la fois, et des
 doublons d'identité existent dans les données.
@@ -84,11 +88,14 @@ await this.unitOfWork.run(async () => {
 });
 ```
 
-**Vérification en revue.** Test de chevauchement entre deux plannings
-différents et test d'homonymie. En v1, la lecture se faisait hors transaction
-(audit C-03) : double affectation possible sous concurrence.
+**Vérification en revue.** Test de chevauchement entre deux plannings,
+d'homonymie et de créneaux contigus. Codes v1 :
+`*_BENEVOLE_DEJA_PLANIFIE` et `*_BENEVOLE_DEJA_PLANIFIE_AILLEURS`. En v1, la
+lecture se faisait hors transaction (audit C-03) : double affectation possible
+sous concurrence.
 
-**Source v1.** `planning/*/aggregates/*.aggregate.ts`, `services/benevole-disponibilite.service.ts`.
+**Source v1.** `libs/domain/src/shared/value-objects/creneau-horaire.vo.ts:54-58` ;
+`libs/domain/src/planning/benevoles-centre/aggregates/planning-benevoles-centre.aggregate.ts:104-133`.
 
 ## RDC-PLANIF-004 — Le type d'engagement est figé dans le créneau
 
@@ -103,7 +110,7 @@ l'engagement du bénévole évolue ensuite.
 **Vérification en revue.** Les statistiques par engagement lisent l'instantané
 du créneau.
 
-**Source v1.** `prisma/schema.prisma#Slot.typeEngagementSnapshot`.
+**Source v1.** `apps/api/prisma/schema.prisma:261-284`.
 
 ## RDC-PLANIF-005 — Une seule implémentation des règles d'affectation
 
@@ -118,15 +125,36 @@ chevauchement : une correction appliquée à un seul fait diverger les autres.
 **Vérification en revue.** Modifier une règle d'affectation ne touche qu'un
 fichier.
 
+**Source v1.** Duplication constatée dans
+`libs/domain/src/planning/magasin/aggregates/planning-magasin.aggregate.ts:75-135`,
+`libs/domain/src/planning/benevoles-centre/aggregates/planning-benevoles-centre.aggregate.ts:86-146`
+et `libs/domain/src/planning/chauffeur/aggregates/planning-chauffeur.aggregate.ts:108-168`.
+
 ## RDC-PLANIF-006 — Un planning référence des bénévoles existants
 
 `pragmatic` · avertissement · ⚠️ à trancher (D-05)
 
-**Règle.** Un créneau référence un bénévole existant du centre. En v1, un
-chauffeur saisi en texte libre crée implicitement un bénévole
-(`findOrCreate`), hors du parcours bénévole.
+**Règle.** En v1, les plannings magasin et chauffeur acceptent une identité
+saisie en texte libre. Ils recherchent dans le centre concerné par email, puis
+téléphone, puis nom-prénom si l'homonyme est unique ; sinon ils créent un
+bénévole. Pour le planning magasin, le centre est le centre gestionnaire du
+magasin dans la collecte.
 
 **Pourquoi.** Créer des données personnelles en dehors du parcours prévu
 empêche d'informer la personne et de l'anonymiser (audit B-03).
 
-**Source v1.** `use-cases/planning-chauffeur/planifier-chauffeur.usecase.ts`.
+**Source v1.**
+`apps/api/src/application/use-cases/planning-magasin/planifier-benevoles-magasin.usecase.ts:114-125,152-185` ;
+`apps/api/src/application/use-cases/planning-chauffeur/planifier-chauffeur.usecase.ts:127-139,165-190`.
+
+## RDC-PLANIF-007 — Un bénévole du planning centre appartient à ce centre
+
+`core` · erreur · ⏳ à implémenter (étape 6)
+
+**Règle.** Un créneau du planning bénévoles centre ne peut référencer qu'un
+bénévole rattaché à ce même centre. Sinon, l'opération échoue avec
+`BENEVOLE_CENTRE_INCOMPATIBLE`. Cette contrainte reste valable quelle que soit la
+décision D-05 sur la création implicite des plannings magasin et chauffeur.
+
+**Source v1.**
+`apps/api/src/application/use-cases/planning-benevoles-centre/planifier-benevoles-centre.usecase.ts:88-99`.

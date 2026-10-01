@@ -41,7 +41,7 @@ const evolution = Evolution.entre(n1, n);
 
 **Vérification en revue.** Aucun autre calcul de variation (rechercher `/ n1`).
 
-**Source v1.** `libs/domain/src/services/comparaison-variation.service.ts`.
+**Source v1.** `libs/domain/src/services/comparaison-variation.service.ts:3-23`.
 
 ## RDC-STATS-002 — Des lectures découpées par besoin
 
@@ -51,10 +51,15 @@ const evolution = Evolution.entre(n1, n);
 avec ses propres types (pas de types Prisma ni d'agrégats). Aucun fichier de
 plus de 500 lignes (ADR-0003 R5).
 
-**Pourquoi.** En v1, une seule requête de 2 954 lignes porte toutes les
-statistiques (audit C-06) : c'est un point unique de maintenance et de lenteur.
+**Pourquoi.** En v1, `global-stats.prisma.query.ts` atteint 3 047 lignes et
+concentre la majorité des statistiques ; la comparaison annuelle dispose en
+plus de sa propre requête de 847 lignes. Ce sont des points de maintenance et de
+lenteur (audit C-06).
 
-**Source v1.** `infrastructure/queries/global-stats.prisma.query.ts`.
+**Source v1.**
+`apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:1-3047` ;
+`apps/api/src/infrastructure/queries/comparaison-annuelle.prisma.query.ts:1-847`,
+tailles vérifiées le 2026-10-01.
 
 ## RDC-STATS-003 — Le périmètre d'un document est respecté
 
@@ -67,7 +72,9 @@ attribuées (collectes, bénévoles) au lieu de les recopier.
 **Pourquoi.** Un document intitulé « Enseigne X » ne doit jamais afficher des
 chiffres du réseau entier.
 
-**Source v1.** `use-cases/stats/restreindre-stats-enseigne.ts`, `restreindre-stats-magasin.ts`.
+**Source v1.**
+`apps/api/src/application/use-cases/stats/restreindre-stats-enseigne.ts:22-83` ;
+`apps/api/src/application/use-cases/stats/restreindre-stats-magasin.ts:16-70`.
 
 ## RDC-STATS-004 — Les exports neutralisent les formules de tableur
 
@@ -82,6 +89,9 @@ Excel (audit A-17).
 
 **Vérification en revue.** Test d'export avec une valeur commençant par `=`.
 
+**Source v1.** Fonctionnalité absente :
+`docs/audit/audit-backend-2026-08-01.md:187` (audit A-17).
+
 ## RDC-STATS-005 — Ce qui est compté
 
 `core` · erreur · ⚠️ à trancher (D-08)
@@ -90,4 +100,31 @@ Excel (audit A-17).
 lus dans les articles pesés (référence figée, RDC-SAISIE-005). En v1, **toutes
 les pesées** sont comptées, validées ou non. À confirmer.
 
-**Source v1.** `global-stats.prisma.query.ts` (filtre `statut = 'PLANIFIE'` sur les créneaux, aucun filtre sur les pesées).
+**Source v1.**
+`apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:500-540`
+(créneaux PLANIFIE) et
+`apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:634-684`
+(pesées sans filtre de statut).
+
+## RDC-STATS-006 — Le centre crédité d'une pesée doit être cohérent
+
+`core` · erreur · ⚠️ à trancher (D-10)
+
+**Règle.** RDC-SAISIE-006 attribue une pesée au centre gestionnaire de la
+participation. La v1 est incohérente : certaines synthèses utilisent
+`ParticipationMagasin.centreId`, tandis que la comparaison annuelle et certaines
+séries journalières utilisent `Magasin.centreId`, le rattachement permanent. La
+v2 doit choisir un seul axe et l'appliquer à tous les écrans et exports.
+
+**Source v1.**
+`apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:505-572` ;
+`apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:665-684` ;
+`apps/api/src/infrastructure/queries/comparaison-annuelle.prisma.query.ts:186-204`.
+
+**Axes temporels v1.** L'année d'une collecte vient de `dateDebut` via
+`EXTRACT(YEAR ...)`. Le jour d'une pesée vient de `SaisieEntry.createdAt`,
+converti de UTC vers `Europe/Paris` avant extraction.
+
+**Source v1.**
+`apps/api/src/infrastructure/queries/comparaison-annuelle.prisma.query.ts:186-228` ;
+`apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:634-684`.

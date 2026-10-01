@@ -1,6 +1,6 @@
 # ADR-0011 — Connaissance métier : glossaire, contextes et règles `RDC-XXX-NNN`
 
-- **Statut :** proposé
+- **Statut :** accepté
 - **Date :** 2026-10-01
 
 ## Contexte
@@ -32,6 +32,12 @@ ne connaît pas les règles en invente.
      chaque session (environ 5 000 tokens) : le langage métier sert aussi aux
      spécifications et aux revues.
    - Les fichiers de contexte se chargent quand on modifie `libs/<contexte>/**`.
+   - `identite-acces.md` couvre aussi `libs/*/adapters/src/http/**/*` et
+     `apps/api/**/*`, car le périmètre « mon centre » traverse toutes les routes
+     HTTP.
+   - `a-trancher.md` se charge pour `docs/domaine/**`, pas pour `libs/**` : chaque
+     règle ⚠️ résume donc la décision qui la bloque et renvoie vers son identifiant
+     `D-XX`.
 4. **Une règle ⚠️ à trancher** n'est pas implémentée avant sa décision.
 
 ## Conséquences

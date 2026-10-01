@@ -15,15 +15,20 @@ vus dans la v1 ou tentants, qui ne doivent pas entrer dans le code v2.
 
 ## Référentiel
 
-| Terme                         | Contexte     | Définition                                                                                              | À éviter                           |
-| ----------------------------- | ------------ | ------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| **Centre**                    | referentiel  | Centre de distribution des Restos du Cœur du Lot-et-Garonne. Unité opérationnelle et périmètre d'accès. | site, antenne, agence              |
-| **Magasin**                   | referentiel  | Point de vente où se déroule la collecte. Rattaché en permanence à un centre.                           | boutique, shop, store              |
-| **Rattachement**              | referentiel  | Lien permanent magasin → centre. Distinct du centre gestionnaire d'une collecte.                        | affectation                        |
-| **Enseigne**                  | statistiques | Regroupement de magasins portant le même nom (casse et espaces ignorés). Aucun attribut dédié en v1.    | chaîne, marque                     |
-| **Produit**                   | referentiel  | Élément du catalogue de référence : code (`D` + 6 chiffres), famille, sous-famille, actif ou non.       | article (≠ article pesé)           |
-| **Famille / Sous-famille**    | referentiel  | Classement des produits utilisé par les statistiques.                                                   | catégorie                          |
-| **Actif / Inactif / Archivé** | referentiel  | Statut d'un centre ou d'un magasin. Inactif = en pause, réversible ; archivé = retiré définitivement.   | supprimé, désactivé définitivement |
+| Terme                                   | Contexte     | Définition                                                                                                                                    | À éviter                            |
+| --------------------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| **Centre**                              | referentiel  | Centre de distribution des Restos du Cœur du Lot-et-Garonne. Unité opérationnelle et périmètre d'accès.                                       | site, antenne, agence               |
+| **Magasin**                             | referentiel  | Point de vente où se déroule la collecte. Rattaché en permanence à un centre.                                                                 | boutique, shop, store               |
+| **Rattachement**                        | referentiel  | Lien permanent magasin → centre. Distinct du centre gestionnaire d'une collecte.                                                              | affectation                         |
+| **Transférer** (`transfererVers`)       | referentiel  | Changer le centre de rattachement permanent d'un magasin.                                                                                     | réassigner (réservé à une collecte) |
+| **Clé de doublon** (`CleDoublonCentre`) | referentiel  | Valeur normalisée qui identifie deux centres de même nom et adresse.                                                                          | identifiant, clé métier             |
+| **Enseigne**                            | statistiques | Regroupement v1 par nom après `UPPER(TRIM(nom))` : casse et espaces aux extrémités ignorés, espaces internes conservés. Aucun attribut dédié. | chaîne, marque                      |
+| **Produit**                             | referentiel  | Élément du catalogue de référence : code (`D` + 6 chiffres), famille, sous-famille, actif ou non.                                             | article (≠ article pesé)            |
+| **Famille / Sous-famille**              | referentiel  | Classement des produits utilisé par les statistiques.                                                                                         | catégorie                           |
+| **Actif / Inactif / Archivé**           | referentiel  | Statut d'un centre ou d'un magasin. Inactif = en pause, réversible et sans nouveau rattachement ; archivé = retiré définitivement.            | supprimé                            |
+| **Activer** (`activer`)                 | referentiel  | Passer un élément INACTIF à ACTIF.                                                                                                            | réactiver                           |
+| **Désactiver** (`desactiver`)           | referentiel  | Passer un élément ACTIF à INACTIF, de façon réversible.                                                                                       | mettre en pause                     |
+| **Archiver** (`archiver`)               | referentiel  | Passer définitivement un élément ACTIF ou INACTIF à ARCHIVE.                                                                                  | supprimer                           |
 
 ## Collecte
 
@@ -45,7 +50,7 @@ vus dans la v1 ou tentants, qui ne doivent pas entrer dans le code v2.
 | **Centre gestionnaire**               | collecte | Centre qui gère un magasin pour une collecte donnée. Par défaut le centre de rattachement, réassignable en préparation.           | centre du magasin                            |
 | **Réassigner**                        | collecte | Changer le centre gestionnaire d'une participation.                                                                               | transférer (≠ transfert de rattachement)     |
 | **Planification ouverte / fermée**    | collecte | Interrupteur piloté par l'admin : les plannings ne se modifient que lorsqu'elle est ouverte.                                      | inscriptions ouvertes (ancien nom v1)        |
-| **Démarrer**                          | collecte | Passer PREPARATION → EN_COURS (automatique à la date de début).                                                                   | lancer, ouvrir                               |
+| **Démarrer**                          | collecte | Passer PREPARATION → EN_COURS, automatiquement à la date de début ou manuellement par l'admin.                                    | lancer, ouvrir                               |
 | **Fenêtre de saisie**                 | collecte | Période pendant laquelle les pesées sont permises. Calculée à partir de la date de fin.                                           | saisie ouverte (comme état stocké)           |
 | **Saisie d'un centre**                | collecte | État de saisie d'un centre pour une collecte : en cours, terminée par le centre, rouverte par l'admin.                            | statut de saisie                             |
 | **Déclarer la saisie terminée**       | collecte | Le centre (ou l'admin, en forçant) affirme que toutes ses pesées sont faites.                                                     | valider la saisie (≠ valider une pesée)      |

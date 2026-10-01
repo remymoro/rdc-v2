@@ -13,7 +13,7 @@ lors d'un passage. Le droit de peser est décidé par `collecte`
 
 `core` · erreur · ⏳ à implémenter (étape 6)
 
-**Règle.** Créer ou modifier une pesée exige :
+**Règle.** Créer ou valider une pesée exige :
 
 - un magasin inscrit à la collecte ;
 - une collecte EN_COURS ;
@@ -39,7 +39,8 @@ if (!droit.autorise) throw new SaisieFermee(droit.motif);
 contrat, dans la même unité de travail que l'écriture. Codes v1 :
 `COLLECTE_SAISIE_FERMEE`, `COLLECTE_SAISIE_CENTRE_TERMINEE`, `MAGASIN_NON_INSCRIT`.
 
-**Source v1.** `services/saisie-collecte.service.ts`, `use-cases/saisie/creer-saisie-entry.usecase.ts`.
+**Source v1.** `apps/api/src/presentation/http/controllers/saisie.controller.ts:39-70` ;
+`apps/api/src/application/use-cases/saisie/valider-saisie-entry.usecase.ts:51-85`.
 
 ## RDC-SAISIE-002 — Un poids est strictement positif et n'est jamais arrondi vers le bas
 
@@ -63,27 +64,29 @@ const total = articles.map((a) => a.poids).reduce((s, p) => s.ajouter(p), Poids.
 ```
 
 **Vérification en revue.** Aucun calcul de poids en `number` à virgule dans le
-domaine. Base : `Decimal(10, 3)`.
+domaine. Base : `Decimal(10, 3)`. Code v1 : `POIDS_KG_INVALIDE`.
 
-**Source v1.** `saisie/value-objects/poids-kg.vo.ts`.
+**Source v1.** `libs/domain/src/saisie/value-objects/poids-kg.vo.ts:3-41`.
 
 ## RDC-SAISIE-003 — Une pesée contient au moins un article, et son numéro de passage se suit
 
 `core` · erreur · ⏳ à implémenter
 
 **Règle.** Une pesée concerne un couple (collecte, magasin) et contient au
-moins un article, sans identifiant d'article en double. Les pesées d'un même
-magasin dans une collecte sont numérotées 1, 2, 3… : la nouvelle prend le plus
-grand numéro existant + 1, calculé dans la même unité de travail que l'écriture.
+moins un article. En v1, les identifiants d'article sont des UUID générés par le
+serveur : leur absence de doublon est une garde technique, pas une règle
+interdisant deux lignes du même produit. Le prochain numéro de passage est
+calculé par `max + 1` hors transaction et sans contrainte unique ; garantir
+réellement 1, 2, 3… sans doublon est une amélioration v2.
 
 **Pourquoi.** Le numéro de passage sert à suivre les allers-retours au magasin
 pendant la collecte ; deux pesées simultanées ne doivent pas obtenir le même.
 
-**Vérification en revue.** Codes v1 : `SAISIE_ENTRY_VIDE`,
-`SAISIE_ENTRY_ITEM_DUPLICATE_ID`. Test de concurrence ou contrainte unique
-(collecte, magasin, numéro) en base.
+**Vérification en revue.** Code v1 : `SAISIE_ENTRY_VIDE`. La v2 ajoute un test de
+concurrence ou une contrainte unique (collecte, magasin, numéro) en base.
 
-**Source v1.** `saisie/saisie-entry.entity.ts`, `creer-saisie-entry.usecase.ts`.
+**Source v1.**
+`apps/api/src/application/use-cases/saisie/creer-saisie-entry.usecase.ts:91-113`.
 
 ## RDC-SAISIE-004 — Valider une pesée déjà validée est une erreur
 
@@ -106,14 +109,18 @@ if (!pesee.estValidee()) pesee.valider(maintenant); // masque l'anomalie
 pesee.valider(maintenant); // PeseeDejaValidee
 ```
 
-**Source v1.** `saisie/saisie-entry.entity.ts#valider`.
+**Source v1.** `libs/domain/src/saisie/saisie-entry.entity.ts:245-261`.
 
 ## RDC-SAISIE-005 — Un article pesé fige la référence du produit
 
-`core` · erreur · ⏳ à implémenter
+`core` · erreur · ⚠️ source de la référence à trancher (D-11)
 
-**Règle.** Chaque article copie la référence, la famille et la sous-famille du
-produit au moment de la pesée. Il n'a pas de clé étrangère vers le catalogue.
+**Règle.** Chaque article copie la référence, la famille et la sous-famille au
+moment de la pesée. En v1, ces valeurs viennent directement du client, sans
+validation contre le catalogue ; `ReferenceProduit` est une chaîne libre de 50
+caractères au plus, distincte de `CodeProduit`. La v2 doit décider si elle
+conserve cette liberté ou impose le catalogue (D-11). L'article n'a pas de clé
+étrangère vers le catalogue.
 
 **Pourquoi.** Le catalogue évolue (désactivation, reclassement) ; les
 statistiques des années passées doivent rester identiques.
@@ -123,13 +130,15 @@ statistiques des années passées doivent rester identiques.
 articles: [{ produitId, poids }]; // les stats joindront le catalogue actuel
 
 // ✅ Correct
-articles: [{ reference: produit.code, famille: produit.famille, sousFamille: produit.sousFamille, poids }];
+articles: [{ referenceSaisie, familleSaisie, sousFamilleSaisie, poids }];
 ```
 
 **Vérification en revue.** Les statistiques par famille lisent l'article, pas
 le catalogue.
 
-**Source v1.** `prisma/schema.prisma#SaisieEntryItem`.
+**Source v1.**
+`apps/api/src/application/use-cases/saisie/creer-saisie-entry.usecase.ts:101-113` ;
+`libs/domain/src/produit/value-objects/reference-produit.vo.ts:3-20`.
 
 ## RDC-SAISIE-006 — Une pesée appartient au centre gestionnaire, pas au centre de rattachement
 
@@ -152,4 +161,5 @@ const centreId = await this.participations.centreGestionnaire(collecteId, magasi
 **Vérification en revue.** Les contrôles de droit et de périmètre utilisent le
 centre gestionnaire.
 
-**Source v1.** `creer-saisie-entry.usecase.ts` (`collecte.centreGestionnairePour`).
+**Source v1.**
+`apps/api/src/application/use-cases/saisie/creer-saisie-entry.usecase.ts:63-89`.

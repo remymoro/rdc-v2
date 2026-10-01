@@ -15,21 +15,26 @@ règle concernée (état ⏳), et écrire un ADR si elle s'écarte de la v1.
 
 | ID   | Sujet                                       | Règles                           | Bloque l'étape |
 | ---- | ------------------------------------------- | -------------------------------- | -------------- |
-| D-01 | Ordre des étapes                            | —                                | 3              |
+| D-01 | Ordre interne de l'étape 6                  | —                                | 6              |
 | D-02 | ✅ Décidée : vérification, puis inscription | RDC-COLLECTE-004, 014 à 021      | —              |
 | D-03 | Magasin engagé dans une collecte active     | RDC-REF-006                      | 3              |
 | D-04 | Enseigne implicite ou explicite             | RDC-REF-009, RDC-STATS-003       | 3              |
-| D-05 | Chauffeur saisi en texte libre              | RDC-PLANIF-006, RDC-BENEVOLE-005 | 6              |
+| D-05 | Bénévole créé depuis un planning            | RDC-PLANIF-006, RDC-BENEVOLE-005 | 6              |
 | D-06 | Conservation et traçabilité RGPD            | RDC-BENEVOLE-004, RDC-ACCES-008  | 4 et 6         |
 | D-07 | Fenêtre de saisie                           | RDC-COLLECTE-007                 | 5              |
 | D-08 | Sens de la validation d'une pesée           | RDC-SAISIE-004, RDC-STATS-005    | 6              |
-| D-09 | Changement de mot de passe en libre-service | RDC-ACCES-007                    | 4              |
+| D-09 | Changement de mot de passe en libre-service | RDC-ACCES-009                    | 4              |
+| D-10 | Centre crédité des poids                    | RDC-STATS-006                    | 7              |
+| D-11 | Référence produit libre ou catalogue        | RDC-SAISIE-005                   | 6              |
+| D-12 | Fuseau de l'année d'une collecte            | RDC-COLLECTE-022                 | 5              |
+| D-13 | Raison de réouverture réellement saisie     | RDC-COLLECTE-010                 | 5              |
 
 ## D-01 — Ordre des étapes
 
-**Constat.** La feuille de route place bénévoles et planification avec la
-saisie (étape 6), après collecte (étape 5). Planification et saisie dépendent
-des contrats publiés par collecte (RDC-COLLECTE-013).
+**Constat.** La feuille de route place bénévoles, planification et saisie dans
+la même étape 6, après collecte (étape 5). Leur ordre interne n'est pas fixé :
+planification dépend de bénévoles, et planification comme saisie dépendent des
+contrats publiés par collecte (RDC-COLLECTE-013).
 
 **Proposition.** referentiel → identite-acces → collecte → benevoles →
 planification → saisie → statistiques. Bénévoles peut aussi venir plus tôt :
@@ -119,17 +124,20 @@ case de coordination.
 
 ## D-04 — L'enseigne est-elle une donnée ?
 
-**Constat.** En v1, l'enseigne est le nom du magasin normalisé. Deux magasins
-de même enseigne doivent donc porter exactement le même nom, et un magasin ne
-peut pas s'appeler « Leclerc Agen Sud ».
+**Constat.** En v1, l'enseigne est le nom du magasin normalisé par
+`UPPER(TRIM(nom))` : casse et espaces aux extrémités sont ignorés, mais les
+espaces internes comptent. Un magasin peut s'appeler « Leclerc Agen Sud » ; il
+forme alors une enseigne distincte de « Leclerc ».
 
 **Options.** (a) Convention v1. (b) Attribut `enseigne` du magasin, avec
 reprise des données (enseigne = nom actuel).
 
-## D-05 — Chauffeur saisi en texte libre
+## D-05 — Bénévole créé depuis un planning
 
-**Constat.** En v1, saisir un chauffeur inconnu dans le planning crée un
-bénévole (`findOrCreate`), hors du parcours bénévole (audit B-03).
+**Constat.** En v1, saisir une personne inconnue dans un planning magasin ou
+chauffeur crée un bénévole (`findOrCreate`) dans le centre concerné, hors du
+parcours bénévole (audit B-03). Le rapprochement se fait par email, puis
+téléphone, puis homonyme unique.
 
 **Options.** (a) Le planning n'accepte que des bénévoles existants. (b) La
 création reste possible depuis le planning, mais passe par le use case de
@@ -177,3 +185,58 @@ cible était un NAS local non exposé à Internet.
 
 **À décider.** Le déploiement cible de la v2 est-il toujours ce NAS ? Si l'API
 est exposée sur Internet, le libre-service redevient nécessaire.
+
+## D-10 — Quel centre est crédité des poids ?
+
+**Constat.** La synthèse v1 attribue les poids au centre gestionnaire de la
+participation (`ParticipationMagasin.centreId`), cohérent avec RDC-SAISIE-006.
+La comparaison annuelle et certaines séries journalières utilisent au contraire
+le centre de rattachement permanent (`Magasin.centreId`).
+
+**À décider.** Retenir le centre gestionnaire, le centre de rattachement, ou
+présenter explicitement les deux axes. La décision doit être identique dans tous
+les écrans et exports.
+
+**Sources v1.**
+`apps/api/src/infrastructure/queries/global-stats.prisma.query.ts:505-572,665-684` ;
+`apps/api/src/infrastructure/queries/comparaison-annuelle.prisma.query.ts:186-204`.
+
+## D-11 — Référence produit libre ou catalogue obligatoire ?
+
+**Constat.** En v1, référence, famille et sous-famille viennent du client sans
+contrôle catalogue. `ReferenceProduit` est libre (50 caractères au plus) et
+distincte de `CodeProduit`.
+
+**À décider.** Conserver la référence libre pour ne pas bloquer le terrain, ou
+exiger un produit du catalogue et prévoir un parcours explicite pour les produits
+inconnus.
+
+**Sources v1.**
+`apps/api/src/application/use-cases/saisie/creer-saisie-entry.usecase.ts:101-113` ;
+`libs/domain/src/produit/value-objects/reference-produit.vo.ts:3-20`.
+
+## D-12 — Quel fuseau définit l'année d'une collecte ?
+
+**Constat.** Les use cases v1 utilisent `dateDebut.getFullYear()` alors que le
+repository recherche entre deux bornes construites avec `Date.UTC`. Une date
+proche du changement d'année peut donc être classée différemment selon le fuseau
+du processus.
+
+**À décider.** Année civile `Europe/Paris` (usage métier) ou année UTC, appliquée
+de façon identique à la validation d'unicité et aux statistiques N/N-1.
+
+**Sources v1.**
+`apps/api/src/application/use-cases/collecte/creer-collecte.usecase.ts:24-33` ;
+`apps/api/src/infrastructure/repositories/collecte.prisma.repository.ts:145-157`.
+
+## D-13 — La raison de réouverture doit-elle être saisie ?
+
+**Constat.** Le domaine v1 exige au moins 3 caractères, mais la requête HTTP rend
+la raison facultative et le use case fournit une phrase par défaut.
+
+**À décider.** Exiger une justification réellement saisie par l'admin, ou
+assumer une raison technique par défaut.
+
+**Sources v1.** `libs/domain/src/collecte/saisie-centre.entity.ts:145-159` ;
+`apps/api/src/application/use-cases/collecte/reouvrir-saisie-centre.usecase.ts:79-80` ;
+`apps/api/src/presentation/http/dtos/requests/reouvrir-saisie-centre.request.ts:1-8`.
