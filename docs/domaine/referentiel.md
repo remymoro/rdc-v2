@@ -122,12 +122,14 @@ actifs rattachés à chaque centre actif (TENETS-CONTEXT-006).
 
 ## RDC-REF-006 — Désactiver ou archiver un magasin engagé dans une collecte active
 
-`core` · erreur · ⚠️ à trancher (D-03)
+`core` · erreur · 🔁 reportée à l'étape 5 · ⚠️ comportement à trancher (D-03)
 
 **Règle.** Le code v1 refuse la désactivation et l'archivage d'un magasin qui
 participe à une collecte PREPARATION ou EN_COURS (`MAGASIN_COLLECTES_EN_COURS`).
 Le document soumis au client prévoyait au contraire un **retrait automatique**
-du magasin en PREPARATION. À trancher avant l'étape 3.
+du magasin en PREPARATION. La règle dépend de `collecte` : elle est reportée à
+l'étape 5, comme RDC-REF-004 ; le choix du comportement (D-03) se fait avant
+cette étape.
 
 **Vérification en revue.** Une fois tranchée, la règle vit dans le domaine,
 pas dans un use case seul.
@@ -170,13 +172,14 @@ catalogue peut donc évoluer sans modifier l'historique.
 
 ## RDC-REF-009 — L'enseigne d'un magasin
 
-`pragmatic` · avertissement · ⚠️ à trancher (D-04)
+`pragmatic` · avertissement · ⏳ à implémenter (étape 7) · D-04 décidée
 
 **Règle.** En v1, l'enseigne n'existe pas comme donnée : c'est le **nom du
 magasin** normalisé par `UPPER(TRIM(nom))`. Seuls les espaces de début et de fin
 et la casse sont ignorés ; les espaces internes comptent. « Leclerc » et
-« Leclerc Agen Sud » forment donc deux enseignes. À décider : attribut
-`enseigne` explicite sur le magasin, ou maintien de la convention v1.
+« Leclerc Agen Sud » forment donc deux enseignes. **Décision D-04 : la v2
+garde cette convention.** Le magasin n'a pas de champ `enseigne` ; un tel champ
+pourra s'ajouter plus tard par une migration qui recopie le nom.
 
 **Source v1.**
 `apps/api/src/application/use-cases/stats/restreindre-stats-enseigne.ts:86-88` ;

@@ -21,17 +21,18 @@ La vérification vit dans le contexte `collecte`, qui n'existe pas encore
 (étape 5). Elle a besoin de la liste des magasins actifs par centre (contrat
 publié par `referentiel`), et de rôles pour l'HTTP (étape 4).
 
-L'étape 3 (magasins) reste bloquée jusqu'aux décisions D-03 et D-04
-(`docs/domaine/a-trancher.md`) : RDC-REF-006 et RDC-REF-009 doivent être
-tranchées avant de créer le vrai repository `Magasin` et le contrat « magasins
-actifs par centre » du lot 3.
+L'étape 3 (magasins) n'est plus bloquée (2026-10-01) : RDC-REF-006 est
+reportée à l'étape 5 (D-03 reste à trancher d'ici là) et D-04 est décidée
+(convention v1, pas de champ `enseigne`). L'étape 3 passe avant le lot 3, dont
+le contrat publié « magasins actifs par centre » s'appuie sur le vrai
+repository `Magasin`.
 
 ```text
 Lot 1  Design doc collecte + vérification            (doc seulement)
   │
 Lot 2  Créer une collecte                            ← décision D-12
   │                                    Étape 3  Magasins : créer, rattacher, statuts
-  │                                      │      (hors mission ; bloquée par D-03 et D-04)
+  │                                      │      (hors mission, en parallèle des lots 1 et 2)
   ├── Lot 2b Démarrer une collecte (rattrapage après la veille)
   ├── Lot 3  Inscrire les magasins + reprise N-1 ◄──┘ (contrat publié « magasins actifs par centre »)
   └── Lot 4  Domaine : ListeVerification
@@ -60,16 +61,14 @@ Lot 2  Créer une collecte                            ← décision D-12
 
 ## Décisions à prendre avant les lots concernés
 
-| Décision | Question                                                                        | Bloque              | Proposition                                                                   |
-| -------- | ------------------------------------------------------------------------------- | ------------------- | ----------------------------------------------------------------------------- |
-| D-12     | Fuseau de l'année d'une collecte (RDC-COLLECTE-022)                             | lot 2               | Année civile `Europe/Paris`                                                   |
-| D-03     | Désactiver ou archiver un magasin engagé dans une collecte active (RDC-REF-006) | étape 3, donc lot 3 | Reporter la règle à l'étape 5, comme RDC-REF-004 pour le centre               |
-| D-04     | Enseigne : nom du magasin ou donnée à part (RDC-REF-009)                        | étape 3, donc lot 3 | Garder la convention v1 ; un champ `enseigne` s'ajoutera sans casse si besoin |
-| V-1      | « Avis » = commentaire global du centre à la transmission ?                     | lot 4               | Oui, facultatif                                                               |
-| V-2      | Transmettre avec des magasins encore « à contacter » ?                          | lot 4               | Oui, signalés au siège comme non vérifiés                                     |
-| V-3      | Le siège voit-il l'avancement avant transmission ?                              | lot 5               | Oui, en lecture seule                                                         |
-| V-4      | Une liste non transmise bloque-t-elle le démarrage ?                            | lot 4               | Non, avertissement seulement                                                  |
-| Client   | Le responsable de centre saisit les réponses dans RDC (COLLECTE-014)            | lot 7               | À présenter avant la mise en service                                          |
+| Décision | Question                                                             | Bloque | Proposition                               |
+| -------- | -------------------------------------------------------------------- | ------ | ----------------------------------------- |
+| D-12     | Fuseau de l'année d'une collecte (RDC-COLLECTE-022)                  | lot 2  | Année civile `Europe/Paris`               |
+| V-1      | « Avis » = commentaire global du centre à la transmission ?          | lot 4  | Oui, facultatif                           |
+| V-2      | Transmettre avec des magasins encore « à contacter » ?               | lot 4  | Oui, signalés au siège comme non vérifiés |
+| V-3      | Le siège voit-il l'avancement avant transmission ?                   | lot 5  | Oui, en lecture seule                     |
+| V-4      | Une liste non transmise bloque-t-elle le démarrage ?                 | lot 4  | Non, avertissement seulement              |
+| Client   | Le responsable de centre saisit les réponses dans RDC (COLLECTE-014) | lot 7  | À présenter avant la mise en service      |
 
 V-1 à V-4 sont les choix par défaut inscrits dans COLLECTE-016 à 020 : une
 réponse différente modifie la règle avant le lot, pas pendant.
