@@ -39,8 +39,10 @@ de nouvel ADR, aucune option nouvelle n'est tranchée :
   `PATCH /api/centres/:id/archiver` ; corps ignoré (le front envoie `{}`) ;
   succès **204 sans corps**.
 - `:id` validé par le value object `CentreId` dans l'adapter (pas de
-  `ParseUUIDPipe`, comme en v1) : id vide ou mal formé → 400 `CENTRE_ID_EMPTY`
-  ou `CENTRE_ID_INVALID`.
+  `ParseUUIDPipe`, comme en v1) : id mal formé → 400 `CENTRE_ID_INVALID` ; id
+  fait d'espaces (`/api/centres/%20/desactiver`) → 400 `CENTRE_ID_EMPTY`. Un id
+  vide (`/api/centres//desactiver`) ne correspond à aucune route : 404
+  `RESOURCE_NOT_FOUND`, répondu par le filtre global.
 - Centre inconnu → 404 `CENTRE_NOT_FOUND` « Le centre demandé est introuvable. »
 - Activer ou désactiver un centre archivé → 409 `CENTRE_ARCHIVED`.
 - Désactiver un centre inactif, activer un centre actif ou archiver un centre
