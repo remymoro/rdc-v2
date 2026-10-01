@@ -1,6 +1,6 @@
 export { Centre } from './centre/centre';
 export type { EtatCentre, NouveauCentre } from './centre/centre';
-export { CentreArchive } from './centre/centre.errors';
+export { CentreArchive, CentreNonActif } from './centre/centre.errors';
 export { CentreRepository } from './ports/centre.repository';
 export {
   MagasinDejaExistant,
