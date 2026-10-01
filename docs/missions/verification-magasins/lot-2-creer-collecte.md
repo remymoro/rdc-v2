@@ -39,7 +39,7 @@ l'étape 1 (même structure, même démarche).
    fonction de fin de journée (RDC-COLLECTE-006).
 4. `PeriodeCollecte.reconstituer` : n'applique pas « début non passé ».
 5. Année de la collecte : année civile Europe/Paris de la date de début
-   (D-12, RDC-COLLECTE-022), une seule fonction, testée sur un début au
+   (D-12, ADR-0016, RDC-COLLECTE-022), une seule fonction, testée sur un début au
    1er janvier à 0 h 30 heure de Paris (31 décembre en UTC).
 6. `Collecte.creer` : statut PREPARATION, planification fermée, vérification
    fermée, aucune participation, `creeLe = modifieLe = maintenant`.

@@ -396,7 +396,7 @@ recopiées dans plusieurs use cases et un service de présentation (audit C-04).
 
 ## RDC-COLLECTE-022 — Une seule collecte par année
 
-`core` · erreur · ⏳ à implémenter (lot 2) · D-12 décidée
+`core` · erreur · ⏳ à implémenter (lot 2) · D-12 décidée (ADR-0016)
 
 **Règle.** La date de début détermine l'année de la collecte. Créer ou modifier
 une collecte vers une année déjà occupée est refusé avec

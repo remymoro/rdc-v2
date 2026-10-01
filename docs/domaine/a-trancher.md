@@ -244,7 +244,7 @@ inconnus.
 collecte est celle de sa date de début, lue à l'heure de Paris. La même fonction
 sert à l'unicité annuelle (RDC-COLLECTE-022) et aux statistiques N/N-1. Les
 bornes d'une année en base sont le 1er janvier à 0 h, heure de Paris, converties
-en UTC, et non `Date.UTC`.
+en UTC, et non `Date.UTC`. Écart à la v1 enregistré par l'**ADR-0016**.
 
 **Constat.** Les use cases v1 utilisent `dateDebut.getFullYear()` alors que le
 repository recherche entre deux bornes construites avec `Date.UTC`. Une date

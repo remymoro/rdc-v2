@@ -35,6 +35,20 @@ pull request titrée « feat(referentiel): images d'un magasin ».
   `.webp`) vient du format reconnu.
 - Stockage derrière un port applicatif (`StockageImages`) ; adapter disque
   local en production, fake en mémoire en test.
+- **Base et disque sans transaction commune : la base fait foi.** Une ligne
+  d'image en base doit toujours avoir son fichier ; un fichier sans ligne
+  (orphelin) est toléré puis nettoyé.
+  - **Ajout** : écrire le fichier, puis enregistrer l'image et valider la
+    transaction. Si la transaction échoue, supprimer le fichier ; si cette
+    suppression échoue aussi, le fichier reste orphelin.
+  - **Suppression** : retirer l'image en base et valider la transaction,
+    **puis** supprimer le fichier. Si la transaction échoue, le fichier n'est
+    pas touché. Si la suppression du fichier échoue, il reste orphelin ; la
+    réponse HTTP reste 204, l'échec est journalisé.
+  - **Nettoyage** : un use case supprime les fichiers d'images sans ligne en
+    base. Il s'exécute au démarrage de l'API (le NAS est éteint hors saison),
+    est idempotent, et ignore les fichiers de moins d'une heure pour ne pas
+    effacer un ajout en cours.
 - Contrat v1 : `POST /api/magasins/:id/images` (multipart),
   `DELETE /api/magasins/:id/images/:imageId` ; URL publique comme en v1.
 
@@ -45,9 +59,15 @@ pull request titrée « feat(referentiel): images d'un magasin ».
    GIF, un PDF et un texte renommé `.jpg` refusés.
 3. Port de stockage, fake, adapter disque avec test d'intégration (nom généré,
    refus d'un nom de fichier forgé).
-4. Use cases dans l'unité de travail ; si l'écriture en base échoue, le fichier
-   écrit est supprimé.
-5. HTTP et E2E : 201 ; 413 `IMAGE_TROP_VOLUMINEUSE` (fichier de 5 Mo + 1
+4. Use cases dans l'unité de travail, avec les deux ordres d'échec testés :
+   ajout dont la transaction échoue (fichier supprimé), ajout dont la
+   transaction et la suppression échouent (orphelin), suppression dont la
+   transaction échoue (fichier intact, image toujours en base), suppression
+   dont l'effacement du fichier échoue (204, orphelin journalisé).
+5. `NettoyerImagesOrphelinesUseCase` : supprime les orphelins de plus d'une
+   heure, garde les autres, relancé deux fois sans effet de plus ; exécuté au
+   démarrage de l'API.
+6. HTTP et E2E : 201 ; 413 `IMAGE_TROP_VOLUMINEUSE` (fichier de 5 Mo + 1
    octet) ; 400 `IMAGE_FORMAT_NON_SUPPORTE` (PDF annoncé `image/jpeg`) ; 400
    `MAGASIN_IMAGE_INTROUVABLE` ; 404 magasin inconnu.
 
