@@ -147,7 +147,7 @@ listes de la collecte, et la contrainte unique (`collecteId`, `magasinId`) de
 `ReponseVerificationMagasin` reste le dernier rempart contre deux ajouts
 concurrents ; sa violation est traduite par l'adapter dans la même erreur
 (TENETS-ADAPTER-006). Le déplacement automatique de la réponse vers la nouvelle
-liste n'est pas retenu (hypothèse V-5).
+liste n'est pas retenu (V-5, décidée le 2026-10-01).
 
 ### Inscription en lot
 
@@ -512,7 +512,7 @@ lot 2 livre la première tranche verticale complète et sa migration, puis le lo
 | V-2      | A_CONTACTER autorisé à la transmission      | hypothèse actuelle conservée par RDC-COLLECTE-020                                                  |
 | V-3      | visibilité admin avant transmission         | hypothèse actuelle conservée par RDC-COLLECTE-016                                                  |
 | V-4      | liste incomplète non bloquante              | hypothèse actuelle conservée par RDC-COLLECTE-018                                                  |
-| V-5      | magasin transféré pendant la vérification   | hypothèse : reste dans sa liste d'origine, ajout ailleurs refusé ; à confirmer (RDC-COLLECTE-014)  |
+| V-5      | magasin transféré pendant la vérification   | ✅ décidée : reste dans sa liste d'origine, ajout ailleurs refusé (RDC-COLLECTE-014)               |
 | Client   | le responsable saisit les réponses dans RDC | à présenter avant le lot 7, sans remettre en cause le domaine tant que COLLECTE-014 reste la règle |
 
 Toute réponse différente sur V-1 à V-5 modifie d'abord la règle métier puis ce
