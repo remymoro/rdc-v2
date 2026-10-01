@@ -2,7 +2,7 @@
 
 - **Branche :** `feat/collecte-creer`
 - **Prérequis :** lot 1 fusionné (D-12 décidée : année civile Europe/Paris)
-- **À réviser après le lot 1 :** oui, ce brief suit le découpage actuel
+- **Révisé après le lot 1 :** le 2026-10-01, d'après `docs/design/collecte.md`
 
 ## Ordre de mission (à coller dans Codex)
 
@@ -20,12 +20,18 @@ appliquées, les cycles réalisés et la section « Hors périmètre ».
 ## Objectif
 
 Créer les libs `collecte/{domain,application,adapters}` et la première
-tranche verticale : créer une collecte en PREPARATION, comme `Centre` à
-l'étape 1 (même structure, même démarche).
+tranche verticale complète : créer une collecte en PREPARATION, du domaine à
+`POST /api/collectes`, comme `Centre` à l'étape 1 (même structure, même
+démarche). Ce lot livre aussi la première migration additive du contexte
+(design, section « Persistance additive ») ; le lot 6 n'ajoutera que les
+tables de la vérification.
 
 ## À lire
 
-- `docs/design/collecte.md` (lot 1)
+- `docs/design/collecte.md` : agrégat `Collecte`, persistance additive,
+  erreurs et statuts HTTP
+- ADR-0008 (schéma v1 repris), ADR-0009 (contrat HTTP v1), ADR-0016 (année
+  Europe/Paris)
 - `docs/domaine/collecte.md` : RDC-COLLECTE-001, 006, 012, 022
 - `docs/architecture/regles/15-structure.md` (génération des libs et tags)
 - Exemple à imiter : `libs/referentiel/**` (création de centre)
@@ -42,18 +48,26 @@ l'étape 1 (même structure, même démarche).
    (D-12, ADR-0016, RDC-COLLECTE-022), une seule fonction, testée sur un début au
    1er janvier à 0 h 30 heure de Paris (31 décembre en UTC).
 6. `Collecte.creer` : statut PREPARATION, planification fermée, vérification
-   fermée, aucune participation, `creeLe = modifieLe = maintenant`.
+   NON_OUVERTE (`EtatVerification` : NON_OUVERTE / OUVERTE / FERMEE), aucune
+   participation, version 0, `creeLe = modifieLe = maintenant`.
 7. `CreerCollecteUseCase` : refus nom existant (`CollecteDejaExistante`,
-   RDC-COLLECTE-012) et année occupée (`COLLECTE_ANNEE_DEJA_EXISTANTE`), dans
-   l'unité de travail.
+   `COLLECTE_ALREADY_EXISTS`, RDC-COLLECTE-012) et année occupée
+   (`COLLECTE_ANNEE_DEJA_EXISTANTE`), dans l'unité de travail.
 8. Suite de contrat `CollecteRepository` + fake en mémoire.
-9. `PrismaCollecteRepository` sur la table v1 (passe la même suite).
-10. `POST /api/collectes` : DTO de forme, filtre d'erreurs du contexte, E2E
-    (201, 400, 409).
+9. Migration additive : `Collecte.etatVerification` (enum `EtatVerification`,
+   défaut NON_OUVERTE) et `Collecte.version` (défaut 0), sans toucher aux
+   colonnes v1 (`dateFinSaisie`, `saisieOuverte` restent en place).
+10. `PrismaCollecteRepository` sur la table v1 étendue (passe la même suite).
+    Le contrôle de version à l'écriture (ADR-0015) arrive au lot 6 : ce lot
+    ne fait que créer, protégé par les contraintes uniques.
+11. `POST /api/collectes` : DTO de forme, filtre d'erreurs du contexte, E2E
+    (201, 400, 409 pour le nom comme pour l'année, statuts du design).
 
 ## Hors périmètre
 
-Démarrer, modifier, clôturer, planification, participations, vérification.
+Démarrer, modifier, clôturer, planification, participations, vérification,
+contrôle de rôle (étape 4 : route non protégée, déploiement toujours bloqué par
+`verifierDeploiementAutorise`).
 
 ## Critères d'acceptation
 
