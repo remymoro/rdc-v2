@@ -43,15 +43,25 @@ précédente. Ce lot crée aussi le premier contrat publié entre contextes :
    qui ne la laisse importer que par des libs `layer:adapters` d'autres
    contextes ; un test de lint qui échoue si `collecte/domain` ou
    `collecte/application` l'importe.
-5. Contrat publié par `referentiel` : façade « magasins actifs par centre
-   actif » en primitives, implémentée par `referentiel/adapters` sur le
-   repository `Magasin` de l'étape 3.
+5. Contrat publié par `referentiel`, en primitives, implémenté par
+   `referentiel/adapters` sur les repositories de l'étape 3 :
+   - `etatMagasin(magasinId)` → statut du magasin, centre de rattachement et
+     statut de ce centre (ACTIF / INACTIF / ARCHIVE), ou absent ;
+   - `statutCentre(centreId)` → ACTIF / INACTIF / ARCHIVE, ou absent ;
+   - `magasinsActifsParCentre()` → pour le préremplissage du lot 5.
+
+   Les statuts exposés permettent à `collecte` d'appliquer RDC-COLLECTE-004 :
+   magasin ACTIF, centre INACTIF accepté, centre ARCHIVE refusé, à
+   l'inscription comme à la réassignation.
+
 6. Port consommateur de `collecte`, dans son langage, avec suite de contrat
    et fake en mémoire.
 7. Adapter de traduction dans `collecte/adapters` : appelle la façade publiée
    et traduit vers les types du port (TENETS-CONTEXT-004).
-8. `InscrireMagasinUseCase` : magasin actif connu du référentiel, centre
-   gestionnaire = centre de rattachement par défaut.
+8. `InscrireMagasinUseCase` et `ReassignerMagasinUseCase` : magasin ACTIF
+   (`MAGASIN_INACTIF`), centre gestionnaire non archivé (`CENTRE_ARCHIVE`,
+   400), centre INACTIF accepté ; centre gestionnaire = centre de rattachement
+   par défaut (RDC-COLLECTE-004).
 9. `ReprendreCollectePrecedenteUseCase` (RDC-COLLECTE-019) : participants de
    la dernière collecte TERMINEE encore actifs, sans doublon.
 10. Persistance des participations (table `ParticipationMagasin` v1).

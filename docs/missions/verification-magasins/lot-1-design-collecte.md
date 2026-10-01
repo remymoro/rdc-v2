@@ -54,7 +54,9 @@ contrats inter-contextes. Les lots 2 à 7 seront ajustés d'après ce document.
      1. le **contrat publié** par `referentiel` : lib
         `libs/referentiel/contrat` (`scope:published`), types et façade en
         primitives, sans objet du domaine, implémentée par
-        `referentiel/adapters` ;
+        `referentiel/adapters`. Elle expose aussi les **statuts** du magasin
+        et du centre (ACTIF / INACTIF / ARCHIVE), dont RDC-COLLECTE-004 a
+        besoin à l'inscription et à la réassignation ;
      2. le **port consommateur** de `collecte`, dans son langage et ses types
         (`domain` ou `application` selon TENETS-CONTEXT-005) ;
      3. l'**adapter de traduction** dans `collecte/adapters`, seul à importer
