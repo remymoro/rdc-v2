@@ -10,3 +10,8 @@ export type CreerCentreCommande = Omit<NouveauCentre, 'id'>;
 export interface DesactiverCentreCommande {
   readonly centreId: CentreId;
 }
+
+/** Réactivation d'un centre désactivé. */
+export interface ActiverCentreCommande {
+  readonly centreId: CentreId;
+}

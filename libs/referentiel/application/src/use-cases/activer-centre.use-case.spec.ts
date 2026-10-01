@@ -9,41 +9,41 @@ import { CentreRepositoryEnMemoire } from '../testing/centre-repository-en-memoi
 import { unCentreExistant } from '../testing/centre-existant.test-utils';
 import { HorlogeFixe } from '../testing/horloge-fixe.test-utils';
 import { UnitOfWorkEspion } from '../testing/unit-of-work-espion.test-utils';
-import { DesactiverCentreUseCase } from './desactiver-centre.use-case';
+import { ActiverCentreUseCase } from './activer-centre.use-case';
 
-describe('DesactiverCentreUseCase', () => {
+describe('ActiverCentreUseCase', () => {
   const maintenant = new Date('2026-10-02T14:30:00.000Z');
   const centreId = CentreId.creer('7f1c9d7e-2d4b-4f7a-9c1e-3b8a5d6e0f12');
 
   let centreRepository: CentreRepositoryEnMemoire;
   let unitOfWork: UnitOfWorkEspion;
-  let desactiverCentre: DesactiverCentreUseCase;
+  let activerCentre: ActiverCentreUseCase;
 
   function preparer(centres: Centre[]): void {
     centreRepository = new CentreRepositoryEnMemoire(centres);
     unitOfWork = new UnitOfWorkEspion();
-    desactiverCentre = new DesactiverCentreUseCase(
+    activerCentre = new ActiverCentreUseCase(
       centreRepository,
       unitOfWork,
       new HorlogeFixe(maintenant),
     );
   }
 
-  describe('centre actif', () => {
+  describe('centre inactif', () => {
     beforeEach(() =>
-      preparer([unCentreExistant(centreId, StatutCentre.ACTIF)]),
+      preparer([unCentreExistant(centreId, StatutCentre.INACTIF)]),
     );
 
-    it("enregistre le centre INACTIF, daté par l'horloge", async () => {
-      await desactiverCentre.execute({ centreId });
+    it("enregistre le centre ACTIF, daté par l'horloge", async () => {
+      await activerCentre.execute({ centreId });
 
       const enregistre = await centreRepository.get(centreId);
-      expect(enregistre?.statut).toBe(StatutCentre.INACTIF);
+      expect(enregistre?.statut).toBe(StatutCentre.ACTIF);
       expect(enregistre?.modifieLe).toEqual(maintenant);
     });
 
     it('valide la transaction une seule fois', async () => {
-      await desactiverCentre.execute({ centreId });
+      await activerCentre.execute({ centreId });
 
       expect(unitOfWork.nombreDeCommits).toBe(1);
     });
@@ -53,13 +53,13 @@ describe('DesactiverCentreUseCase', () => {
     beforeEach(() => preparer([]));
 
     it('est refusé avec CentreIntrouvable', async () => {
-      await expect(desactiverCentre.execute({ centreId })).rejects.toThrow(
+      await expect(activerCentre.execute({ centreId })).rejects.toThrow(
         CentreIntrouvable,
       );
     });
 
     it('ne valide aucune transaction', async () => {
-      await desactiverCentre.execute({ centreId }).catch(() => undefined);
+      await activerCentre.execute({ centreId }).catch(() => undefined);
 
       expect(unitOfWork.nombreDeCommits).toBe(0);
     });
@@ -71,13 +71,13 @@ describe('DesactiverCentreUseCase', () => {
     );
 
     it("laisse passer l'erreur du domaine CentreArchive", async () => {
-      await expect(desactiverCentre.execute({ centreId })).rejects.toThrow(
+      await expect(activerCentre.execute({ centreId })).rejects.toThrow(
         CentreArchive,
       );
     });
 
     it('ne modifie rien et ne valide aucune transaction', async () => {
-      await desactiverCentre.execute({ centreId }).catch(() => undefined);
+      await activerCentre.execute({ centreId }).catch(() => undefined);
 
       expect((await centreRepository.get(centreId))?.statut).toBe(
         StatutCentre.ARCHIVE,
