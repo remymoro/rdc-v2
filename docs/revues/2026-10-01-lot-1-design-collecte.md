@@ -4,7 +4,7 @@
 - **Branche relue :** `docs/collecte-design`, commit `5265b4c`
 - **Fichiers :** `docs/design/collecte.md`, ADR-0014, ADR-0015
 - **Relecteur :** Claude Code (orchestrateur de la mission)
-- **Verdict :** `a-corriger` (3 constats bloquants, 2 à décider, 2 mineurs)
+- **Verdict :** `acceptee` (après corrections ; verdict initial `a-corriger`)
 - **Agent Gate :** `pnpm agent:gate` passe
 
 ## Consignes pour l'agent qui corrige
@@ -108,3 +108,18 @@ la liste est celle du centre de rattachement (RDC-COLLECTE-014).
 | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
 | I-1   | Proposition retenue : lot 2 complet (Prisma, migration `version` et `etatVerification`, `POST /api/collectes`) ; lot 6 = tables de la vérification seulement | 2026-10-01 |
 | I-2   | Proposition retenue : `POST …/verification/magasins/:magasinId`, liste du centre de rattachement                                                             | 2026-10-01 |
+
+## Suivi des corrections
+
+Relu le 2026-10-01 sur `docs/collecte-design`. `pnpm agent:gate` passe.
+
+| Constat                     | Corrigé par                                  | Remarque                                                                               |
+| --------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------- |
+| B-1 — PR et convention      | `ed3b0f7`, `caac140`, `2a61a04`, `5dec29a`   | Commits au format `docs(collecte)` ; PR à ouvrir par l'utilisateur                     |
+| B-2 — Statuts HTTP v1       | `ed3b0f7` (Codex), `72971b8` (orchestrateur) | `COLLECTE_ANNEE_DEJA_EXISTANTE` remis à 409 : `DomainConflictException` en v1          |
+| B-3 — Noms des états        | `caac140`                                    | `NON_OUVERTE` / `OUVERTE` / `FERMEE`, `VERIFICATION_FERMEE`                            |
+| I-1 — Lot 2 complet         | `2a61a04`                                    | Lot 2 avec Prisma, migration et `POST /api/collectes` ; lot 6 limité à la vérification |
+| I-2 — Liste du rattachement | `5dec29a`                                    | `POST …/verification/magasins/:magasinId`                                              |
+| D-12 décidée après la revue | `72971b8`                                    | Année civile Europe/Paris reprise dans le design                                       |
+| M-1 — Ordre des lots        | —                                            | Plan et briefs mis à jour par l'orchestrateur après fusion                             |
+| M-2 — ADR proposés          | —                                            | ADR-0014 et ADR-0015 à accepter par l'utilisateur avant les lots 3 et 6                |
