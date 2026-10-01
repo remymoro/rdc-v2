@@ -1,44 +1,22 @@
-import type { Adresse } from '../commun/adresse';
-import type { CodePostal } from '../commun/code-postal';
-import type { Nom } from '../commun/nom';
-import type { Ville } from '../commun/ville';
+import {
+  cleDeRapprochement,
+  type IdentiteDeLieu,
+} from '../commun/cle-de-rapprochement';
 
-export interface IdentiteCentre {
-  readonly nom: Nom;
-  readonly adresse: Adresse;
-  readonly codePostal: CodePostal;
-  readonly ville: Ville;
-}
+export type IdentiteCentre = IdentiteDeLieu;
 
 /**
- * Clé de rapprochement de deux centres (règle de RDC v1) : plus tolérante que
- * les value objects, elle ignore accents, casse, apostrophes, tirets, points
- * et espaces. Deux centres de même clé sont des doublons.
+ * Clé de rapprochement de deux centres (règle de RDC v1, voir
+ * `cleDeRapprochement`). Deux centres de même clé sont des doublons.
  */
 export class CleDoublonCentre {
   private constructor(readonly valeur: string) {}
 
   static depuis(identite: IdentiteCentre): CleDoublonCentre {
-    return new CleDoublonCentre(
-      [
-        compacter(identite.nom.valeur),
-        compacter(identite.ville.valeur),
-        identite.codePostal.valeur,
-        compacter(identite.adresse.valeur),
-      ].join('|'),
-    );
+    return new CleDoublonCentre(cleDeRapprochement(identite));
   }
 
   equals(autre: CleDoublonCentre): boolean {
     return this.valeur === autre.valeur;
   }
-}
-
-/** Sans accents, en majuscules, sans apostrophes, tirets, points ni espaces. */
-function compacter(texte: string): string {
-  return texte
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/['\u2019\-_.\s]/g, '')
-    .toLocaleUpperCase('fr-FR');
 }
