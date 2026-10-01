@@ -16,10 +16,12 @@ import {
   CentreArchive,
   CentreIdInvalide,
   CentreIdVide,
+  CentreNonActif,
   CodePostalInvalide,
   EmailInvalide,
   EmailTropLong,
   EmailVide,
+  MagasinDejaExistant,
   NomTropLong,
   NomVide,
   TelephoneInvalide,
@@ -34,12 +36,14 @@ type ErreurConnue = Error & { readonly code: string };
 /**
  * Seul endroit où les erreurs connues du contexte deviennent des statuts HTTP
  * (TENETS-ERROR-006). Statuts identiques à RDC v1 : validation 400, centre
- * introuvable 404, conflit (doublon, centre archivé) 409.
+ * introuvable 404, conflit (doublon, centre archivé ou non actif) 409.
  */
 const STATUTS_HTTP = new Map<Type<ErreurConnue>, HttpStatus>([
   [CentreDejaExistant, HttpStatus.CONFLICT],
   [CentreIntrouvable, HttpStatus.NOT_FOUND],
   [CentreArchive, HttpStatus.CONFLICT],
+  [CentreNonActif, HttpStatus.CONFLICT],
+  [MagasinDejaExistant, HttpStatus.CONFLICT],
   [NomVide, HttpStatus.BAD_REQUEST],
   [NomTropLong, HttpStatus.BAD_REQUEST],
   [CentreIdVide, HttpStatus.BAD_REQUEST],

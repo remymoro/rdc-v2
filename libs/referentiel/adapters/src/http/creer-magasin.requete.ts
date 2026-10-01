@@ -1,6 +1,7 @@
-import type { CreerCentreCommande } from '@rdc/referentiel-application';
+import type { CreerMagasinCommande } from '@rdc/referentiel-application';
 import {
   Adresse,
+  CentreId,
   CodePostal,
   Email,
   Nom,
@@ -12,12 +13,13 @@ import { IsOptional, IsString } from 'class-validator';
 import { videVersAbsent } from './champ-facultatif';
 
 /**
- * Corps de POST /api/centres. Ne vérifie que la FORME (présence, texte) :
- * les règles métier restent dans les value objects (TENETS-VALIDATE-002).
+ * Corps de POST /api/centres/:centreId/magasins. Ne vérifie que la FORME
+ * (présence, texte) : les règles métier restent dans les value objects
+ * (TENETS-VALIDATE-002).
  */
-export class CreerCentreRequete {
+export class CreerMagasinRequete {
   @IsString({
-    message: 'Le nom du centre est obligatoire et doit être un texte.',
+    message: 'Le nom du magasin est obligatoire et doit être un texte.',
   })
   nom!: string;
 
@@ -43,11 +45,16 @@ export class CreerCentreRequete {
   email?: string;
 }
 
-/** Requête HTTP → commande applicative ; le domaine valide chaque valeur. */
-export function versCreerCentreCommande(
-  requete: CreerCentreRequete,
-): CreerCentreCommande {
+/**
+ * Paramètre :centreId et corps → commande applicative ; le domaine valide
+ * chaque valeur, identifiant du centre compris (pas de ParseUUIDPipe).
+ */
+export function versCreerMagasinCommande(
+  centreId: string,
+  requete: CreerMagasinRequete,
+): CreerMagasinCommande {
   return {
+    centreId: CentreId.creer(centreId),
     nom: Nom.creer(requete.nom),
     adresse: Adresse.creer(requete.adresse),
     codePostal: CodePostal.creer(requete.codePostal),

@@ -3,15 +3,18 @@ import {
   ActiverCentreUseCase,
   ArchiverCentreUseCase,
   CreerCentreUseCase,
+  CreerMagasinUseCase,
   DesactiverCentreUseCase,
   GenerateurIdentifiants,
 } from '@rdc/referentiel-application';
-import { CentreRepository } from '@rdc/referentiel-domain';
+import { CentreRepository, MagasinRepository } from '@rdc/referentiel-domain';
 import { Clock, UnitOfWork } from '@rdc/shared-kernel-application';
 import { PrismaTransaction } from '@rdc/shared-kernel-adapters';
 import { CentresController } from './http/centres.controller';
+import { MagasinsController } from './http/magasins.controller';
 import { GenerateurIdentifiantsUuid } from './identifiants/generateur-identifiants-uuid';
 import { PrismaCentreRepository } from './prisma/prisma-centre.repository';
+import { PrismaMagasinRepository } from './prisma/prisma-magasin.repository';
 
 /**
  * Composition root du contexte Référentiel (TENETS-COMPOSE-001) : seul endroit
@@ -19,13 +22,20 @@ import { PrismaCentreRepository } from './prisma/prisma-centre.repository';
  * classes simples, construites par useFactory.
  */
 @Module({
-  controllers: [CentresController],
+  controllers: [CentresController, MagasinsController],
   providers: [
     {
       provide: CentreRepository,
       scope: Scope.REQUEST,
       useFactory: (transaction: PrismaTransaction) =>
         new PrismaCentreRepository(transaction),
+      inject: [PrismaTransaction],
+    },
+    {
+      provide: MagasinRepository,
+      scope: Scope.REQUEST,
+      useFactory: (transaction: PrismaTransaction) =>
+        new PrismaMagasinRepository(transaction),
       inject: [PrismaTransaction],
     },
     {
@@ -78,6 +88,31 @@ import { PrismaCentreRepository } from './prisma/prisma-centre.repository';
         clock: Clock,
       ) => new ArchiverCentreUseCase(centreRepository, unitOfWork, clock),
       inject: [CentreRepository, UnitOfWork, Clock],
+    },
+    {
+      provide: CreerMagasinUseCase,
+      scope: Scope.REQUEST,
+      useFactory: (
+        magasinRepository: MagasinRepository,
+        centreRepository: CentreRepository,
+        generateurIdentifiants: GenerateurIdentifiants,
+        unitOfWork: UnitOfWork,
+        clock: Clock,
+      ) =>
+        new CreerMagasinUseCase(
+          magasinRepository,
+          centreRepository,
+          generateurIdentifiants,
+          unitOfWork,
+          clock,
+        ),
+      inject: [
+        MagasinRepository,
+        CentreRepository,
+        GenerateurIdentifiants,
+        UnitOfWork,
+        Clock,
+      ],
     },
   ],
 })
