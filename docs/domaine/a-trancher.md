@@ -17,8 +17,8 @@ règle concernée (état ⏳), et écrire un ADR si elle s'écarte de la v1.
 | ---- | ------------------------------------------- | -------------------------------- | -------------- |
 | D-01 | Ordre interne de l'étape 6                  | —                                | 6              |
 | D-02 | ✅ Décidée : vérification, puis inscription | RDC-COLLECTE-004, 014 à 021      | —              |
-| D-03 | Magasin engagé dans une collecte active     | RDC-REF-006                      | 3              |
-| D-04 | Enseigne implicite ou explicite             | RDC-REF-009, RDC-STATS-003       | 3              |
+| D-03 | Magasin engagé dans une collecte active     | RDC-REF-006                      | 5              |
+| D-04 | ✅ Décidée : convention v1                  | RDC-REF-009, RDC-STATS-003       | —              |
 | D-05 | Bénévole créé depuis un planning            | RDC-PLANIF-006, RDC-BENEVOLE-005 | 6              |
 | D-06 | Conservation et traçabilité RGPD            | RDC-BENEVOLE-004, RDC-ACCES-008  | 4 et 6         |
 | D-07 | Fenêtre de saisie                           | RDC-COLLECTE-007                 | 5              |
@@ -108,6 +108,11 @@ plutôt que (b).
 
 ## D-03 — Désactiver ou archiver un magasin engagé dans une collecte active
 
+**Report (2026-10-01).** La règle a besoin de savoir si un magasin participe à
+une collecte active : elle dépend donc de `collecte`. Comme RDC-REF-004 pour le
+centre, elle est **reportée à l'étape 5**. L'étape 3 se fait sans elle. Le choix
+entre (a) et (b) reste ouvert et bloque désormais l'étape 5, pas l'étape 3.
+
 **Constat.**
 
 - Document client : en PREPARATION, autorisé, avec **retrait automatique** du
@@ -123,6 +128,11 @@ il faut un événement « magasin désactivé » consommé par collecte, ou un u
 case de coordination.
 
 ## D-04 — L'enseigne est-elle une donnée ?
+
+**Décision (2026-10-01).** Option (a) : convention v1, l'enseigne est le nom du
+magasin normalisé par `UPPER(TRIM(nom))`. Le magasin de l'étape 3 n'a pas de
+champ `enseigne`. Si le besoin apparaît, un champ s'ajoutera par une migration
+qui recopie le nom actuel, sans casser l'existant.
 
 **Constat.** En v1, l'enseigne est le nom du magasin normalisé par
 `UPPER(TRIM(nom))` : casse et espaces aux extrémités sont ignorés, mais les
