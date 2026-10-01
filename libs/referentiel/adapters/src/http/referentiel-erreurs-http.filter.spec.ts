@@ -1,9 +1,14 @@
 import type { ArgumentsHost } from '@nestjs/common';
-import { CentreDejaExistant } from '@rdc/referentiel-application';
+import {
+  CentreDejaExistant,
+  CentreIntrouvable,
+} from '@rdc/referentiel-application';
 import {
   AdresseAbreviationInterdite,
   AdresseTropLongue,
   AdresseVide,
+  CentreArchive,
+  CentreId,
   CentreIdInvalide,
   CentreIdVide,
   CodePostalInvalide,
@@ -32,6 +37,7 @@ function hoteHttp() {
 
 describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
   const filtre = new ReferentielErreursHttpFilter();
+  const unCentreId = CentreId.creer('0b8f5c3e-2d4a-4f6b-9c1d-7e8f9a0b1c2d');
 
   it('traduit un doublon en 409 CENTRE_ALREADY_EXISTS', () => {
     const { hote, reponse } = hoteHttp();
@@ -44,6 +50,37 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
         statusCode: 409,
         error: 'CentreDejaExistant',
         code: 'CENTRE_ALREADY_EXISTS',
+      }),
+    );
+  });
+
+  it('traduit un centre inconnu en 404 CENTRE_NOT_FOUND', () => {
+    const { hote, reponse } = hoteHttp();
+
+    filtre.catch(new CentreIntrouvable(unCentreId), hote);
+
+    expect(reponse.status).toHaveBeenCalledWith(404);
+    expect(reponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statusCode: 404,
+        error: 'CentreIntrouvable',
+        message: 'Le centre demandé est introuvable.',
+        code: 'CENTRE_NOT_FOUND',
+      }),
+    );
+  });
+
+  it('traduit un centre archivé en 409 CENTRE_ARCHIVED', () => {
+    const { hote, reponse } = hoteHttp();
+
+    filtre.catch(new CentreArchive(unCentreId), hote);
+
+    expect(reponse.status).toHaveBeenCalledWith(409);
+    expect(reponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statusCode: 409,
+        error: 'CentreArchive',
+        code: 'CENTRE_ARCHIVED',
       }),
     );
   });

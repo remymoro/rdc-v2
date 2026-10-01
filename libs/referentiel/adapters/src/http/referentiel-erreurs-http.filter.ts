@@ -5,11 +5,15 @@ import {
   HttpStatus,
   Type,
 } from '@nestjs/common';
-import { CentreDejaExistant } from '@rdc/referentiel-application';
+import {
+  CentreDejaExistant,
+  CentreIntrouvable,
+} from '@rdc/referentiel-application';
 import {
   AdresseAbreviationInterdite,
   AdresseTropLongue,
   AdresseVide,
+  CentreArchive,
   CentreIdInvalide,
   CentreIdVide,
   CodePostalInvalide,
@@ -29,10 +33,13 @@ type ErreurConnue = Error & { readonly code: string };
 
 /**
  * Seul endroit où les erreurs connues du contexte deviennent des statuts HTTP
- * (TENETS-ERROR-006). Statuts identiques à RDC v1 : validation 400, conflit 409.
+ * (TENETS-ERROR-006). Statuts identiques à RDC v1 : validation 400, centre
+ * introuvable 404, conflit (doublon, centre archivé) 409.
  */
 const STATUTS_HTTP = new Map<Type<ErreurConnue>, HttpStatus>([
   [CentreDejaExistant, HttpStatus.CONFLICT],
+  [CentreIntrouvable, HttpStatus.NOT_FOUND],
+  [CentreArchive, HttpStatus.CONFLICT],
   [NomVide, HttpStatus.BAD_REQUEST],
   [NomTropLong, HttpStatus.BAD_REQUEST],
   [CentreIdVide, HttpStatus.BAD_REQUEST],
