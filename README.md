@@ -19,6 +19,26 @@ pnpm e2e                         # tests E2E HTTP (base rdc_test)
 pnpm nx serve api  # http://localhost:3000/api
 ```
 
+## Agent Gate
+
+Avant de proposer une pull request, un agent exécute :
+
+```bash
+pnpm agent:gate
+```
+
+Le contrôle vérifie la politique Git et documentaire, puis le formatage, le
+lint, les tests et le build. Avant fusion d'une évolution qui touche la
+persistance ou HTTP, PostgreSQL étant démarré :
+
+```bash
+pnpm agent:gate -- --full
+```
+
+Le mode complet ajoute les migrations Prisma, les tests d'intégration et les
+tests E2E. La décision est documentée dans
+[`ADR-0012`](docs/adr/0012-agent-gate.md).
+
 ## Structure
 
 ```text
