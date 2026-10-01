@@ -28,6 +28,8 @@ règle concernée (état ⏳), et écrire un ADR si elle s'écarte de la v1.
 | D-11 | Référence produit libre ou catalogue        | RDC-SAISIE-005                   | 6              |
 | D-12 | ✅ Décidée : année civile Europe/Paris      | RDC-COLLECTE-022                 | —              |
 | D-13 | Raison de réouverture réellement saisie     | RDC-COLLECTE-010                 | 5              |
+| D-16 | Signaler les oublis de pesée avant clôture  | RDC-COLLECTE-005, 009            | 5              |
+| D-17 | Corriger une collecte après sa clôture      | RDC-COLLECTE-001, RDC-STATS-005  | 5              |
 
 ## D-01 — Ordre des étapes
 
@@ -183,6 +185,13 @@ de l'association.
 **Options.** (a) Comportement du code v1. (b) Délai de saisie configurable
 après la fin de collecte (date saisie par l'admin, ou nombre de jours fixe).
 
+**Recommandation (2026-10-01, à valider avec le client).** Option (b) avec un
+délai fixe : la fenêtre de saisie court jusqu'à la fin de la collecte plus
+**3 jours**. Les centres rattrapent eux-mêmes la plupart des oublis ; la
+réouverture par l'admin (RDC-COLLECTE-010) reste l'exception. Le délai vit dans
+un seul concept du domaine (`FenetreSaisie`) : passer plus tard à un délai réglé
+par collecte ne change que ce concept.
+
 ## D-08 — Que change la validation d'une pesée ?
 
 **Constat.** Une pesée passe EN_COURS → VALIDEE, et valider deux fois est une
@@ -267,6 +276,44 @@ la raison facultative et le use case fournit une phrase par défaut.
 **À décider.** Exiger une justification réellement saisie par l'admin, ou
 assumer une raison technique par défaut.
 
+**Recommandation (2026-10-01, à valider avec le client).** Raison obligatoire,
+saisie par l'admin (au moins 3 caractères, comme le domaine v1) : la
+réouverture est l'exception qui rattrape un oubli après le délai de saisie
+(D-07), elle doit rester traçable.
+
 **Sources v1.** `libs/domain/src/collecte/saisie-centre.entity.ts:145-159` ;
 `apps/api/src/application/use-cases/collecte/reouvrir-saisie-centre.usecase.ts:79-80` ;
 `apps/api/src/presentation/http/dtos/requests/reouvrir-saisie-centre.request.ts:1-8`.
+
+## D-16 — Signaler les oublis de pesée avant la clôture
+
+**Constat.** Rien n'avertit un centre ou l'admin qu'un magasin inscrit n'a
+aucune pesée. Un tel oubli n'est découvert qu'après la clôture, quand les
+statistiques sont figées (RDC-COLLECTE-001).
+
+**Recommandation (2026-10-01, à valider avec le client).** Un **rapport de
+complétude**, en lecture seule : par centre, les magasins inscrits sans aucune
+pesée et l'état de la saisie du centre. Il est présenté :
+
+- au centre qui déclare sa saisie terminée, comme un avertissement non bloquant
+  (« 2 magasins sans pesée : confirmer ? ») ;
+- à l'admin sur l'avancement de la collecte et avant d'approuver la clôture.
+
+**À décider.** « Magasin inscrit sans pesée » est-il le bon signal, ou faut-il
+aussi signaler un nombre de passages anormalement bas ? L'avertissement
+doit-il rester non bloquant ?
+
+## D-17 — Corriger une collecte après sa clôture
+
+**Constat.** Une collecte TERMINEE ne revient jamais en arrière
+(RDC-COLLECTE-001) : un oubli découvert après la clôture ne peut plus être
+saisi.
+
+**Options.** (a) Aucune correction après la clôture : les oublis se rattrapent
+avant, grâce au délai de saisie (D-07), à la réouverture (RDC-COLLECTE-010) et
+au rapport de complétude (D-16). (b) Une **rectification** tracée : nouvel
+enregistrement approuvé par l'admin, visible comme tel dans les statistiques,
+sans modifier les pesées existantes.
+
+**Recommandation (2026-10-01).** (a) pour l'instant ; (b) seulement si le client
+exprime ce besoin. (b) s'ajoute sans changer le modèle actuel.

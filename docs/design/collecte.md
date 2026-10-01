@@ -180,6 +180,26 @@ gestionnaires distincts des participations et les `SaisieCentre` correspondants
 dans un instantané cohérent. Une ligne absente vaut EN_COURS. Seule la collecte
 est modifiée après validation de l'ensemble (RDC-COLLECTE-005).
 
+### Contrôler la complétude avant la clôture (proposition D-16)
+
+Une requête applicative en lecture seule, `ControlerCompletudeSaisieQuery`,
+renvoie par centre gestionnaire les magasins inscrits sans aucune pesée et
+l'état de sa `SaisieCentre`. Elle ne modifie aucun agrégat et n'ajoute aucun
+invariant : c'est un avertissement, jamais une précondition.
+
+- `DeclarerSaisieTermineeUseCase` reste inchangé ; l'interface affiche le
+  rapport du centre avant la confirmation.
+- L'admin le consulte sur l'avancement de la collecte et avant
+  `approuverCloture`.
+- Savoir quels magasins ont été pesés appartient à `saisie` : la requête
+  passe par un port consommateur de `collecte` et un adapter vers un contrat
+  publié par `saisie` (ADR-0014). Elle peut aussi vivre dans `statistiques`,
+  qui lit tout sans rien écrire ; le choix se fait à l'étape 6.
+
+Avec un délai de saisie après la fin de la collecte (proposition D-07) et une
+réouverture à raison obligatoire (proposition D-13), les oublis se rattrapent
+avant la clôture, qui reste définitive (D-17).
+
 ## Contrat consommé depuis `referentiel`
 
 ADR-0014 introduit `libs/referentiel/contrat`, taguée `context:referentiel`,
@@ -505,9 +525,11 @@ lot 2 livre la première tranche verticale complète et sa migration, puis le lo
 | Décision | Question                                    | Effet sur l'implémentation                                                                         |
 | -------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | D-03     | blocage ou retrait d'un magasin actif       | extension du contrat publié de `collecte`, sans choix dans ce lot                                  |
-| D-07     | fenêtre de saisie                           | bloque RDC-COLLECTE-007 et le calcul de `centrePeutPeser`                                          |
+| D-07     | fenêtre de saisie                           | bloque RDC-COLLECTE-007 et `centrePeutPeser` ; recommandé : fin + 3 jours, dans `FenetreSaisie`    |
 | D-12     | fuseau de l'année                           | ✅ décidée : année civile Europe/Paris, appliquée dès le lot 2                                     |
-| D-13     | raison réellement saisie                    | bloque la forme finale de RDC-COLLECTE-010                                                         |
+| D-13     | raison réellement saisie                    | bloque la forme finale de RDC-COLLECTE-010 ; recommandé : raison obligatoire                       |
+| D-16     | signaler les oublis avant clôture           | `ControlerCompletudeSaisieQuery`, lecture seule, avertissement non bloquant                        |
+| D-17     | correction après clôture                    | recommandé : aucune ; une rectification tracée s'ajouterait sans changer le modèle                 |
 | V-1      | avis global facultatif                      | hypothèse actuelle conservée par RDC-COLLECTE-020                                                  |
 | V-2      | A_CONTACTER autorisé à la transmission      | hypothèse actuelle conservée par RDC-COLLECTE-020                                                  |
 | V-3      | visibilité admin avant transmission         | hypothèse actuelle conservée par RDC-COLLECTE-016                                                  |
