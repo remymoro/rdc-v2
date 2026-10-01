@@ -30,7 +30,7 @@
 | ----- | ------------------------------------------------------------------ | ---------- |
 | 0     | Fondations : Nx, lint d'architecture, CI, règles Tenets, ADR       | ✅ Terminé |
 | 1     | Référentiel : créer un centre (domaine → use case → Prisma → HTTP) | ✅ Terminé |
-| 2     | Référentiel : cycle de vie d'un centre (désactiver, archiver)      | ⏳         |
+| 2     | Référentiel : cycle de vie d'un centre (désactiver, archiver)      | ✅ Terminé |
 | 3     | Référentiel : magasins et produits                                 | ⏳         |
 | 4     | Identité et accès : bootstrap admin, connexion, rôles              | ⏳         |
 | 5     | Collecte : design doc, puis création et cycle de vie               | ⏳         |
