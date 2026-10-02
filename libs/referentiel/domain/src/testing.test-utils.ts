@@ -4,3 +4,11 @@ export {
   verifierContratCentreRepository,
   type ContexteContratCentreRepository,
 } from './ports/centre.repository.contrat.test-utils';
+export {
+  verifierContratMagasinRepository,
+  type ContexteContratMagasinRepository,
+} from './ports/magasin.repository.contrat.test-utils';
+export {
+  verifierContratProduitRepository,
+  type ContexteContratProduitRepository,
+} from './ports/produit.repository.contrat.test-utils';

@@ -109,7 +109,7 @@ function reconstituerCentre(ligne: Prisma.CentreModel): Centre {
   });
 }
 
-function versStatutDomaine(statut: StatutCentrePrisma): StatutCentre {
+export function versStatutDomaine(statut: StatutCentrePrisma): StatutCentre {
   switch (statut) {
     case 'ACTIF':
       return StatutCentre.ACTIF;

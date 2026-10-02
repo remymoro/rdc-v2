@@ -28,14 +28,14 @@ B   Catalogue des produits             (indépendant des lots A)
 C   Images d'un magasin                (après A1 et confirmation du lieu NAS)
 ```
 
-| Lot | Brief                           | Branche                              | Prérequis                          | État      |
-| --- | ------------------------------- | ------------------------------------ | ---------------------------------- | --------- |
-| A1  | `lot-a1-creer-magasin.md`       | `feat/referentiel-creer-magasin`     | —                                  | 🟢 prêt   |
-| A2  | `lot-a2-cycle-de-vie.md`        | `feat/referentiel-cycle-vie-magasin` | A1                                 | ⏸ bloqué |
-| A3  | `lot-a3-modifier-transferer.md` | `feat/referentiel-modifier-magasin`  | A1                                 | ⏸ bloqué |
-| A4  | `lot-a4-lire-magasins.md`       | `feat/referentiel-lire-magasins`     | A1                                 | ⏸ bloqué |
-| B   | `lot-b-produits.md`             | `feat/referentiel-produits`          | —                                  | 🟢 prêt   |
-| C   | `lot-c-images.md`               | `feat/referentiel-images-magasin`    | A1 + lieu de stockage NAS confirmé | ⏸ bloqué |
+| Lot | Brief                           | Branche                              | Prérequis                          | État              |
+| --- | ------------------------------- | ------------------------------------ | ---------------------------------- | ----------------- |
+| A1  | `lot-a1-creer-magasin.md`       | `feat/referentiel-creer-magasin`     | —                                  | ✅ fusionné (#11) |
+| A2  | `lot-a2-cycle-de-vie.md`        | `feat/referentiel-cycle-vie-magasin` | A1                                 | ✅ fusionné (#13) |
+| A3  | `lot-a3-modifier-transferer.md` | `feat/referentiel-modifier-magasin`  | A1                                 | ✅ fusionné (#15) |
+| A4  | `lot-a4-lire-magasins.md`       | `feat/referentiel-lire-magasins`     | A1                                 | ✅ fusionné (#16) |
+| B   | `lot-b-produits.md`             | `feat/referentiel-produits`          | —                                  | 🟣 en revue       |
+| C   | `lot-c-images.md`               | `feat/referentiel-images-magasin`    | A1 + lieu de stockage NAS confirmé | ⏸ bloqué         |
 
 A2, A3 et A4 peuvent avancer en parallèle après A1 ; A1 et B dès maintenant.
 Le lot C attend aussi la confirmation du lieu de stockage après le rendez-vous NAS.

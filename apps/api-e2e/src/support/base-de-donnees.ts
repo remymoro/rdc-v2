@@ -42,3 +42,27 @@ export async function lireCentre(id: string): Promise<CentrePersiste | null> {
     await client.end();
   }
 }
+
+/** Relit le statut d'un magasin (base de test uniquement). */
+export async function lireStatutMagasin(id: string): Promise<string | null> {
+  const client = await connecterLaBaseDeTest();
+  try {
+    const resultat = await client.query<{ statut: string }>(
+      'SELECT "statut" FROM "Magasin" WHERE "id" = $1',
+      [id],
+    );
+    return resultat.rows[0]?.statut ?? null;
+  } finally {
+    await client.end();
+  }
+}
+
+/** Vide le catalogue des produits entre deux tests (base de test uniquement). */
+export async function viderLesProduits(): Promise<void> {
+  const client = await connecterLaBaseDeTest();
+  try {
+    await client.query('TRUNCATE TABLE "Produit" CASCADE');
+  } finally {
+    await client.end();
+  }
+}

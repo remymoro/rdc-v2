@@ -9,13 +9,7 @@ import {
 } from '@rdc/referentiel-domain';
 import { Transform } from 'class-transformer';
 import { IsOptional, IsString } from 'class-validator';
-
-/** "" ou espaces → absent : un champ facultatif vide n'est pas renseigné (ADR-0007). */
-function videVersAbsent({ value }: { value: unknown }): unknown {
-  return typeof value === 'string' && value.trim().length === 0
-    ? undefined
-    : value;
-}
+import { videVersAbsent } from './champ-facultatif';
 
 /**
  * Corps de POST /api/centres. Ne vérifie que la FORME (présence, texte) :

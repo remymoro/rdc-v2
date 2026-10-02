@@ -6,22 +6,38 @@ import {
   Type,
 } from '@nestjs/common';
 import {
-  CentreDejaExistant,
+  CentreADesMagasins,
   CentreIntrouvable,
+  MagasinIntrouvable,
+  ProduitIntrouvable,
 } from '@rdc/referentiel-application';
 import {
+  CentreDejaExistant,
   AdresseAbreviationInterdite,
   AdresseTropLongue,
   AdresseVide,
   CentreArchive,
   CentreIdInvalide,
   CentreIdVide,
+  CentreNonActif,
   CodePostalInvalide,
+  CodeProduitInvalide,
+  CodeProduitVide,
   EmailInvalide,
   EmailTropLong,
   EmailVide,
+  FamilleTropLongue,
+  FamilleVide,
+  MagasinArchive,
+  MagasinDejaExistant,
+  MagasinIdInvalide,
+  MagasinIdVide,
   NomTropLong,
   NomVide,
+  ProduitIdInvalide,
+  ProduitIdVide,
+  SousFamilleTropLongue,
+  SousFamilleVide,
   TelephoneInvalide,
   TelephoneVide,
   VilleTropLongue,
@@ -34,16 +50,24 @@ type ErreurConnue = Error & { readonly code: string };
 /**
  * Seul endroit où les erreurs connues du contexte deviennent des statuts HTTP
  * (TENETS-ERROR-006). Statuts identiques à RDC v1 : validation 400, centre
- * introuvable 404, conflit (doublon, centre archivé) 409.
+ * ou magasin introuvable 404, conflit (doublon, centre archivé ou non actif) 409.
  */
 const STATUTS_HTTP = new Map<Type<ErreurConnue>, HttpStatus>([
   [CentreDejaExistant, HttpStatus.CONFLICT],
   [CentreIntrouvable, HttpStatus.NOT_FOUND],
+  [MagasinIntrouvable, HttpStatus.NOT_FOUND],
+  [ProduitIntrouvable, HttpStatus.NOT_FOUND],
+  [MagasinArchive, HttpStatus.CONFLICT],
   [CentreArchive, HttpStatus.CONFLICT],
+  [CentreNonActif, HttpStatus.CONFLICT],
+  [CentreADesMagasins, HttpStatus.CONFLICT],
+  [MagasinDejaExistant, HttpStatus.CONFLICT],
   [NomVide, HttpStatus.BAD_REQUEST],
   [NomTropLong, HttpStatus.BAD_REQUEST],
   [CentreIdVide, HttpStatus.BAD_REQUEST],
   [CentreIdInvalide, HttpStatus.BAD_REQUEST],
+  [MagasinIdVide, HttpStatus.BAD_REQUEST],
+  [MagasinIdInvalide, HttpStatus.BAD_REQUEST],
   [CodePostalInvalide, HttpStatus.BAD_REQUEST],
   [VilleVide, HttpStatus.BAD_REQUEST],
   [VilleTropLongue, HttpStatus.BAD_REQUEST],
@@ -55,6 +79,14 @@ const STATUTS_HTTP = new Map<Type<ErreurConnue>, HttpStatus>([
   [EmailVide, HttpStatus.BAD_REQUEST],
   [EmailTropLong, HttpStatus.BAD_REQUEST],
   [EmailInvalide, HttpStatus.BAD_REQUEST],
+  [ProduitIdVide, HttpStatus.BAD_REQUEST],
+  [ProduitIdInvalide, HttpStatus.BAD_REQUEST],
+  [CodeProduitVide, HttpStatus.BAD_REQUEST],
+  [CodeProduitInvalide, HttpStatus.BAD_REQUEST],
+  [FamilleVide, HttpStatus.BAD_REQUEST],
+  [FamilleTropLongue, HttpStatus.BAD_REQUEST],
+  [SousFamilleVide, HttpStatus.BAD_REQUEST],
+  [SousFamilleTropLongue, HttpStatus.BAD_REQUEST],
 ]);
 
 /**

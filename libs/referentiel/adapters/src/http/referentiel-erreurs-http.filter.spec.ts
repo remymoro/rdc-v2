@@ -1,10 +1,13 @@
 import type { ArgumentsHost, Type } from '@nestjs/common';
 import { FILTER_CATCH_EXCEPTIONS } from '@nestjs/common/constants';
 import {
-  CentreDejaExistant,
+  CentreADesMagasins,
   CentreIntrouvable,
+  MagasinIntrouvable,
+  ProduitIntrouvable,
 } from '@rdc/referentiel-application';
 import {
+  CentreDejaExistant,
   AdresseAbreviationInterdite,
   AdresseTropLongue,
   AdresseVide,
@@ -12,18 +15,34 @@ import {
   CentreId,
   CentreIdInvalide,
   CentreIdVide,
+  CentreNonActif,
   CodePostalInvalide,
+  CodeProduitInvalide,
+  CodeProduitVide,
   EmailInvalide,
   EmailTropLong,
   EmailVide,
+  FamilleTropLongue,
+  FamilleVide,
+  MagasinArchive,
+  MagasinDejaExistant,
+  MagasinId,
+  MagasinIdInvalide,
+  MagasinIdVide,
   NomTropLong,
   NomVide,
+  ProduitId,
+  ProduitIdInvalide,
+  ProduitIdVide,
+  SousFamilleTropLongue,
+  SousFamilleVide,
   TelephoneInvalide,
   TelephoneVide,
   VilleTropLongue,
   VilleVide,
 } from '@rdc/referentiel-domain';
 import { CentrePersisteInvalide } from '../prisma/centre-persiste-invalide';
+import { MagasinPersisteInvalide } from '../prisma/magasin-persiste-invalide';
 import { ReferentielErreursHttpFilter } from './referentiel-erreurs-http.filter';
 
 function hoteHttp() {
@@ -87,6 +106,63 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
     );
   });
 
+  // Magasins (lot A1) : statuts de RDC v1 (RDC-REF-001, RDC-REF-010).
+  it.each([
+    [
+      new MagasinDejaExistant(),
+      'MagasinDejaExistant',
+      'MAGASIN_ALREADY_EXISTS',
+    ],
+    [new CentreNonActif(unCentreId), 'CentreNonActif', 'CENTRE_NON_ACTIF'],
+    // Archivage d'un centre qui a encore des magasins (RDC-REF-011).
+    [
+      new CentreADesMagasins(unCentreId),
+      'CentreADesMagasins',
+      'CENTRE_A_DES_MAGASINS',
+    ],
+  ])('traduit %s en 409', (erreur, nom, code) => {
+    const { hote, reponse } = hoteHttp();
+
+    filtre.catch(erreur, hote);
+
+    expect(reponse.status).toHaveBeenCalledWith(409);
+    expect(reponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({ statusCode: 409, error: nom, code }),
+    );
+  });
+
+  // Cycle de vie d'un magasin (lot A2) : mêmes statuts que pour le centre.
+  it.each([
+    [404, 'MagasinIntrouvable', 'MAGASIN_NOT_FOUND', MagasinIntrouvable],
+    [409, 'MagasinArchive', 'MAGASIN_ARCHIVED', MagasinArchive],
+  ] as const)('traduit en %i %s', (statut, nom, code, TypeErreur) => {
+    const { hote, reponse } = hoteHttp();
+    const magasinId = MagasinId.creer('3b8a5d6e-0f12-4f7a-9c1e-7f1c9d7e2d4b');
+
+    filtre.catch(new TypeErreur(magasinId), hote);
+
+    expect(reponse.status).toHaveBeenCalledWith(statut);
+    expect(reponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({ statusCode: statut, error: nom, code }),
+    );
+  });
+
+  it('traduit un produit inconnu en 404 PRODUIT_NOT_FOUND', () => {
+    const { hote, reponse } = hoteHttp();
+
+    filtre.catch(
+      new ProduitIntrouvable(
+        ProduitId.creer('9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d'),
+      ),
+      hote,
+    );
+
+    expect(reponse.status).toHaveBeenCalledWith(404);
+    expect(reponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({ code: 'PRODUIT_NOT_FOUND' }),
+    );
+  });
+
   // @Catch filtre par instanceof : une sous-classe d'une erreur listée doit
   // garder le statut de son parent, pas retomber sur un statut par défaut.
   it.each([
@@ -109,6 +185,8 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
     [new NomTropLong(100), 'NOM_TOO_LONG'],
     [new CentreIdVide(), 'CENTRE_ID_EMPTY'],
     [new CentreIdInvalide(), 'CENTRE_ID_INVALID'],
+    [new MagasinIdVide(), 'MAGASIN_ID_EMPTY'],
+    [new MagasinIdInvalide(), 'MAGASIN_ID_INVALID'],
     [new CodePostalInvalide(), 'CODE_POSTAL_INVALID'],
     [new VilleVide(), 'VILLE_EMPTY'],
     [new VilleTropLongue(100), 'VILLE_TOO_LONG'],
@@ -123,6 +201,14 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
     [new EmailVide(), 'EMAIL_EMPTY'],
     [new EmailTropLong(254), 'EMAIL_TOO_LONG'],
     [new EmailInvalide(), 'EMAIL_INVALID'],
+    [new ProduitIdVide(), 'PRODUIT_ID_EMPTY'],
+    [new ProduitIdInvalide(), 'PRODUIT_ID_INVALID'],
+    [new CodeProduitVide(), 'CODE_PRODUIT_EMPTY'],
+    [new CodeProduitInvalide(), 'CODE_PRODUIT_INVALID'],
+    [new FamilleVide(), 'FAMILLE_EMPTY'],
+    [new FamilleTropLongue(100), 'FAMILLE_TOO_LONG'],
+    [new SousFamilleVide(), 'SOUS_FAMILLE_EMPTY'],
+    [new SousFamilleTropLongue(100), 'SOUS_FAMILLE_TOO_LONG'],
   ])('traduit %s en 400 %s', (erreur, code) => {
     const { hote, reponse } = hoteHttp();
 
@@ -150,6 +236,19 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
     });
 
     expect(typesCaptures.length).toBeGreaterThan(0);
+    expect(typesCaptures.some((type) => erreur instanceof type)).toBe(false);
+  });
+
+  it('ne capture pas MagasinPersisteInvalide, même par sa cause de validation', () => {
+    const typesCaptures: Type<Error>[] = Reflect.getMetadata(
+      FILTER_CATCH_EXCEPTIONS,
+      ReferentielErreursHttpFilter,
+    );
+    const erreur = new MagasinPersisteInvalide(
+      '3b8a5d6e-0f12-4f7a-9c1e-7f1c9d7e2d4b',
+      { cause: new TelephoneInvalide() },
+    );
+
     expect(typesCaptures.some((type) => erreur instanceof type)).toBe(false);
   });
 });

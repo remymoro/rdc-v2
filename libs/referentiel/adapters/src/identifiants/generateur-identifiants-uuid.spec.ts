@@ -1,4 +1,4 @@
-import { CentreId } from '@rdc/referentiel-domain';
+import { CentreId, MagasinId, ProduitId } from '@rdc/referentiel-domain';
 import { GenerateurIdentifiantsUuid } from './generateur-identifiants-uuid';
 
 describe('GenerateurIdentifiantsUuid', () => {
@@ -17,5 +17,23 @@ describe('GenerateurIdentifiantsUuid', () => {
     );
 
     expect(ids.size).toBe(100);
+  });
+
+  it('génère un MagasinId valide (UUID), différent à chaque appel', () => {
+    const ids = Array.from({ length: 100 }, () =>
+      generateur.nouveauMagasinId(),
+    );
+
+    expect(ids[0]).toBeInstanceOf(MagasinId);
+    expect(new Set(ids.map((id) => id.valeur)).size).toBe(100);
+  });
+
+  it('génère un ProduitId valide (UUID), différent à chaque appel', () => {
+    const ids = Array.from({ length: 100 }, () =>
+      generateur.nouveauProduitId(),
+    );
+
+    expect(ids[0]).toBeInstanceOf(ProduitId);
+    expect(new Set(ids.map((id) => id.valeur)).size).toBe(100);
   });
 });

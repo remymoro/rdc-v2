@@ -26,17 +26,17 @@
 
 ## Étapes
 
-| Étape | Contenu                                                            | État       |
-| ----- | ------------------------------------------------------------------ | ---------- |
-| 0     | Fondations : Nx, lint d'architecture, CI, règles Tenets, ADR       | ✅ Terminé |
-| 1     | Référentiel : créer un centre (domaine → use case → Prisma → HTTP) | ✅ Terminé |
-| 2     | Référentiel : cycle de vie d'un centre (désactiver, archiver)      | ✅ Terminé |
-| 3     | Référentiel : magasins et produits                                 | ⏳         |
-| 4     | Identité et accès : bootstrap admin, connexion, rôles              | ⏳         |
-| 5     | Collecte : design doc, puis création et cycle de vie               | ⏳         |
-| 6     | Planification, saisie, bénévoles                                   | ⏳         |
-| 7     | Statistiques (modèle de lecture séparé)                            | ⏳         |
-| 8     | Front Angular 22 dans le workspace (Node ≥ 24.15)                  | ⏳         |
+| Étape | Contenu                                                            | État           |
+| ----- | ------------------------------------------------------------------ | -------------- |
+| 0     | Fondations : Nx, lint d'architecture, CI, règles Tenets, ADR       | ✅ Terminé     |
+| 1     | Référentiel : créer un centre (domaine → use case → Prisma → HTTP) | ✅ Terminé     |
+| 2     | Référentiel : cycle de vie d'un centre (désactiver, archiver)      | ✅ Terminé     |
+| 3     | Référentiel : magasins et produits                                 | 🔄 tout sauf C |
+| 4     | Identité et accès : bootstrap admin, connexion, rôles              | ⏳             |
+| 5     | Collecte : design doc, puis création et cycle de vie               | ⏳             |
+| 6     | Planification, saisie, bénévoles                                   | ⏳             |
+| 7     | Statistiques (modèle de lecture séparé)                            | ⏳             |
+| 8     | Front Angular 22 dans le workspace (Node ≥ 24.15)                  | ⏳             |
 
 L'ordre des étapes 3 à 7 reste à confirmer avec la carte des contextes.
 
@@ -64,9 +64,9 @@ L'ordre des étapes 3 à 7 reste à confirmer avec la carte des contextes.
 | `POST /api/centres`, filtres d'erreurs, tests E2E (ADR-0009)                                  | ✅   |
 
 Avant la mise en production (ADR-0008) : script de reprise qui calcule
-`cleDoublon` pour les centres de la v1, puis colonne rendue obligatoire. Reste à
-traduire une violation d'unicité de `cleDoublon` en `CentreDejaExistant` (créations
-simultanées, TENETS-ADAPTER-006).
+`cleDoublon` pour les centres de la v1, puis colonne rendue obligatoire. La
+violation d'unicité est traduite en `CentreDejaExistant` depuis l'étape 3
+(TENETS-ADAPTER-006).
 
 ⚠️ **Avant tout déploiement** : authentification ADMIN sur `POST /api/centres`
 et les routes `PATCH` de cycle de vie (étape 4, ADR-0009). En attendant, l'API refuse de démarrer en production
@@ -107,3 +107,49 @@ Règles de la v1 reportées (décision du 2026-10-01) :
   même transaction). En v2, plutôt une réaction à un événement « centre archivé »
   émis par le domaine (TENETS-EVENT-002, AGGREGATE-006) ; l'événement n'est pas
   créé tant que personne ne le consomme.
+
+## Étape 3 — Magasins, produits et fin des centres
+
+Mission : `docs/missions/etape-3-magasins/00-plan.md`.
+
+| Élément                                                                                                                      | État |
+| ---------------------------------------------------------------------------------------------------------------------------- | ---- |
+| A1 — `MagasinId`, `StatutMagasin`, `Magasin.creer()` / `reconstituer()` (rattachement au centre)                             | ✅   |
+| A1 — `CleDoublonMagasin` globale, règle de rapprochement partagée avec le centre                                             | ✅   |
+| A1 — `Centre.verifierOuvertAuxRattachements()` : `CENTRE_NON_ACTIF` (RDC-REF-010)                                            | ✅   |
+| A1 — Port `MagasinRepository`, suite de contrat, fake en mémoire                                                             | ✅   |
+| A1 — `CreerMagasinUseCase` : `CENTRE_NOT_FOUND`, `CENTRE_NON_ACTIF`, `MAGASIN_ALREADY_EXISTS`                                | ✅   |
+| A1 — Migration `Magasin.cleDoublon`, `PrismaMagasinRepository`, P2002 traduite en `MagasinDejaExistant`                      | ✅   |
+| A1 — `POST /api/centres/:centreId/magasins`, filtre d'erreurs, E2E                                                           | ✅   |
+| A2 — Cycle de vie d'un magasin : désactiver, activer, archiver (`MAGASIN_ARCHIVED`, `MAGASIN_NOT_FOUND`)                     | ✅   |
+| A3 — `PATCH /api/magasins/:id` : modifier (absent = inchangé, `null` = suppression), transférer, sans doublon                | ✅   |
+| A4 — Lire les magasins : `GET /api/magasins`, `/api/magasins/:id`, `/api/centres/:centreId/magasins` (port de lecture dédié) | ✅   |
+| B — Catalogue des produits : créer, modifier, activer, désactiver, lister (`/api/produits`)                                  | ✅   |
+| Centres — Archivage refusé tant qu'un magasin actif ou inactif est rattaché (`CENTRE_A_DES_MAGASINS`, RDC-REF-011, D-18)     | ✅   |
+| Centres — Lire : `GET /api/centres` (statut, recherche, tri), `/api/centres/:id`, avec les magasins actifs et inactifs       | ✅   |
+| Centres — `PATCH /api/centres/:id` : modifier (absent = inchangé, `null` = suppression), sans doublon, archivé refusé        | ✅   |
+| Centres — Filet P2002 : `CentreDejaExistant` déclaré par le port, deux contraintes uniques traduites                         | ✅   |
+| C — Images d'un magasin                                                                                                      | ⏳   |
+
+Produits : pas d'unicité du code (retirée volontairement en v1, migration
+`remove_produit_code_unique`) ; forme de `ProduitDto` et tri par code à vérifier
+contre la v1.
+
+Lectures des centres : tri par nom par défaut, ou `?tri=statut|magasins` et
+`?ordre=desc` (tri en mémoire dans la requête applicative : une douzaine de
+centres) ; la recherche ignore la casse mais pas les
+accents (« Nerac » ne trouve pas « Nérac ») ; la réponse ajoute `magasins`
+au `CentreDto` de la v1.
+
+Lectures des magasins : tri par nom supposé, archivés compris ; le filtre « son
+centre » d'un responsable arrive avec l'étape 4.
+
+À vérifier contre la v1 (non disponible lors du lot A1) : la forme exacte de
+`MagasinDto` (reprise du `CentreDto`, plus `centreId` et `images`) et les codes
+`MAGASIN_ID_EMPTY` / `MAGASIN_ID_INVALID`.
+
+Concurrence sur un magasin : « le dernier qui écrit gagne », comme pour le
+centre (ADR-0017, proposé).
+
+Avant la mise en production (ADR-0008) : le script de reprise calcule aussi
+`cleDoublon` pour les magasins de la v1, puis la colonne devient obligatoire.

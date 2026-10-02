@@ -9,3 +9,15 @@ export class CentreArchive extends Error {
     this.name = 'CentreArchive';
   }
 }
+
+/** Seul un centre ACTIF reçoit un nouveau rattachement (RDC-REF-010). */
+export class CentreNonActif extends Error {
+  readonly code = 'CENTRE_NON_ACTIF';
+
+  constructor(readonly centreId: CentreId) {
+    super(
+      "Ce centre n'est pas actif : il ne peut pas recevoir de rattachement.",
+    );
+    this.name = 'CentreNonActif';
+  }
+}

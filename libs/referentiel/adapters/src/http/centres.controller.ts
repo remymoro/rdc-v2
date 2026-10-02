@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
   Patch,
   Post,
+  Query,
   UseFilters,
 } from '@nestjs/common';
 import {
@@ -13,8 +15,16 @@ import {
   ArchiverCentreUseCase,
   CreerCentreUseCase,
   DesactiverCentreUseCase,
+  ListerCentresQuery,
+  ModifierCentreUseCase,
+  ObtenirCentreQuery,
 } from '@rdc/referentiel-application';
-import { type CentreReponse, versCentreReponse } from './centre.reponse';
+import {
+  type CentreLuReponse,
+  type CentreReponse,
+  versCentreReponse,
+  vueVersCentreReponse,
+} from './centre.reponse';
 import {
   CreerCentreRequete,
   versCreerCentreCommande,
@@ -24,6 +34,15 @@ import {
   versArchiverCentreCommande,
   versDesactiverCentreCommande,
 } from './cycle-de-vie-centre.requete';
+import {
+  LireCentresRequete,
+  versListerCentresRequete,
+  versObtenirCentreRequete,
+} from './lire-centres.requete';
+import {
+  ModifierCentreRequete,
+  versModifierCentreCommande,
+} from './modifier-centre.requete';
 import { ReferentielErreursHttpFilter } from './referentiel-erreurs-http.filter';
 
 /**
@@ -39,13 +58,45 @@ export class CentresController {
     private readonly desactiverCentre: DesactiverCentreUseCase,
     private readonly activerCentre: ActiverCentreUseCase,
     private readonly archiverCentre: ArchiverCentreUseCase,
+    private readonly listerCentres: ListerCentresQuery,
+    private readonly obtenirCentre: ObtenirCentreQuery,
+    private readonly modifierCentre: ModifierCentreUseCase,
   ) {}
+
+  @Get()
+  async lister(
+    @Query() requete: LireCentresRequete,
+  ): Promise<CentreLuReponse[]> {
+    const vues = await this.listerCentres.execute(
+      versListerCentresRequete(requete),
+    );
+    return vues.map(vueVersCentreReponse);
+  }
+
+  @Get(':id')
+  async obtenir(@Param('id') id: string): Promise<CentreLuReponse> {
+    const vue = await this.obtenirCentre.execute(versObtenirCentreRequete(id));
+    return vueVersCentreReponse(vue);
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async creer(@Body() requete: CreerCentreRequete): Promise<CentreReponse> {
     const centre = await this.creerCentre.execute(
       versCreerCentreCommande(requete),
+    );
+    return versCentreReponse(centre);
+  }
+
+  // Modification (contrat v1, ADR-0009) : 200 CentreDto.
+  @Patch(':id')
+  @HttpCode(HttpStatus.OK)
+  async modifier(
+    @Param('id') id: string,
+    @Body() requete: ModifierCentreRequete,
+  ): Promise<CentreReponse> {
+    const centre = await this.modifierCentre.execute(
+      versModifierCentreCommande(id, requete),
     );
     return versCentreReponse(centre);
   }
