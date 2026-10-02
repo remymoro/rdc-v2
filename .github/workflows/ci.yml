@@ -71,6 +71,9 @@ jobs:
       - name: Tests de l'Agent Gate
         run: pnpm test:agent-gate
 
+      - name: Tests du contrôle de reprise
+        run: pnpm test:reprise
+
       # Base = dernier commit de main dont la CI est verte.
       - uses: nrwl/nx-set-shas@v5
 

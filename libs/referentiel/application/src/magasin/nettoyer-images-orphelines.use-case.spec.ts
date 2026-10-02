@@ -79,6 +79,34 @@ describe('NettoyerImagesOrphelinesUseCase (RDC-REF-007)', () => {
     );
   });
 
+  it('conserve les fichiers d’un magasin illisible et poursuit les autres magasins', async () => {
+    const panne = new Error('image v1 invalide');
+    const repository = new MagasinRepositoryEnMemoire([unMagasinAvecImage()]);
+    const get = repository.get.bind(repository);
+    jest.spyOn(repository, 'get').mockImplementation(async (id) => {
+      if (id.equals(magasinInconnu)) throw panne;
+      return get(id);
+    });
+    nettoyer = new NettoyerImagesOrphelinesUseCase(
+      repository,
+      stockage,
+      horloge,
+      journal,
+    );
+    // Le magasin invalide passe en premier.
+    stockage.deposer(magasinInconnu, orpheline, ilYA(2 * HEURE));
+    stockage.deposer(magasinId, orpheline, ilYA(2 * HEURE));
+
+    expect(await nettoyer.execute()).toEqual({ supprimes: 1, echecs: 1 });
+    expect(stockage.noms()).toEqual([nom(magasinInconnu, orpheline)]);
+    expect(journal.avertissements).toEqual([
+      expect.objectContaining({
+        details: { magasinId: magasinInconnu.valeur },
+        cause: panne,
+      }),
+    ]);
+  });
+
   it('supprime un orphelin de plus d’une heure', async () => {
     stockage.deposer(magasinId, orpheline, ilYA(2 * HEURE));
 
