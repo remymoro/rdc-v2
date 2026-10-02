@@ -26,17 +26,17 @@
 
 ## Étapes
 
-| Étape | Contenu                                                            | État       |
-| ----- | ------------------------------------------------------------------ | ---------- |
-| 0     | Fondations : Nx, lint d'architecture, CI, règles Tenets, ADR       | ✅ Terminé |
-| 1     | Référentiel : créer un centre (domaine → use case → Prisma → HTTP) | ✅ Terminé |
-| 2     | Référentiel : cycle de vie d'un centre (désactiver, archiver)      | ✅ Terminé |
-| 3     | Référentiel : magasins et produits                                 | 🔄 A1 à A4 |
-| 4     | Identité et accès : bootstrap admin, connexion, rôles              | ⏳         |
-| 5     | Collecte : design doc, puis création et cycle de vie               | ⏳         |
-| 6     | Planification, saisie, bénévoles                                   | ⏳         |
-| 7     | Statistiques (modèle de lecture séparé)                            | ⏳         |
-| 8     | Front Angular 22 dans le workspace (Node ≥ 24.15)                  | ⏳         |
+| Étape | Contenu                                                            | État          |
+| ----- | ------------------------------------------------------------------ | ------------- |
+| 0     | Fondations : Nx, lint d'architecture, CI, règles Tenets, ADR       | ✅ Terminé    |
+| 1     | Référentiel : créer un centre (domaine → use case → Prisma → HTTP) | ✅ Terminé    |
+| 2     | Référentiel : cycle de vie d'un centre (désactiver, archiver)      | ✅ Terminé    |
+| 3     | Référentiel : magasins et produits                                 | 🔄 A1 à A4, B |
+| 4     | Identité et accès : bootstrap admin, connexion, rôles              | ⏳            |
+| 5     | Collecte : design doc, puis création et cycle de vie               | ⏳            |
+| 6     | Planification, saisie, bénévoles                                   | ⏳            |
+| 7     | Statistiques (modèle de lecture séparé)                            | ⏳            |
+| 8     | Front Angular 22 dans le workspace (Node ≥ 24.15)                  | ⏳            |
 
 L'ordre des étapes 3 à 7 reste à confirmer avec la carte des contextes.
 
@@ -124,8 +124,12 @@ Mission : `docs/missions/etape-3-magasins/00-plan.md`.
 | A2 — Cycle de vie d'un magasin : désactiver, activer, archiver (`MAGASIN_ARCHIVED`, `MAGASIN_NOT_FOUND`)                     | ✅   |
 | A3 — `PATCH /api/magasins/:id` : modifier (absent = inchangé, `null` = suppression), transférer, sans doublon                | ✅   |
 | A4 — Lire les magasins : `GET /api/magasins`, `/api/magasins/:id`, `/api/centres/:centreId/magasins` (port de lecture dédié) | ✅   |
-| B — Catalogue des produits                                                                                                   | ⏳   |
+| B — Catalogue des produits : créer, modifier, activer, désactiver, lister (`/api/produits`)                                  | ✅   |
 | C — Images d'un magasin                                                                                                      | ⏳   |
+
+Produits : pas d'unicité du code (retirée volontairement en v1, migration
+`remove_produit_code_unique`) ; forme de `ProduitDto` et tri par code à vérifier
+contre la v1.
 
 Lectures des magasins : tri par nom supposé, archivés compris ; le filtre « son
 centre » d'un responsable arrive avec l'étape 4.

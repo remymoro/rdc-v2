@@ -158,7 +158,7 @@ est `apps/api/src/application/use-cases/magasin/ajouter-image-magasin.usecase.ts
 
 ## RDC-REF-008 — Catalogue des produits
 
-`core` · erreur · ⏳ à implémenter (étape 3)
+`core` · erreur · ✅ implémentée (étape 3, lot B)
 
 **Règle.** Un produit a un code au format `D` suivi de 6 chiffres, une famille
 et une sous-famille non vides, et un indicateur actif. On désactive un
