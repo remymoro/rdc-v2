@@ -7,7 +7,10 @@ import {
   StatutMagasin,
 } from '@rdc/referentiel-domain';
 import { MagasinIntrouvable } from '../errors';
-import { StockageImagesIndisponible } from '../ports/stockage-images';
+import {
+  FichierImageDejaExistant,
+  StockageImagesIndisponible,
+} from '../ports/stockage-images';
 import { unContenuJpeg } from '../ports/stockage-images.contrat.test-utils';
 import { GenerateurIdentifiantsFixe } from '../testing/generateur-identifiants-fixe.test-utils';
 import { HorlogeFixe } from '../testing/horloge-fixe.test-utils';
@@ -175,6 +178,22 @@ describe('AjouterImageMagasinUseCase (RDC-REF-007)', () => {
     expect(erreur).toBeInstanceOf(MagasinArchive);
     expect(enregistrer).not.toHaveBeenCalled();
     expect(stockage.noms()).toEqual([]);
+    expect(unitOfWork.nombreDeCommits).toBe(0);
+  });
+
+  it('refuse une collision de nom sans supprimer le fichier déjà présent', async () => {
+    const useCase = preparer();
+    // Fichier d'une autre image, de même nom (UUID tiré deux fois).
+    await stockage.enregistrer(magasinId, fichierAttendu, unContenuJpeg(7));
+
+    const erreur = await useCase
+      .execute({ magasinId, contenu: unContenuJpeg(42) })
+      .catch((e: unknown) => e);
+
+    expect(erreur).toBeInstanceOf(FichierImageDejaExistant);
+    expect(stockage.contenu(magasinId, fichierAttendu)).toEqual(
+      new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 7, 7, 7]),
+    );
     expect(unitOfWork.nombreDeCommits).toBe(0);
   });
 
