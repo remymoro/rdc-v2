@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
   Patch,
   Post,
+  Query,
   UseFilters,
 } from '@nestjs/common';
 import {
@@ -13,8 +15,15 @@ import {
   ArchiverCentreUseCase,
   CreerCentreUseCase,
   DesactiverCentreUseCase,
+  ListerCentresQuery,
+  ObtenirCentreQuery,
 } from '@rdc/referentiel-application';
-import { type CentreReponse, versCentreReponse } from './centre.reponse';
+import {
+  type CentreLuReponse,
+  type CentreReponse,
+  versCentreReponse,
+  vueVersCentreReponse,
+} from './centre.reponse';
 import {
   CreerCentreRequete,
   versCreerCentreCommande,
@@ -24,6 +33,11 @@ import {
   versArchiverCentreCommande,
   versDesactiverCentreCommande,
 } from './cycle-de-vie-centre.requete';
+import {
+  LireCentresRequete,
+  versListerCentresRequete,
+  versObtenirCentreRequete,
+} from './lire-centres.requete';
 import { ReferentielErreursHttpFilter } from './referentiel-erreurs-http.filter';
 
 /**
@@ -39,7 +53,25 @@ export class CentresController {
     private readonly desactiverCentre: DesactiverCentreUseCase,
     private readonly activerCentre: ActiverCentreUseCase,
     private readonly archiverCentre: ArchiverCentreUseCase,
+    private readonly listerCentres: ListerCentresQuery,
+    private readonly obtenirCentre: ObtenirCentreQuery,
   ) {}
+
+  @Get()
+  async lister(
+    @Query() requete: LireCentresRequete,
+  ): Promise<CentreLuReponse[]> {
+    const vues = await this.listerCentres.execute(
+      versListerCentresRequete(requete),
+    );
+    return vues.map(vueVersCentreReponse);
+  }
+
+  @Get(':id')
+  async obtenir(@Param('id') id: string): Promise<CentreLuReponse> {
+    const vue = await this.obtenirCentre.execute(versObtenirCentreRequete(id));
+    return vueVersCentreReponse(vue);
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
