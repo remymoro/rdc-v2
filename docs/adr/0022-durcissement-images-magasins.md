@@ -42,6 +42,8 @@
    de 16 Kio et 2 000 paires d'en-têtes, sans exploiter `headerPairs`.
    La mémoire des champs reste bornée par `fields: 0` et `parts: 1` ;
    le plafond de 100 paires ne constitue donc pas une garantie effective.
+   `fieldSize` n'est pas fixé : avec `fields: 0`, tout champ texte est
+   refusé avant d'être lu, sa taille ne compte donc pas.
 
 4. **Publication restreinte (I4).** Dans tous les environnements, l'API sert
    uniquement `/uploads/magasins/<UUID>/<UUID>.(jpg|jpeg|png|webp)`, sans
