@@ -1,7 +1,11 @@
 import fs from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { unContenuJpeg, unFichier } from '@rdc/referentiel-application/testing';
+import {
+  JournalEnMemoire,
+  unContenuJpeg,
+  unFichier,
+} from '@rdc/referentiel-application/testing';
 import { MagasinId } from '@rdc/referentiel-domain';
 import { DisqueStockageImages } from './disque-stockage-images';
 
@@ -12,16 +16,42 @@ describe('DisqueStockageImages — écriture atomique', () => {
   let racine: string;
   let dossier: string;
   let stockage: DisqueStockageImages;
+  let journal: JournalEnMemoire;
 
   beforeEach(async () => {
     racine = await fs.mkdtemp(join(tmpdir(), 'rdc-images-pannes-'));
     dossier = join(racine, 'magasins', magasin.valeur);
-    stockage = new DisqueStockageImages(racine);
+    journal = new JournalEnMemoire();
+    stockage = new DisqueStockageImages(racine, journal);
   });
 
   afterEach(async () => {
     jest.restoreAllMocks();
     await fs.rm(racine, { recursive: true, force: true });
+  });
+
+  it('journalise le temporaire conservé sans masquer la panne initiale (SIMP-3)', async () => {
+    const panneEcriture = Object.assign(new Error('disque plein'), {
+      code: 'ENOSPC',
+    });
+    const panneNettoyage = Object.assign(new Error('accès refusé'), {
+      code: 'EACCES',
+    });
+    jest.spyOn(fs, 'writeFile').mockRejectedValueOnce(panneEcriture);
+    jest.spyOn(fs, 'rm').mockRejectedValueOnce(panneNettoyage);
+
+    await expect(
+      stockage.enregistrer(magasin, fichier, unContenuJpeg()),
+    ).rejects.toMatchObject({ cause: panneEcriture });
+    expect(journal.avertissements).toEqual([
+      expect.objectContaining({
+        details: {
+          magasinId: magasin.valeur,
+          fichier: expect.stringMatching(/\.tmp$/),
+        },
+        cause: panneNettoyage,
+      }),
+    ]);
   });
 
   it('ne rend jamais visible un contenu partiel, et nettoie après ENOSPC', async () => {

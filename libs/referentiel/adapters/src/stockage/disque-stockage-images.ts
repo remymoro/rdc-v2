@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import { Logger } from '@nestjs/common';
 import { link, mkdir, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { join, resolve, sep } from 'node:path';
 import {
   type FichierImageStocke,
+  Journal,
   StockageImages,
   StockageImagesIndisponible,
   FichierImageDejaExistant,
@@ -75,9 +75,11 @@ const CODES_INDISPONIBLE = new Set([
  */
 export class DisqueStockageImages extends StockageImages {
   readonly racine: string;
-  private readonly logger = new Logger(DisqueStockageImages.name);
 
-  constructor(racine: string) {
+  constructor(
+    racine: string,
+    private readonly journal: Journal,
+  ) {
     super();
     this.racine = resolve(racine);
   }
@@ -111,11 +113,14 @@ export class DisqueStockageImages extends StockageImages {
         try {
           await rm(temporaire, { force: true });
         } catch (erreur) {
-          this.logger.warn({
-            message: 'Fichier temporaire conservé après échec du nettoyage',
-            temporaire,
+          this.journal.avertir(
+            'Fichier temporaire conservé après échec du nettoyage',
+            {
+              magasinId: magasinId.valeur,
+              fichier: temporaire.slice(dossier.length + 1),
+            },
             erreur,
-          });
+          );
         }
       }
     });

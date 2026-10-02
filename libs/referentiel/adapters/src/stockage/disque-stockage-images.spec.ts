@@ -10,6 +10,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, sep } from 'node:path';
 import { StockageImagesIndisponible } from '@rdc/referentiel-application';
 import {
+  JournalEnMemoire,
   unContenuJpeg,
   unFichier,
   verifierContratStockageImages,
@@ -33,7 +34,7 @@ const ID_IMAGE = '0d4e2b8c-6a1f-4c3e-9b7d-5f2a8e1c4b6d';
 verifierContratStockageImages('DisqueStockageImages', async () => {
   const racine = await unDossierTemporaire();
   return {
-    stockage: new DisqueStockageImages(racine),
+    stockage: new DisqueStockageImages(racine, new JournalEnMemoire()),
     lireFichier: async (magasinId, fichier) => {
       try {
         return new Uint8Array(
@@ -61,7 +62,7 @@ describe('DisqueStockageImages — emplacement des fichiers (audit A-18)', () =>
   });
 
   it('range le fichier sous <racine>/magasins/<magasin>/<uuid>.<extension>', async () => {
-    await new DisqueStockageImages(racine).enregistrer(
+    await new DisqueStockageImages(racine, new JournalEnMemoire()).enregistrer(
       MAGASIN,
       unFichier(ID_IMAGE),
       unContenuJpeg(),
@@ -73,7 +74,10 @@ describe('DisqueStockageImages — emplacement des fichiers (audit A-18)', () =>
   });
 
   it('accepte une racine relative, résolue depuis le dossier courant', () => {
-    const stockage = new DisqueStockageImages('uploads');
+    const stockage = new DisqueStockageImages(
+      'uploads',
+      new JournalEnMemoire(),
+    );
 
     expect(stockage.racine).toBe(join(process.cwd(), 'uploads'));
   });
@@ -119,7 +123,9 @@ describe('DisqueStockageImages — emplacement des fichiers (audit A-18)', () =>
     );
     await writeFile(join(racine, 'magasins', 'fichier-a-la-racine.jpg'), 'x');
 
-    expect(await new DisqueStockageImages(racine).lister()).toEqual([]);
+    expect(
+      await new DisqueStockageImages(racine, new JournalEnMemoire()).lister(),
+    ).toEqual([]);
   });
 
   it('traduit un dossier inutilisable en StockageImagesIndisponible, avec la cause', async () => {
@@ -127,7 +133,10 @@ describe('DisqueStockageImages — emplacement des fichiers (audit A-18)', () =>
     const racineFichier = join(racine, 'pas-un-dossier');
     await writeFile(racineFichier, 'x');
 
-    const erreur = await new DisqueStockageImages(racineFichier)
+    const erreur = await new DisqueStockageImages(
+      racineFichier,
+      new JournalEnMemoire(),
+    )
       .enregistrer(MAGASIN, unFichier(ID_IMAGE), unContenuJpeg())
       .catch((e: unknown) => e);
 
