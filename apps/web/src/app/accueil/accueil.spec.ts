@@ -22,6 +22,17 @@ describe('Page d’accueil', () => {
     expect(page().querySelector('h2')?.textContent).toContain('Bienvenue');
   });
 
+  it('affiche le carrousel de présentation avant les rubriques', () => {
+    const carrousel = page().querySelector('rdc-presentation');
+    const rubriques = page().querySelector('ul');
+
+    expect(carrousel).not.toBeNull();
+    expect(
+      carrousel!.compareDocumentPosition(rubriques!) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   it('présente chaque rubrique de l’application', () => {
     const rubriques = [...page().querySelectorAll('li h3')].map((titre) =>
       titre.textContent?.trim(),

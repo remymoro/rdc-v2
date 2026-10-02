@@ -1,0 +1,53 @@
+<!-- tabindex="0" : la région reçoit le focus, les flèches du clavier la pilotent. -->
+<section
+  aria-roledescription="carrousel"
+  aria-label="Présentation de RDC"
+  tabindex="0"
+  (keydown)="auClavier($event)"
+  class="rounded-lg bg-red-50 p-6 focus:outline-2 focus:outline-red-700"
+>
+  <div class="flex items-center gap-4">
+    <button
+      type="button"
+      aria-label="Diapositive précédente"
+      (click)="precedente()"
+      class="rounded-full p-2 text-2xl text-red-700 hover:bg-red-100"
+    >
+      ‹
+    </button>
+
+    <!-- aria-live : un lecteur d'écran annonce la nouvelle diapositive. -->
+    <div aria-live="polite" class="min-h-28 flex-1 space-y-2">
+      <h3 class="text-lg font-semibold text-red-800">
+        {{ diapositive().titre }}
+      </h3>
+      <p class="text-gray-700">{{ diapositive().texte }}</p>
+    </div>
+
+    <button
+      type="button"
+      aria-label="Diapositive suivante"
+      (click)="suivante()"
+      class="rounded-full p-2 text-2xl text-red-700 hover:bg-red-100"
+    >
+      ›
+    </button>
+  </div>
+
+  <div class="mt-4 flex items-center justify-center gap-2">
+    @for (d of diapositives; track d.titre; let position = $index) {
+    <button
+      type="button"
+      [attr.aria-label]="'Aller à la diapositive ' + (position + 1)"
+      [attr.aria-current]="position === index() ? 'true' : null"
+      (click)="allerA(position)"
+      class="h-2.5 w-2.5 rounded-full"
+      [class.bg-red-700]="position === index()"
+      [class.bg-red-200]="position !== index()"
+    ></button>
+    }
+    <span data-position class="ml-2 text-xs text-gray-500">
+      {{ index() + 1 }} / {{ diapositives.length }}
+    </span>
+  </div>
+</section>

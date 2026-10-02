@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Presentation } from './presentation/presentation';
 
 /** Une rubrique de l'application, présentée sur la page d'accueil. */
 interface Rubrique {
@@ -12,6 +13,8 @@ interface Rubrique {
  */
 @Component({
   selector: 'rdc-accueil',
+  // Un composant utilisé dans le template doit être importé ici.
+  imports: [Presentation],
   templateUrl: './accueil.html',
 })
 export class Accueil {
