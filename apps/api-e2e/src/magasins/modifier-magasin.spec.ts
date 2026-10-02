@@ -55,7 +55,10 @@ describe('PATCH /api/magasins/:id', () => {
   });
 
   it('transfère le magasin vers un autre centre actif (200)', async () => {
-    const autreCentre = await creerCentre('Centre de Boé', '3 avenue de la Liberté');
+    const autreCentre = await creerCentre(
+      'Centre de Boé',
+      '3 avenue de la Liberté',
+    );
 
     const reponse = await api.patch(`/magasins/${magasinId}`, {
       centreId: autreCentre,
@@ -101,7 +104,10 @@ describe('PATCH /api/magasins/:id', () => {
   });
 
   it('refuse un transfert vers un centre inactif (409 CENTRE_NON_ACTIF)', async () => {
-    const autreCentre = await creerCentre('Centre de Boé', '3 avenue de la Liberté');
+    const autreCentre = await creerCentre(
+      'Centre de Boé',
+      '3 avenue de la Liberté',
+    );
     await api.patch(`/centres/${autreCentre}/desactiver`, {});
 
     const reponse = await api.patch(`/magasins/${magasinId}`, {
