@@ -222,6 +222,7 @@ les étapes métier (ADR-0023).
 | Node 24.20, `apps/web` Angular 22.2 (esbuild, sans SSR), Vitest, Tailwind v4       | ✅   |
 | Frontière : `layer:frontend` n'importe ni lib back-end, ni NestJS, Prisma, Express | ✅   |
 | Proxy `/api` vers l'API en développement                                           | ✅   |
+| Page d'accueil : présentation et rubriques (`/`, titre de l'onglet)                | ✅   |
 | Règles d'architecture du front (écrans, appels HTTP, erreurs `code`) : un ADR      | ⏳   |
 | Tests E2E du front (Playwright), avec le premier écran                             | ⏳   |
 | Premier écran : connexion (dépend de l'étape 4, lot 1)                             | ⏳   |
