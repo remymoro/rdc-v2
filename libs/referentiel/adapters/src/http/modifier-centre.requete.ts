@@ -1,10 +1,9 @@
-import type { ModifierMagasinCommande } from '@rdc/referentiel-application';
+import type { ModifierCentreCommande } from '@rdc/referentiel-application';
 import {
   Adresse,
   CentreId,
   CodePostal,
   Email,
-  MagasinId,
   Nom,
   Telephone,
   Ville,
@@ -14,20 +13,20 @@ import { IsString, ValidateIf } from 'class-validator';
 import { videVersSuppression } from './champ-facultatif';
 
 const fourni =
-  (champ: keyof ModifierMagasinRequete) => (o: ModifierMagasinRequete) =>
+  (champ: keyof ModifierCentreRequete) => (o: ModifierCentreRequete) =>
     o[champ] !== undefined;
 const renseigne =
-  (champ: 'telephone' | 'email') => (o: ModifierMagasinRequete) =>
+  (champ: 'telephone' | 'email') => (o: ModifierCentreRequete) =>
     o[champ] !== undefined && o[champ] !== null;
 
 /**
- * Corps de PATCH /api/magasins/:id (contrat v1) : champ absent = inchangé ;
+ * Corps de PATCH /api/centres/:id (contrat v1) : champ absent = inchangé ;
  * `null` = suppression, pour le téléphone et l'email seulement. Ne vérifie que
  * la FORME : les règles restent dans les value objects (TENETS-VALIDATE-002).
  */
-export class ModifierMagasinRequete {
+export class ModifierCentreRequete {
   @ValidateIf(fourni('nom'))
-  @IsString({ message: 'Le nom du magasin doit être un texte.' })
+  @IsString({ message: 'Le nom du centre doit être un texte.' })
   nom?: string;
 
   @ValidateIf(fourni('ville'))
@@ -51,19 +50,15 @@ export class ModifierMagasinRequete {
   @ValidateIf(renseigne('email'))
   @IsString({ message: "L'e-mail doit être un texte ou null." })
   email?: string | null;
-
-  @ValidateIf(fourni('centreId'))
-  @IsString({ message: "L'identifiant du centre doit être un texte." })
-  centreId?: string;
 }
 
 /** Paramètre :id et corps → commande ; le domaine valide chaque valeur. */
-export function versModifierMagasinCommande(
+export function versModifierCentreCommande(
   id: string,
-  requete: ModifierMagasinRequete,
-): ModifierMagasinCommande {
+  requete: ModifierCentreRequete,
+): ModifierCentreCommande {
   return {
-    magasinId: MagasinId.creer(id),
+    centreId: CentreId.creer(id),
     changements: {
       ...(requete.nom !== undefined && { nom: Nom.creer(requete.nom) }),
       ...(requete.adresse !== undefined && {
@@ -83,8 +78,5 @@ export function versModifierMagasinCommande(
         email: requete.email === null ? null : Email.creer(requete.email),
       }),
     },
-    ...(requete.centreId !== undefined && {
-      centreId: CentreId.creer(requete.centreId),
-    }),
   };
 }

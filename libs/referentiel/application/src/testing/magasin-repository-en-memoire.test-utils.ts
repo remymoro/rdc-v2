@@ -1,9 +1,11 @@
 import {
+  CentreId,
   CleDoublonMagasin,
   Magasin,
   MagasinDejaExistant,
   MagasinId,
   MagasinRepository,
+  StatutMagasin,
 } from '@rdc/referentiel-domain';
 
 /** Fake de MagasinRepository pour les tests de use case (TENETS-TEST-002). */
@@ -42,6 +44,14 @@ export class MagasinRepositoryEnMemoire extends MagasinRepository {
     this.clesDemandees.push(cle);
     return [...this.magasins.values()].some((magasin) =>
       CleDoublonMagasin.depuis(magasin).equals(cle),
+    );
+  }
+
+  async existsNonArchiveDuCentre(centreId: CentreId): Promise<boolean> {
+    return [...this.magasins.values()].some(
+      (magasin) =>
+        magasin.centreId.equals(centreId) &&
+        magasin.statut !== StatutMagasin.ARCHIVE,
     );
   }
 

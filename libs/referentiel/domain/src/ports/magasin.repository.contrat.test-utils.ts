@@ -17,6 +17,8 @@ export interface ContexteContratMagasinRepository {
   readonly repository: MagasinRepository;
   /** Centre de rattachement déjà enregistré (clé étrangère en base). */
   readonly centreId: CentreId;
+  /** Second centre déjà enregistré, pour vérifier qu'on ne mélange pas les centres. */
+  readonly autreCentreId: CentreId;
   /** Remet le stockage à zéro après chaque test (base de test, etc.). */
   readonly nettoyer: () => Promise<void>;
 }
@@ -100,6 +102,50 @@ export function verifierContratMagasinRepository(
 
       const inconnu = MagasinId.creer(ID_AUTRE_MAGASIN);
       expect(await contexte.repository.get(inconnu)).toBeNull();
+    });
+
+    describe('existsNonArchiveDuCentre (RDC-REF-011)', () => {
+      it("répond non quand le centre n'a aucun magasin", async () => {
+        expect(
+          await contexte.repository.existsNonArchiveDuCentre(contexte.centreId),
+        ).toBe(false);
+      });
+
+      it('répond oui pour un magasin actif du centre', async () => {
+        await contexte.repository.save(magasin());
+
+        expect(
+          await contexte.repository.existsNonArchiveDuCentre(contexte.centreId),
+        ).toBe(true);
+      });
+
+      it('répond oui pour un magasin inactif du centre', async () => {
+        const inactif = magasin();
+        inactif.desactiver(new Date('2026-10-02T09:00:00.000Z'));
+        await contexte.repository.save(inactif);
+
+        expect(
+          await contexte.repository.existsNonArchiveDuCentre(contexte.centreId),
+        ).toBe(true);
+      });
+
+      it('ne compte pas un magasin archivé', async () => {
+        const archive = magasin();
+        archive.archiver(new Date('2026-10-02T09:00:00.000Z'));
+        await contexte.repository.save(archive);
+
+        expect(
+          await contexte.repository.existsNonArchiveDuCentre(contexte.centreId),
+        ).toBe(false);
+      });
+
+      it("ne compte pas les magasins d'un autre centre", async () => {
+        await contexte.repository.save(unMagasin(contexte.autreCentreId, {}));
+
+        expect(
+          await contexte.repository.existsNonArchiveDuCentre(contexte.centreId),
+        ).toBe(false);
+      });
     });
 
     it('refuse un second magasin de même clé de doublon (MagasinDejaExistant)', async () => {

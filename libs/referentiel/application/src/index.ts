@@ -6,11 +6,29 @@ export type {
   ArchiverCentreCommande,
   CreerCentreCommande,
   DesactiverCentreCommande,
+  ModifierCentreCommande,
 } from './centre/commandes';
 export { CreerCentreUseCase } from './centre/creer-centre.use-case';
 export { DesactiverCentreUseCase } from './centre/desactiver-centre.use-case';
 export { ActiverCentreUseCase } from './centre/activer-centre.use-case';
 export { ArchiverCentreUseCase } from './centre/archiver-centre.use-case';
+export { ModifierCentreUseCase } from './centre/modifier-centre.use-case';
+export {
+  LecturesCentres,
+  type FiltreCentres,
+  type MagasinsDuCentre,
+  type VueCentre,
+} from './centre/lectures/lectures-centres';
+export {
+  ListerCentresQuery,
+  OrdreTri,
+  TriCentres,
+  type ListerCentresRequete,
+} from './centre/lectures/lister-centres.query';
+export {
+  ObtenirCentreQuery,
+  type ObtenirCentreRequete,
+} from './centre/lectures/obtenir-centre.query';
 
 // Magasin
 export type {
@@ -57,7 +75,7 @@ export { ListerProduitsQuery } from './produit/lectures/lister-produits.query';
 
 // Commun au contexte
 export {
-  CentreDejaExistant,
+  CentreADesMagasins,
   CentreIntrouvable,
   MagasinIntrouvable,
   ProduitIntrouvable,

@@ -8,7 +8,7 @@ import { Email } from '../commun/email';
 import { Nom } from '../commun/nom';
 import { Telephone } from '../commun/telephone';
 import { Ville } from '../commun/ville';
-import type { CentreRepository } from './centre.repository';
+import { CentreDejaExistant, type CentreRepository } from './centre.repository';
 
 export interface ContexteContratCentreRepository {
   readonly repository: CentreRepository;
@@ -113,6 +113,19 @@ export function verifierContratCentreRepository(
       expect(relu?.modifieLe).toEqual(new Date('2026-10-02T14:30:00.000Z'));
     });
 
+    it('refuse un second centre de même clé de doublon (CentreDejaExistant)', async () => {
+      await contexte.repository.save(unCentre());
+
+      const doublon = unCentre({
+        id: '1c7f4a8b-0d3e-4f2a-9b6c-7d8e9f0a1b2c',
+        nom: "CENTRE-D'AGEN",
+      });
+      await expect(contexte.repository.save(doublon)).rejects.toBeInstanceOf(
+        CentreDejaExistant,
+      );
+      expect(await contexte.repository.get(doublon.id)).toBeNull();
+    });
+
     it('ne voit pas une modification qui n’a pas été enregistrée', async () => {
       const centre = unCentre();
       await contexte.repository.save(centre);
@@ -127,6 +140,7 @@ export function verifierContratCentreRepository(
 
 function unCentre(
   surcharges: Partial<{
+    id: string;
     nom: string;
     adresse: string;
     ville: string;
@@ -136,7 +150,9 @@ function unCentre(
 ): Centre {
   return Centre.creer(
     {
-      id: CentreId.creer('7f1c9d7e-2d4b-4f7a-9c1e-3b8a5d6e0f12'),
+      id: CentreId.creer(
+        surcharges.id ?? '7f1c9d7e-2d4b-4f7a-9c1e-3b8a5d6e0f12',
+      ),
       nom: Nom.creer(surcharges.nom ?? "Centre d'Agen"),
       adresse: Adresse.creer(surcharges.adresse ?? '12 avenue Jean Jaurès'),
       codePostal: CodePostal.creer('47000'),

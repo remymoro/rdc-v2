@@ -6,12 +6,13 @@ import {
   Type,
 } from '@nestjs/common';
 import {
-  CentreDejaExistant,
+  CentreADesMagasins,
   CentreIntrouvable,
   MagasinIntrouvable,
   ProduitIntrouvable,
 } from '@rdc/referentiel-application';
 import {
+  CentreDejaExistant,
   AdresseAbreviationInterdite,
   AdresseTropLongue,
   AdresseVide,
@@ -59,6 +60,7 @@ const STATUTS_HTTP = new Map<Type<ErreurConnue>, HttpStatus>([
   [MagasinArchive, HttpStatus.CONFLICT],
   [CentreArchive, HttpStatus.CONFLICT],
   [CentreNonActif, HttpStatus.CONFLICT],
+  [CentreADesMagasins, HttpStatus.CONFLICT],
   [MagasinDejaExistant, HttpStatus.CONFLICT],
   [NomVide, HttpStatus.BAD_REQUEST],
   [NomTropLong, HttpStatus.BAD_REQUEST],

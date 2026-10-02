@@ -28,6 +28,7 @@ règle concernée (état ⏳), et écrire un ADR si elle s'écarte de la v1.
 | D-11 | Référence produit libre ou catalogue        | RDC-SAISIE-005                   | 6              |
 | D-12 | ✅ Décidée : année civile Europe/Paris      | RDC-COLLECTE-022                 | —              |
 | D-13 | Raison de réouverture réellement saisie     | RDC-COLLECTE-010                 | 5              |
+| D-18 | ✅ Décidée : archiver un centre vide        | RDC-REF-011                      | —              |
 
 ## D-01 — Ordre des étapes
 
@@ -270,3 +271,23 @@ assumer une raison technique par défaut.
 **Sources v1.** `libs/domain/src/collecte/saisie-centre.entity.ts:145-159` ;
 `apps/api/src/application/use-cases/collecte/reouvrir-saisie-centre.usecase.ts:79-80` ;
 `apps/api/src/presentation/http/dtos/requests/reouvrir-saisie-centre.request.ts:1-8`.
+
+## D-18 — Archiver un centre qui a encore des magasins
+
+**Décision (2026-10-02).** Option (a) : l'archivage est **refusé** tant que le
+centre a au moins un magasin non archivé (`CENTRE_A_DES_MAGASINS`, 409).
+L'admin transfère ou archive d'abord ces magasins. La désactivation reste
+permise : elle est réversible, et les magasins gardent leur rattachement
+pendant la pause (RDC-REF-010 empêche déjà tout nouveau rattachement).
+
+**Constat.** Rien n'empêchait d'archiver un centre dont des magasins actifs
+restent rattachés : ces magasins dépendraient pour toujours d'un centre qui
+n'opère plus, sans pouvoir y être rattachés à nouveau. La documentation v1
+reprise ici ne mentionne pas ce cas.
+
+**Options.** (a) Refuser l'archivage. (b) Obliger un transfert dans la même
+opération. (c) Archiver les magasins en cascade.
+
+**Pourquoi (a).** Simple, explicite, sans effet caché ; (c) archiverait des
+magasins encore utiles, et (b) mélange deux décisions en une. Règle ajoutée
+par rapport à la v1 : **ADR-0018**.

@@ -15,7 +15,7 @@ ACTIF ⇄ INACTIF
 
 ## RDC-REF-001 — Un centre est unique par nom et adresse
 
-`core` · erreur · ✅ création (centre, magasin) · ✅ filet P2002 (magasin) · ⏳ filet P2002 (centre) et modification
+`core` · erreur · ✅ création, modification et filet P2002 (centre, magasin)
 
 **Règle.** Deux centres ne partagent pas la même clé de doublon (nom, adresse,
 code postal, ville, normalisés comme en v1 : `CleDoublonCentre`). Le use case
@@ -27,8 +27,8 @@ avec une clé globale qui ne contient pas le centre de rattachement.
 
 **Pourquoi.** Les doublons faussent les statistiques par centre et par magasin.
 
-**Vérification en revue.** Aucune erreur Prisma P2002 ne remonte brute à l'API
-(reste à faire, voir `docs/roadmap.md`).
+**Vérification en revue.** Aucune erreur Prisma P2002 ne remonte brute à l'API :
+`save` lève `CentreDejaExistant` / `MagasinDejaExistant`, déclarées par le port.
 
 **Source v1.** `apps/api/prisma/schema.prisma:12-33` ;
 `apps/api/src/application/use-cases/centre/modifier-centre.usecase.ts:48-58`.
@@ -211,3 +211,31 @@ nouvelle activité opérationnelle.
 `apps/api/src/application/use-cases/planning-benevoles-centre/planifier-benevoles-centre.usecase.ts:58-63` ;
 `apps/api/src/application/use-cases/planning-chauffeur/planifier-chauffeur.usecase.ts:76-81` ;
 `apps/api/src/application/use-cases/planning-magasin/planifier-benevoles-magasin.usecase.ts:122-126,181-192`.
+
+## RDC-REF-011 — Un centre ne s'archive pas tant qu'il a des magasins
+
+`core` · erreur · ✅ implémentée (étape 3, décision D-18)
+
+**Règle.** Archiver un centre qui a au moins un magasin ACTIF ou INACTIF est
+refusé avec `CENTRE_A_DES_MAGASINS` (409). Les magasins archivés ne comptent
+pas. Archiver un centre déjà archivé reste sans effet. Désactiver un centre
+reste permis, quels que soient ses magasins.
+
+**Pourquoi.** Un magasin rattaché à un centre archivé n'a plus de centre qui le
+gère, et ne peut plus y être rattaché à nouveau (RDC-REF-010).
+
+```ts
+// ❌ Incorrect : les magasins restent rattachés à un centre archivé
+centre.archiver(maintenant);
+
+// ✅ Correct : le use case vérifie d'abord les magasins rattachés
+if (await magasinRepository.existsNonArchiveDuCentre(centre.id)) {
+  throw new CentreADesMagasins(centre.id);
+}
+centre.archiver(maintenant);
+```
+
+**Vérification en revue.** Le contrôle se fait dans l'unité de travail, avant
+`archiver()` ; l'erreur est traduite en 409.
+
+**Source v1.** Aucune : règle ajoutée par la v2 (D-18).

@@ -8,7 +8,9 @@ import {
   Telephone,
   Ville,
 } from '@rdc/referentiel-domain';
-import { versCentreReponse } from './centre.reponse';
+import type { VueCentre } from '@rdc/referentiel-application';
+import { StatutCentre } from '@rdc/referentiel-domain';
+import { versCentreReponse, vueVersCentreReponse } from './centre.reponse';
 
 describe('versCentreReponse — format CentreDto de RDC v1', () => {
   const identite = {
@@ -50,5 +52,47 @@ describe('versCentreReponse — format CentreDto de RDC v1', () => {
 
     expect(reponse).not.toHaveProperty('telephone');
     expect(reponse).not.toHaveProperty('email');
+  });
+});
+
+describe('vueVersCentreReponse — lecture, avec les magasins rattachés', () => {
+  const vue: VueCentre = {
+    id: '7f1c9d7e-2d4b-4f7a-9c1e-3b8a5d6e0f12',
+    nom: "Centre d'Agen",
+    adresse: '12 avenue Jean Jaurès',
+    codePostal: '47000',
+    ville: 'Agen',
+    statut: StatutCentre.INACTIF,
+    magasins: { actifs: 8, inactifs: 2 },
+    creeLe: new Date('2026-10-01T09:00:00.000Z'),
+    modifieLe: new Date('2026-10-02T14:30:00.000Z'),
+  };
+
+  it('garde le format CentreDto et ajoute les magasins', () => {
+    expect(vueVersCentreReponse(vue)).toEqual({
+      id: '7f1c9d7e-2d4b-4f7a-9c1e-3b8a5d6e0f12',
+      nom: "Centre d'Agen",
+      ville: 'Agen',
+      codePostal: '47000',
+      adresse: '12 avenue Jean Jaurès',
+      statut: 'INACTIF',
+      responsablesCount: 0,
+      magasins: { actifs: 8, inactifs: 2 },
+      createdAt: '2026-10-01T09:00:00.000Z',
+      updatedAt: '2026-10-02T14:30:00.000Z',
+    });
+  });
+
+  it('expose téléphone et email quand ils existent', () => {
+    const reponse = vueVersCentreReponse({
+      ...vue,
+      telephone: '+33553123456',
+      email: 'agen@restosducoeur.org',
+    });
+
+    expect(reponse).toMatchObject({
+      telephone: '+33553123456',
+      email: 'agen@restosducoeur.org',
+    });
   });
 });

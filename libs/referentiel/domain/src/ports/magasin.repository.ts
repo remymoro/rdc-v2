@@ -1,3 +1,4 @@
+import type { CentreId } from '../centre/centre-id';
 import type { CleDoublonMagasin } from '../magasin/cle-doublon-magasin';
 import type { Magasin } from '../magasin/magasin';
 import type { MagasinId } from '../magasin/magasin-id';
@@ -33,4 +34,10 @@ export abstract class MagasinRepository {
 
   /** Un magasin de même clé de doublon existe-t-il ? (TENETS-REPO-003/004) */
   abstract existsByCleDoublon(cle: CleDoublonMagasin): Promise<boolean>;
+
+  /**
+   * Le centre a-t-il encore un magasin ACTIF ou INACTIF rattaché ?
+   * (RDC-REF-011, TENETS-REPO-003)
+   */
+  abstract existsNonArchiveDuCentre(centreId: CentreId): Promise<boolean>;
 }

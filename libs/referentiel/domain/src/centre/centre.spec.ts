@@ -250,4 +250,87 @@ describe('Centre', () => {
       },
     );
   });
+
+  describe('modifier', () => {
+    const plusTard = new Date('2026-10-25T10:00:00.000Z');
+    const precedemment = new Date('2026-10-20T14:00:00.000Z');
+
+    function existant(statut = StatutCentre.ACTIF): Centre {
+      return Centre.reconstituer({
+        ...donneesObligatoires(),
+        telephone: Telephone.creer('05 53 12 34 56'),
+        email: Email.creer('agen@restosducoeur.org'),
+        statut,
+        creeLe: maintenant,
+        modifieLe: precedemment,
+      });
+    }
+
+    it('remplace les champs fournis et garde les autres', () => {
+      const centre = existant();
+
+      centre.modifier(
+        {
+          nom: Nom.creer("Centre d'Agen Nord"),
+          adresse: Adresse.creer('3 avenue de la Liberté'),
+          codePostal: CodePostal.creer('47520'),
+          ville: Ville.creer('Le Passage'),
+        },
+        plusTard,
+      );
+
+      expect(centre.nom.valeur).toBe("Centre d'Agen Nord");
+      expect(centre.adresse.valeur).toBe('3 avenue de la Liberté');
+      expect(centre.codePostal.valeur).toBe('47520');
+      expect(centre.ville.valeur).toBe('Le Passage');
+      expect(centre.telephone?.valeur).toBe('+33553123456');
+      expect(centre.modifieLe).toEqual(plusTard);
+    });
+
+    it('remplace ou supprime (null) le téléphone et l’email', () => {
+      const centre = existant();
+
+      centre.modifier(
+        { telephone: Telephone.creer('05 53 98 76 54'), email: null },
+        plusTard,
+      );
+
+      expect(centre.telephone?.valeur).toBe('+33553987654');
+      expect(centre.email).toBeUndefined();
+      expect(centre.modifieLe).toEqual(plusTard);
+    });
+
+    it('ne change pas modifieLe pour une modification identique ou vide', () => {
+      const centre = existant();
+
+      centre.modifier(
+        {
+          nom: Nom.creer("Centre d'Agen"),
+          telephone: Telephone.creer('05 53 12 34 56'),
+        },
+        plusTard,
+      );
+      centre.modifier({}, plusTard);
+
+      expect(centre.modifieLe).toEqual(precedemment);
+    });
+
+    it('modifie aussi un centre inactif', () => {
+      const centre = existant(StatutCentre.INACTIF);
+
+      centre.modifier({ nom: Nom.creer('Centre de Boé') }, plusTard);
+
+      expect(centre.nom.valeur).toBe('Centre de Boé');
+      expect(centre.statut).toBe(StatutCentre.INACTIF);
+    });
+
+    it('refuse de modifier un centre archivé (RDC-REF-002)', () => {
+      const centre = existant(StatutCentre.ARCHIVE);
+
+      expect(() =>
+        centre.modifier({ nom: Nom.creer('Centre de Boé') }, plusTard),
+      ).toThrow(CentreArchive);
+      expect(centre.nom.valeur).toBe("Centre d'Agen");
+    });
+  });
 });

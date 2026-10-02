@@ -64,6 +64,64 @@ describe('PATCH /api/centres/:id/{desactiver,activer,archiver}', () => {
     );
   });
 
+  describe('centre qui a encore des magasins (RDC-REF-011)', () => {
+    async function ajouterUnMagasin(centreId: string): Promise<string> {
+      const reponse = await api.post(`/centres/${centreId}/magasins`, {
+        nom: 'Leclerc Agen Sud',
+        ville: 'Agen',
+        codePostal: '47000',
+        adresse: '1 avenue du Général de Gaulle',
+      });
+      expect(reponse.status).toBe(201);
+      return reponse.data.id;
+    }
+
+    it("refuse l'archivage tant qu'un magasin est actif ou inactif (409 CENTRE_A_DES_MAGASINS)", async () => {
+      const id = await creerUnCentre();
+      const magasinId = await ajouterUnMagasin(id);
+      await api.patch(`/magasins/${magasinId}/desactiver`, {});
+
+      const reponse = await api.patch(`/centres/${id}/archiver`, {});
+
+      expect(reponse.status).toBe(409);
+      expect(reponse.data).toEqual(
+        expect.objectContaining({
+          statusCode: 409,
+          code: 'CENTRE_A_DES_MAGASINS',
+          path: `/api/centres/${id}/archiver`,
+        }),
+      );
+      expect(await lireCentre(id)).toEqual(
+        expect.objectContaining({ statut: 'ACTIF' }),
+      );
+    });
+
+    it('archive le centre une fois ses magasins archivés (204)', async () => {
+      const id = await creerUnCentre();
+      const magasinId = await ajouterUnMagasin(id);
+      await api.patch(`/magasins/${magasinId}/archiver`, {});
+
+      const reponse = await api.patch(`/centres/${id}/archiver`, {});
+
+      expect(reponse.status).toBe(204);
+      expect(await lireCentre(id)).toEqual(
+        expect.objectContaining({ statut: 'ARCHIVE' }),
+      );
+    });
+
+    it('laisse désactiver le centre : ses magasins gardent leur rattachement (204)', async () => {
+      const id = await creerUnCentre();
+      await ajouterUnMagasin(id);
+
+      const reponse = await api.patch(`/centres/${id}/desactiver`, {});
+
+      expect(reponse.status).toBe(204);
+      expect(await lireCentre(id)).toEqual(
+        expect.objectContaining({ statut: 'INACTIF' }),
+      );
+    });
+  });
+
   it('archiver un centre déjà archivé est sans effet (204, rien de réécrit)', async () => {
     const id = await creerUnCentre();
     await api.patch(`/centres/${id}/archiver`, {});

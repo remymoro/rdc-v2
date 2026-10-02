@@ -1,12 +1,13 @@
 import type { ArgumentsHost, Type } from '@nestjs/common';
 import { FILTER_CATCH_EXCEPTIONS } from '@nestjs/common/constants';
 import {
-  CentreDejaExistant,
+  CentreADesMagasins,
   CentreIntrouvable,
   MagasinIntrouvable,
   ProduitIntrouvable,
 } from '@rdc/referentiel-application';
 import {
+  CentreDejaExistant,
   AdresseAbreviationInterdite,
   AdresseTropLongue,
   AdresseVide,
@@ -113,6 +114,12 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
       'MAGASIN_ALREADY_EXISTS',
     ],
     [new CentreNonActif(unCentreId), 'CentreNonActif', 'CENTRE_NON_ACTIF'],
+    // Archivage d'un centre qui a encore des magasins (RDC-REF-011).
+    [
+      new CentreADesMagasins(unCentreId),
+      'CentreADesMagasins',
+      'CENTRE_A_DES_MAGASINS',
+    ],
   ])('traduit %s en 409', (erreur, nom, code) => {
     const { hote, reponse } = hoteHttp();
 

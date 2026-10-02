@@ -1,11 +1,11 @@
 import {
+  CentreDejaExistant,
   Centre,
   CentreRepository,
   CleDoublonCentre,
 } from '@rdc/referentiel-domain';
 import { Clock, UnitOfWork } from '@rdc/shared-kernel-application';
 import type { CreerCentreCommande } from './commandes';
-import { CentreDejaExistant } from '../errors';
 import { GenerateurIdentifiants } from '../ports/generateur-identifiants';
 
 /** Classe simple, sans NestJS : câblée par le module du contexte (TENETS-COMPOSE-001). */

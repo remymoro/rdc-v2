@@ -1,3 +1,4 @@
+import type { MagasinsDuCentre, VueCentre } from '@rdc/referentiel-application';
 import type { Centre } from '@rdc/referentiel-domain';
 
 /** Contrat de réponse repris de RDC v1 (CentreDto) : le front l'utilise tel quel. */
@@ -16,6 +17,14 @@ export interface CentreReponse {
   updatedAt: string;
 }
 
+/**
+ * Réponse des lectures : CentreDto, plus les magasins rattachés non archivés
+ * (ajout v2, pour la liste et la fiche d'un centre, RDC-REF-011).
+ */
+export interface CentreLuReponse extends CentreReponse {
+  magasins: MagasinsDuCentre;
+}
+
 /** Centre du domaine → réponse HTTP explicite (TENETS-API-003). */
 export function versCentreReponse(centre: Centre): CentreReponse {
   return {
@@ -30,5 +39,23 @@ export function versCentreReponse(centre: Centre): CentreReponse {
     responsablesCount: 0,
     createdAt: centre.creeLe.toISOString(),
     updatedAt: centre.modifieLe.toISOString(),
+  };
+}
+
+/** Vue de lecture → réponse HTTP explicite (TENETS-API-003). */
+export function vueVersCentreReponse(vue: VueCentre): CentreLuReponse {
+  return {
+    id: vue.id,
+    nom: vue.nom,
+    ville: vue.ville,
+    codePostal: vue.codePostal,
+    adresse: vue.adresse,
+    ...(vue.telephone !== undefined && { telephone: vue.telephone }),
+    ...(vue.email !== undefined && { email: vue.email }),
+    statut: vue.statut,
+    responsablesCount: 0,
+    magasins: { actifs: vue.magasins.actifs, inactifs: vue.magasins.inactifs },
+    createdAt: vue.creeLe.toISOString(),
+    updatedAt: vue.modifieLe.toISOString(),
   };
 }
