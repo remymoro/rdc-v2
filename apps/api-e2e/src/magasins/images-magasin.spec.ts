@@ -160,6 +160,27 @@ describe('POST et DELETE /api/magasins/:id/images', () => {
     expect(reponse.data.code).toBe('REQUEST_VALIDATION');
   });
 
+  it.each([
+    ['un champ texte en plus du fichier', 'texte'],
+    ['un second fichier', 'fichier'],
+  ])(
+    'refuse %s (400 REQUEST_VALIDATION, limites multipart)',
+    async (_cas, intrus) => {
+      const id = await creerUnMagasin();
+      const corps = formulaire(unJpeg());
+      if (intrus === 'texte') {
+        corps.append('texte', 'intrus');
+      } else {
+        corps.append('file', new Blob([unJpeg()], { type: 'image/jpeg' }));
+      }
+
+      const reponse = await api.post(`/magasins/${id}/images`, corps);
+
+      expect(reponse.status).toBe(400);
+      expect(reponse.data.code).toBe('REQUEST_VALIDATION');
+    },
+  );
+
   it('refuse un magasin inconnu (404 MAGASIN_NOT_FOUND)', async () => {
     const reponse = await api.post(
       `/magasins/${magasinInconnu}/images`,
