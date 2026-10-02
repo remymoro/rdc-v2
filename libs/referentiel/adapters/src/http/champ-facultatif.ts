@@ -4,3 +4,8 @@ export function videVersAbsent({ value }: { value: unknown }): unknown {
     ? undefined
     : value;
 }
+
+/** "" ou espaces → null : vider un champ facultatif le supprime (ADR-0007). */
+export function videVersSuppression({ value }: { value: unknown }): unknown {
+  return typeof value === 'string' && value.trim().length === 0 ? null : value;
+}

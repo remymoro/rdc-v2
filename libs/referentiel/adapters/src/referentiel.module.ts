@@ -12,6 +12,7 @@ import {
   ListerCentresQuery,
   ListerMagasinsDuCentreQuery,
   ListerMagasinsQuery,
+  ModifierCentreUseCase,
   ModifierMagasinUseCase,
   ActiverProduitUseCase,
   CreerProduitUseCase,
@@ -121,6 +122,16 @@ import { PrismaMagasinRepository } from './prisma/prisma-magasin.repository';
           clock,
         ),
       inject: [CentreRepository, MagasinRepository, UnitOfWork, Clock],
+    },
+    {
+      provide: ModifierCentreUseCase,
+      scope: Scope.REQUEST,
+      useFactory: (
+        centreRepository: CentreRepository,
+        unitOfWork: UnitOfWork,
+        clock: Clock,
+      ) => new ModifierCentreUseCase(centreRepository, unitOfWork, clock),
+      inject: [CentreRepository, UnitOfWork, Clock],
     },
     {
       provide: CreerMagasinUseCase,

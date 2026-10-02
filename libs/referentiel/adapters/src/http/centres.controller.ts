@@ -16,6 +16,7 @@ import {
   CreerCentreUseCase,
   DesactiverCentreUseCase,
   ListerCentresQuery,
+  ModifierCentreUseCase,
   ObtenirCentreQuery,
 } from '@rdc/referentiel-application';
 import {
@@ -38,6 +39,10 @@ import {
   versListerCentresRequete,
   versObtenirCentreRequete,
 } from './lire-centres.requete';
+import {
+  ModifierCentreRequete,
+  versModifierCentreCommande,
+} from './modifier-centre.requete';
 import { ReferentielErreursHttpFilter } from './referentiel-erreurs-http.filter';
 
 /**
@@ -55,6 +60,7 @@ export class CentresController {
     private readonly archiverCentre: ArchiverCentreUseCase,
     private readonly listerCentres: ListerCentresQuery,
     private readonly obtenirCentre: ObtenirCentreQuery,
+    private readonly modifierCentre: ModifierCentreUseCase,
   ) {}
 
   @Get()
@@ -78,6 +84,19 @@ export class CentresController {
   async creer(@Body() requete: CreerCentreRequete): Promise<CentreReponse> {
     const centre = await this.creerCentre.execute(
       versCreerCentreCommande(requete),
+    );
+    return versCentreReponse(centre);
+  }
+
+  // Modification (contrat v1, ADR-0009) : 200 CentreDto.
+  @Patch(':id')
+  @HttpCode(HttpStatus.OK)
+  async modifier(
+    @Param('id') id: string,
+    @Body() requete: ModifierCentreRequete,
+  ): Promise<CentreReponse> {
+    const centre = await this.modifierCentre.execute(
+      versModifierCentreCommande(id, requete),
     );
     return versCentreReponse(centre);
   }
