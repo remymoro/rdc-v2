@@ -217,13 +217,13 @@ chaque compte a une adresse propre (ADR-0020).
 Socle posé le 2026-10-02, avant les étapes 4 à 7, pour que les écrans suivent
 les étapes métier (ADR-0023).
 
-| Élément                                                                            | État |
-| ---------------------------------------------------------------------------------- | ---- |
-| Node 24.20, `apps/web` Angular 22.2 (esbuild, sans SSR), Vitest, Tailwind v4       | ✅   |
-| Frontière : `layer:frontend` n'importe ni lib back-end, ni NestJS, Prisma, Express | ✅   |
-| Proxy `/api` vers l'API en développement                                           | ✅   |
-| Page d'accueil : carrousel de présentation, rubriques (`/`, titre de l'onglet)     | ✅   |
-| Règles d'architecture du front (écrans, appels HTTP, erreurs `code`) : un ADR      | ⏳   |
-| Tests E2E du front (Playwright), avec le premier écran                             | ⏳   |
-| Premier écran : connexion (dépend de l'étape 4, lot 1)                             | ⏳   |
-| Servir le front sur le NAS derrière HTTPS (ADR-0019)                               | ⏳   |
+| Élément                                                                             | État |
+| ----------------------------------------------------------------------------------- | ---- |
+| Node 24.20, `apps/web` Angular 22.2 (esbuild, sans SSR), Vitest, Tailwind v4        | ✅   |
+| Frontière : `layer:frontend` n'importe ni lib back-end, ni NestJS, Prisma, Express  | ✅   |
+| Proxy `/api` vers l'API en développement                                            | ✅   |
+| Page d'accueil : guide pas à pas par profil (centre, siège), `/`, titre de l'onglet | ✅   |
+| Règles d'architecture du front (écrans, appels HTTP, erreurs `code`) : un ADR       | ⏳   |
+| Tests E2E du front (Playwright), avec le premier écran                              | ⏳   |
+| Premier écran : connexion (dépend de l'étape 4, lot 1)                              | ⏳   |
+| Servir le front sur le NAS derrière HTTPS (ADR-0019)                                | ⏳   |

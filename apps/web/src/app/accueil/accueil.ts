@@ -1,46 +1,43 @@
 import { Component } from '@angular/core';
-import { Presentation } from './presentation/presentation';
 
-/** Une rubrique de l'application, présentée sur la page d'accueil. */
-interface Rubrique {
+/** Le guide d'un profil : ce que la personne a à faire, dans l'ordre. */
+interface Guide {
   readonly titre: string;
-  readonly description: string;
+  readonly etapes: readonly string[];
 }
 
 /**
- * Page d'accueil : présente l'application et ses rubriques, dans l'ordre de
- * construction de la feuille de route. Aucune donnée de l'API pour l'instant.
+ * Page d'accueil, pensée pour des personnes peu habituées à l'informatique :
+ * pour chaque profil, les étapes d'une collecte en phrases simples
+ * (RDC-COLLECTE-002, 005, 008, 009, 014, 015, 017, 020 ; RDC-ACCES-009).
  */
 @Component({
   selector: 'rdc-accueil',
-  // Un composant utilisé dans le template doit être importé ici.
-  imports: [Presentation],
   templateUrl: './accueil.html',
 })
 export class Accueil {
-  protected readonly rubriques: readonly Rubrique[] = [
+  protected readonly guides: readonly Guide[] = [
     {
-      titre: 'Référentiel',
-      description: 'Les centres, les magasins et le catalogue des produits.',
+      titre: 'Vous êtes responsable d’un centre',
+      etapes: [
+        'Connectez-vous avec l’adresse e-mail et le mot de passe de votre centre, donnés par le siège.',
+        'Avant la collecte, appelez les magasins de votre liste et notez pour chacun s’il participe ou non.',
+        'Transmettez votre liste au siège, avec votre avis si vous le souhaitez.',
+        'Placez vos bénévoles sur des créneaux : en magasin, au centre ou comme chauffeur.',
+        'Après la collecte, enregistrez les pesées de chaque magasin. Quand tout est saisi, déclarez votre saisie terminée.',
+      ],
     },
     {
-      titre: 'Collectes',
-      description:
-        'La préparation et le suivi de chaque collecte, et les magasins inscrits.',
-    },
-    {
-      titre: 'Planification',
-      description:
-        'Les créneaux des bénévoles en magasin, au centre et pour les chauffeurs.',
-    },
-    {
-      titre: 'Saisie des pesées',
-      description: 'Les poids collectés dans chaque magasin, pesée par pesée.',
-    },
-    {
-      titre: 'Statistiques',
-      description:
-        'Les synthèses par centre, magasin, enseigne ou famille, et la comparaison annuelle.',
+      titre: 'Vous êtes l’administrateur du siège',
+      etapes: [
+        'Créez la collecte : son nom, sa date de début et sa date de fin.',
+        'Ouvrez la vérification : chaque centre reçoit la liste des magasins à appeler.',
+        'Quand les centres vous ont transmis leur liste, inscrivez les magasins qui participent.',
+        'Ouvrez la planification, pour que les centres placent leurs bénévoles.',
+        'La collecte démarre toute seule à sa date de début, ou plus tôt si vous la démarrez vous-même.',
+        'Quand tous les centres ont terminé leur saisie, approuvez la clôture de la collecte.',
+        'Consultez les statistiques : les totaux par centre et par magasin, comparés à ceux de l’an dernier.',
+      ],
     },
   ];
 }

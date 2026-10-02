@@ -18,33 +18,40 @@ describe('Page d’accueil', () => {
     return harness.routeNativeElement as HTMLElement;
   }
 
+  /** Le guide d'un profil : son titre et ses étapes, dans l'ordre. */
+  function guide(titre: string): string[] {
+    const section = [...page().querySelectorAll('section')].find((s) =>
+      s.querySelector('h3')?.textContent?.includes(titre),
+    );
+    return [...(section?.querySelectorAll('ol > li') ?? [])].map(
+      (etape) => etape.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+    );
+  }
+
   it('souhaite la bienvenue', () => {
     expect(page().querySelector('h2')?.textContent).toContain('Bienvenue');
   });
 
-  it('affiche le carrousel de présentation avant les rubriques', () => {
-    const carrousel = page().querySelector('rdc-presentation');
-    const rubriques = page().querySelector('ul');
+  it('guide le responsable de centre, étape par étape', () => {
+    const etapes = guide('Vous êtes responsable d’un centre');
 
-    expect(carrousel).not.toBeNull();
-    expect(
-      carrousel!.compareDocumentPosition(rubriques!) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
+    expect(etapes).toHaveLength(5);
+    expect(etapes[0]).toMatch(/connectez-vous/i);
+    expect(etapes[1]).toMatch(/appelez les magasins/i);
+    expect(etapes[4]).toMatch(/déclarez votre saisie terminée/i);
   });
 
-  it('présente chaque rubrique de l’application', () => {
-    const rubriques = [...page().querySelectorAll('li h3')].map((titre) =>
-      titre.textContent?.trim(),
-    );
+  it('guide l’administrateur du siège, étape par étape', () => {
+    const etapes = guide('Vous êtes l’administrateur du siège');
 
-    expect(rubriques).toEqual([
-      'Référentiel',
-      'Collectes',
-      'Planification',
-      'Saisie des pesées',
-      'Statistiques',
-    ]);
+    expect(etapes).toHaveLength(7);
+    expect(etapes[0]).toMatch(/créez la collecte/i);
+    expect(etapes[5]).toMatch(/approuvez la clôture/i);
+    expect(etapes[6]).toMatch(/statistiques/i);
+  });
+
+  it('prévient que l’application est en construction', () => {
+    expect(page().textContent).toContain('en construction');
   });
 
   it('donne son titre à l’onglet du navigateur', () => {

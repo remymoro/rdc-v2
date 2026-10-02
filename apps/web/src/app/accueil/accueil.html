@@ -1,21 +1,39 @@
-<section class="space-y-8">
+<div class="space-y-8 text-lg">
   <div class="space-y-2">
-    <h2 class="text-2xl font-bold text-gray-900">Bienvenue</h2>
+    <h2 class="text-3xl font-bold text-gray-900">Bienvenue</h2>
     <p class="text-gray-700">
-      RDC aide l'AD47 et ses centres à organiser les collectes alimentaires des
-      Restos du Cœur du Lot-et-Garonne, de la préparation aux statistiques.
+      Cette application aide les Restos du Cœur du Lot-et-Garonne à organiser
+      leurs collectes alimentaires. Voici ce que vous aurez à faire, étape par
+      étape.
     </p>
   </div>
 
-  <rdc-presentation />
+  <p
+    class="rounded-lg border border-amber-300 bg-amber-50 p-4 text-base text-amber-900"
+  >
+    L’application est en construction : ces étapes arriveront au fur et à
+    mesure.
+  </p>
 
-  <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    @for (rubrique of rubriques; track rubrique.titre) {
-    <li class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-      <h3 class="font-semibold text-red-700">{{ rubrique.titre }}</h3>
-      <p class="mt-1 text-sm text-gray-600">{{ rubrique.description }}</p>
-      <p class="mt-3 text-xs text-gray-400">Bientôt disponible</p>
-    </li>
+  <div class="grid gap-6 md:grid-cols-2">
+    @for (guide of guides; track guide.titre) {
+    <section class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+      <h3 class="mb-4 text-xl font-semibold text-red-700">{{ guide.titre }}</h3>
+      <ol class="space-y-4">
+        @for (etape of guide.etapes; track etape; let numero = $index) {
+        <li class="flex gap-4">
+          <!-- Numéro décoratif : la liste <ol> numérote déjà pour les lecteurs d'écran. -->
+          <span
+            aria-hidden="true"
+            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-700 font-bold text-white"
+          >
+            {{ numero + 1 }}
+          </span>
+          <span class="pt-1 text-gray-800">{{ etape }}</span>
+        </li>
+        }
+      </ol>
+    </section>
     }
-  </ul>
-</section>
+  </div>
+</div>
