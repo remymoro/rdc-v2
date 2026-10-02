@@ -158,7 +158,13 @@ export class MagasinsController {
   @UseFilters(TeleversementImageFilter)
   @UseInterceptors(
     FileInterceptor('file', {
-      limits: { fileSize: TAILLE_MAXIMALE_IMAGE, files: 1 },
+      limits: {
+        fileSize: TAILLE_MAXIMALE_IMAGE,
+        files: 1,
+        fields: 0,
+        parts: 1,
+        headerPairs: 100,
+      },
     }),
   )
   async ajouterUneImage(

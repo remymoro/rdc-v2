@@ -83,7 +83,9 @@ import { NettoyageImagesOrphelinesTache } from './taches/nettoyage-images-orphel
       // Dossier lu dans l'environnement par la composition (ADR-0021,
       // TENETS-COMPOSE-002).
       provide: StockageImages,
-      useFactory: () => new DisqueStockageImages(dossierDesImages(process.env)),
+      useFactory: (journal: Journal) =>
+        new DisqueStockageImages(dossierDesImages(process.env), journal),
+      inject: [Journal],
     },
     {
       provide: Journal,

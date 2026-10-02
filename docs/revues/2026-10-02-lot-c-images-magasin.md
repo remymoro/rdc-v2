@@ -274,4 +274,16 @@ TENETS-ERROR-005 · TENETS-ADAPTER-006
 - **B2** — corrigé : `PrismaMagasinRepository.get()` verrouille la ligne du
   magasin (`SELECT … FOR UPDATE`). Test d'intégration « deux ajouts
   simultanés » ; il n'a pas tourné en local (pas de PostgreSQL), la CI fait foi.
-- I1 à I7 et les points mineurs : à traiter dans un lot suivant.
+- **I1 à I7** — corrections implémentées dans le lot de durcissement
+  (ADR-0022) : tests rouges puis verts pour transaction courte, collision,
+  écriture partielle, limites multipart, publication HTTP, magasin illisible
+  et pannes NAS. Contrôle préalable de reprise disponible dans
+  `tools/reprise/verifier-images-v1.mjs`. Son exécution sur les données v1
+  et la configuration du NAS restent à faire avant bascule.
+- **Précision I1/R1** — la publication précède la transaction ; elle utilise
+  un lien physique atomique sans écrasement, et non un rename après commit.
+  Contrairement à l'hypothèse initiale, I1 ne résout pas le COMMIT incertain
+  R1 : ce point reste ouvert (ADR-0022).
+- **Précision I3** — les cinq limites demandées sont configurées ; Busboy
+  1.6 ignore `headerPairs` et garde ses plafonds internes. Voir ADR-0022.
+- Les points mineurs et les autres remarques restent hors de ce lot.

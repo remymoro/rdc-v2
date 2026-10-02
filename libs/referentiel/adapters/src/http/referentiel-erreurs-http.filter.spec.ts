@@ -6,6 +6,7 @@ import {
   MagasinIntrouvable,
   ProduitIntrouvable,
   StockageImagesIndisponible,
+  FichierImageDejaExistant,
 } from '@rdc/referentiel-application';
 import {
   CentreDejaExistant,
@@ -254,6 +255,7 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
     [new ImageFormatNonSupporte(), 400, 'IMAGE_FORMAT_NON_SUPPORTE'],
     [new ImageTropVolumineuse(), 413, 'IMAGE_TROP_VOLUMINEUSE'],
     [new StockageImagesIndisponible(), 503, 'STOCKAGE_IMAGES_INDISPONIBLE'],
+    [new FichierImageDejaExistant(), 503, 'IMAGE_FICHIER_DEJA_EXISTANT'],
   ] as const)('traduit %s en %i %s', (erreur, statut, code) => {
     const { hote, reponse } = hoteHttp();
 

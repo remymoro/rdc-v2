@@ -79,6 +79,60 @@ describe('NettoyerImagesOrphelinesUseCase (RDC-REF-007)', () => {
     );
   });
 
+  it('conserve les fichiers d’un magasin illisible et poursuit les autres magasins', async () => {
+    const panne = new Error('image v1 invalide');
+    const repository = new MagasinRepositoryEnMemoire([unMagasinAvecImage()]);
+    const get = repository.get.bind(repository);
+    jest.spyOn(repository, 'get').mockImplementation(async (id) => {
+      if (id.equals(magasinInconnu)) throw panne;
+      return get(id);
+    });
+    nettoyer = new NettoyerImagesOrphelinesUseCase(
+      repository,
+      stockage,
+      horloge,
+      journal,
+    );
+    // Le magasin invalide passe en premier.
+    stockage.deposer(magasinInconnu, orpheline, ilYA(2 * HEURE));
+    stockage.deposer(magasinId, orpheline, ilYA(2 * HEURE));
+
+    expect(await nettoyer.execute()).toEqual({ supprimes: 1, echecs: 1 });
+    expect(stockage.noms()).toEqual([nom(magasinInconnu, orpheline)]);
+    expect(journal.avertissements).toEqual([
+      expect.objectContaining({
+        details: { magasinId: magasinInconnu.valeur },
+        cause: panne,
+      }),
+    ]);
+  });
+
+  it('poursuit les orphelins et journalise une purge des temporaires en échec (IMP-1)', async () => {
+    const panne = new StockageImagesIndisponible();
+    class StockageAvecPurgeEnPanne extends StockageImagesEnMemoire {
+      limiteRecue?: Date;
+      override async purgerTemporaires(avant: Date): Promise<void> {
+        this.limiteRecue = avant;
+        throw panne;
+      }
+    }
+    const stockageAvecPurge = new StockageAvecPurgeEnPanne(horloge);
+    stockageAvecPurge.deposer(magasinId, orpheline, ilYA(2 * HEURE));
+    nettoyer = new NettoyerImagesOrphelinesUseCase(
+      new MagasinRepositoryEnMemoire([unMagasinAvecImage()]),
+      stockageAvecPurge,
+      horloge,
+      journal,
+    );
+
+    expect(await nettoyer.execute()).toEqual({ supprimes: 1, echecs: 1 });
+    expect(stockageAvecPurge.limiteRecue).toEqual(ilYA(HEURE));
+    expect(stockageAvecPurge.noms()).toEqual([]);
+    expect(journal.avertissements).toEqual([
+      expect.objectContaining({ cause: panne }),
+    ]);
+  });
+
   it('supprime un orphelin de plus d’une heure', async () => {
     stockage.deposer(magasinId, orpheline, ilYA(2 * HEURE));
 

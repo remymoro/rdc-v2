@@ -1,9 +1,12 @@
-import { mkdir, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
+import { link, mkdir, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { join, resolve, sep } from 'node:path';
 import {
   type FichierImageStocke,
+  Journal,
   StockageImages,
   StockageImagesIndisponible,
+  FichierImageDejaExistant,
 } from '@rdc/referentiel-application';
 import {
   ContenuImage,
@@ -51,6 +54,18 @@ const CODES_INDISPONIBLE = new Set([
   'EBUSY',
   'ENOTDIR',
   'ETIMEDOUT',
+  'ENOENT',
+  'ESTALE',
+  'ENOTCONN',
+  'ECONNRESET',
+  'ECONNREFUSED',
+  'ENETUNREACH',
+  'EHOSTUNREACH',
+  'ENODEV',
+  'EMFILE',
+  'ENFILE',
+  'EOPNOTSUPP',
+  'EXDEV',
 ]);
 
 /**
@@ -61,7 +76,10 @@ const CODES_INDISPONIBLE = new Set([
 export class DisqueStockageImages extends StockageImages {
   readonly racine: string;
 
-  constructor(racine: string) {
+  constructor(
+    racine: string,
+    private readonly journal: Journal,
+  ) {
     super();
     this.racine = resolve(racine);
   }
@@ -75,8 +93,36 @@ export class DisqueStockageImages extends StockageImages {
     const chemin = cheminDansLeDossier(dossier, fichier.valeur);
     await traduireLesPannes(async () => {
       await mkdir(dossier, { recursive: true });
-      // « wx » : un fichier existant n'est jamais écrasé.
-      await writeFile(chemin, contenu.octets, { flag: 'wx' });
+      const temporaire = cheminDansLeDossier(
+        dossier,
+        fichier.valeur + '.' + randomUUID() + '.tmp',
+      );
+      try {
+        await writeFile(temporaire, contenu.octets, { flag: 'wx' });
+        try {
+          // Publication atomique sans écrasement (rename écraserait la cible).
+          await link(temporaire, chemin);
+        } catch (erreur) {
+          if (codeSysteme(erreur) === 'EEXIST') {
+            throw new FichierImageDejaExistant({ cause: erreur });
+          }
+          throw erreur;
+        }
+      } finally {
+        // Un résidu .tmp reste privé et sera retenté au prochain nettoyage.
+        try {
+          await rm(temporaire, { force: true });
+        } catch (erreur) {
+          this.journal.avertir(
+            'Fichier temporaire conservé après échec du nettoyage',
+            {
+              magasinId: magasinId.valeur,
+              fichier: temporaire.slice(dossier.length + 1),
+            },
+            erreur,
+          );
+        }
+      }
     });
   }
 
@@ -104,14 +150,40 @@ export class DisqueStockageImages extends StockageImages {
             ? fichierDepuisNom(element.name)
             : null;
           if (fichier !== null) {
-            const { mtimeMs } = await stat(
+            const etat = await statSiPresent(
               cheminDansLeDossier(dossier, fichier.valeur),
             );
-            stockes.push({ magasinId, fichier, modifieLe: new Date(mtimeMs) });
+            if (etat !== null) {
+              stockes.push({
+                magasinId,
+                fichier,
+                modifieLe: new Date(etat.mtimeMs),
+              });
+            }
           }
         }
       }
       return stockes;
+    });
+  }
+
+  async purgerTemporaires(avant: Date): Promise<void> {
+    await traduireLesPannes(async () => {
+      for (const entree of await lireDossier(this.dossierDesMagasins())) {
+        const magasinId = entree.isDirectory()
+          ? magasinIdDepuisNom(entree.name)
+          : null;
+        if (magasinId === null) continue;
+        const dossier = this.dossierDuMagasin(magasinId);
+        for (const element of await lireDossier(dossier)) {
+          if (!element.isFile() || !estTemporaire(element.name)) continue;
+          const chemin = cheminDansLeDossier(dossier, element.name);
+          const etat = await statSiPresent(chemin);
+          if (etat !== null && etat.mtimeMs <= avant.getTime()) {
+            await rm(chemin, { force: true });
+          }
+        }
+      }
     });
   }
 
@@ -178,6 +250,27 @@ function fichierDepuisNom(nom: string): FichierImage | null {
     if (erreur instanceof FichierImageInvalide) {
       return null;
     }
+    throw erreur;
+  }
+}
+
+/** Seulement les noms privés générés par cet adapter, jamais les fichiers v1. */
+function estTemporaire(nom: string): boolean {
+  const correspondance =
+    /^(.*)\.([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\.tmp$/.exec(
+      nom,
+    );
+  return (
+    correspondance !== null && fichierDepuisNom(correspondance[1]) !== null
+  );
+}
+
+/** Une suppression concurrente n'est pas une panne de la liste. */
+async function statSiPresent(chemin: string) {
+  try {
+    return await stat(chemin);
+  } catch (erreur) {
+    if (codeSysteme(erreur) === 'ENOENT') return null;
     throw erreur;
   }
 }

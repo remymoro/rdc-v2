@@ -11,6 +11,7 @@ import {
   MagasinIntrouvable,
   ProduitIntrouvable,
   StockageImagesIndisponible,
+  FichierImageDejaExistant,
 } from '@rdc/referentiel-application';
 import {
   CentreDejaExistant,
@@ -103,6 +104,7 @@ const STATUTS_HTTP = new Map<Type<ErreurConnue>, HttpStatus>([
   [ImageFormatNonSupporte, HttpStatus.BAD_REQUEST],
   [ImageTropVolumineuse, HttpStatus.PAYLOAD_TOO_LARGE],
   [StockageImagesIndisponible, HttpStatus.SERVICE_UNAVAILABLE],
+  [FichierImageDejaExistant, HttpStatus.SERVICE_UNAVAILABLE],
 ]);
 
 /**

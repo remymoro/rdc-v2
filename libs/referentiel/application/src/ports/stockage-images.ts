@@ -20,6 +20,15 @@ export class StockageImagesIndisponible extends Error {
   }
 }
 
+export class FichierImageDejaExistant extends Error {
+  readonly code = 'IMAGE_FICHIER_DEJA_EXISTANT';
+
+  constructor(options?: { readonly cause?: unknown }) {
+    super('Le fichier de cette image existe déjà.', options);
+    this.name = 'FichierImageDejaExistant';
+  }
+}
+
 /** Un fichier d'image présent dans le stockage, vu par le nettoyage. */
 export interface FichierImageStocke {
   readonly magasinId: MagasinId;
@@ -36,6 +45,8 @@ export interface FichierImageStocke {
 export abstract class StockageImages {
   /**
    * Écrit le fichier d'une nouvelle image dans le dossier de son magasin.
+   * Ne remplace jamais un fichier existant, même avec un contenu identique.
+   * @throws FichierImageDejaExistant
    * @throws StockageImagesIndisponible
    */
   abstract enregistrer(
@@ -54,9 +65,18 @@ export abstract class StockageImages {
   ): Promise<void>;
 
   /**
-   * Tous les fichiers d'images présents. Ce qui n'a pas la forme d'un fichier
+   * Lecture seule : tous les fichiers d'images présents. Ce qui n'a pas la forme d'un fichier
    * d'image (autre nom, autre dossier) est ignoré, donc jamais supprimé.
    * @throws StockageImagesIndisponible
    */
   abstract lister(): Promise<readonly FichierImageStocke[]>;
+
+  /**
+   * Supprime les seuls temporaires privés de l'adapter dont la dernière
+   * écriture est antérieure ou égale à la limite. Épargne les images publiées.
+   * Sans effet pour un stockage qui ne produit pas de temporaires.
+   * Un échec peut laisser une purge partielle ; un prochain passage réessaie.
+   * @throws StockageImagesIndisponible
+   */
+  abstract purgerTemporaires(avant: Date): Promise<void>;
 }

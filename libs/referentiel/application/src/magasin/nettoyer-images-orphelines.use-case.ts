@@ -1,4 +1,4 @@
-import { MagasinRepository } from '@rdc/referentiel-domain';
+import { type Magasin, MagasinRepository } from '@rdc/referentiel-domain';
 import { Clock } from '@rdc/shared-kernel-application';
 import { Journal } from '../ports/journal';
 import {
@@ -35,15 +35,38 @@ export class NettoyerImagesOrphelinesUseCase {
 
   async execute(): Promise<BilanNettoyageImages> {
     const limite = this.clock.now().getTime() - AGE_MINIMAL_ORPHELIN_MS;
+    let echecs = 0;
+    try {
+      await this.stockageImages.purgerTemporaires(new Date(limite));
+    } catch (erreur) {
+      echecs += 1;
+      this.journal.avertir(
+        'Nettoyage des temporaires en échec, poursuite du nettoyage des images.',
+        {},
+        erreur,
+      );
+    }
     const anciens = (await this.stockageImages.lister()).filter(
       (stocke) => stocke.modifieLe.getTime() <= limite,
     );
 
     let supprimes = 0;
-    let echecs = 0;
     for (const fichiers of parMagasin(anciens)) {
       const magasinId = fichiers[0].magasinId;
-      const magasin = await this.magasinRepository.get(magasinId);
+      let magasin: Magasin | null;
+      try {
+        magasin = await this.magasinRepository.get(magasinId);
+      } catch (erreur) {
+        // Frontière du traitement de ce magasin : ne rien effacer si ses
+        // références sont illisibles, et poursuivre les magasins suivants.
+        echecs += 1;
+        this.journal.avertir(
+          'Nettoyage des images : magasin illisible, fichiers conservés.',
+          { magasinId: magasinId.valeur },
+          erreur,
+        );
+        continue;
+      }
       if (magasin === null) {
         // Un magasin n'est jamais supprimé : son absence signale une base
         // vide, en cours de reprise ou qui n'est pas celle du dossier.

@@ -29,36 +29,36 @@ export class AjouterImageMagasinUseCase {
   ) {}
 
   async execute(commande: AjouterImageMagasinCommande): Promise<ImageMagasin> {
-    const maintenant = this.clock.now();
-    let fichierEcrit: FichierImage | null = null;
+    const apercu = await this.magasinRepository.get(commande.magasinId);
+    if (apercu === null) {
+      throw new MagasinIntrouvable(commande.magasinId);
+    }
+    const id = this.generateurIdentifiants.nouvelleImageMagasinId();
+    const fichier = FichierImage.pour(id, commande.contenu.format);
+    // Pré-contrôle sans écriture en base : refuse notamment un magasin archivé.
+    apercu.ajouterImage({ id, fichier }, this.clock.now());
 
+    // Aucun verrou ni transaction pendant l'accès au NAS.
+    await this.stockageImages.enregistrer(
+      commande.magasinId,
+      fichier,
+      commande.contenu,
+    );
     try {
       return await this.unitOfWork.run(async () => {
+        // Relecture sous verrou : l'état a pu changer pendant l'écriture disque.
         const magasin = await this.magasinRepository.get(commande.magasinId);
         if (magasin === null) {
           throw new MagasinIntrouvable(commande.magasinId);
         }
-
-        // Nom généré, extension du format reconnu : jamais le nom du client.
-        const id = this.generateurIdentifiants.nouvelleImageMagasinId();
-        const fichier = FichierImage.pour(id, commande.contenu.format);
-        const image = magasin.ajouterImage({ id, fichier }, maintenant);
-
-        await this.stockageImages.enregistrer(
-          magasin.id,
-          fichier,
-          commande.contenu,
-        );
-        fichierEcrit = fichier;
+        const image = magasin.ajouterImage({ id, fichier }, this.clock.now());
 
         await this.magasinRepository.save(magasin);
         await this.unitOfWork.commit();
         return image;
       });
     } catch (erreur) {
-      if (fichierEcrit !== null) {
-        await this.supprimerLeFichierEcrit(commande.magasinId, fichierEcrit);
-      }
+      await this.supprimerLeFichierEcrit(commande.magasinId, fichier);
       throw erreur; // L'échec d'origine reste visible (TENETS-UOW-010).
     }
   }

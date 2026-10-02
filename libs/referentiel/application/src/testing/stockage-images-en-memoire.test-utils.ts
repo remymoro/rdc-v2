@@ -4,6 +4,7 @@ import {
   type FichierImageStocke,
   StockageImages,
   StockageImagesIndisponible,
+  FichierImageDejaExistant,
 } from '../ports/stockage-images';
 
 interface Fichier {
@@ -34,6 +35,9 @@ export class StockageImagesEnMemoire extends StockageImages {
     if (this.enregistrementEnPanne) {
       throw new StockageImagesIndisponible();
     }
+    if (this.fichiers.has(cle(magasinId, fichier))) {
+      throw new FichierImageDejaExistant();
+    }
     this.fichiers.set(cle(magasinId, fichier), {
       magasinId,
       fichier,
@@ -57,6 +61,10 @@ export class StockageImagesEnMemoire extends StockageImages {
         modifieLe,
       }),
     );
+  }
+
+  async purgerTemporaires(_avant: Date): Promise<void> {
+    // Les écritures en mémoire ne produisent aucun temporaire.
   }
 
   /** Octets d'un fichier stocké, ou null. */
