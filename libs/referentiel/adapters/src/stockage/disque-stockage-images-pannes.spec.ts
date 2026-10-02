@@ -99,6 +99,29 @@ describe('DisqueStockageImages — écriture atomique', () => {
     expect(await stockage.lister()).toHaveLength(1);
   });
 
+  it('purge les autres temporaires quand l’un résiste, puis signale la panne', async () => {
+    const premier =
+      fichier.valeur + '.11111111-1111-4111-8111-111111111111.tmp';
+    const second = fichier.valeur + '.22222222-2222-4222-8222-222222222222.tmp';
+    await fs.mkdir(dossier, { recursive: true });
+    const ancien = new Date('2020-01-01T00:00:00Z');
+    for (const nom of [premier, second]) {
+      await fs.writeFile(join(dossier, nom), 'partiel');
+      await fs.utimes(join(dossier, nom), ancien, ancien);
+    }
+    jest
+      .spyOn(fs, 'rm')
+      .mockRejectedValueOnce(
+        Object.assign(new Error('accès refusé'), { code: 'EACCES' }),
+      );
+
+    await expect(stockage.purgerTemporaires(ancien)).rejects.toMatchObject({
+      code: 'STOCKAGE_IMAGES_INDISPONIBLE',
+      cause: expect.objectContaining({ code: 'EACCES' }),
+    });
+    expect(await fs.readdir(dossier)).toHaveLength(1);
+  });
+
   it('nettoie seulement ses temporaires anciens, sans toucher les fichiers publiés ou récents', async () => {
     const ancien = fichier.valeur + '.11111111-1111-4111-8111-111111111111.tmp';
     const recent = fichier.valeur + '.22222222-2222-4222-8222-222222222222.tmp';

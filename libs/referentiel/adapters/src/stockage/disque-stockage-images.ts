@@ -174,6 +174,9 @@ export class DisqueStockageImages extends StockageImages {
 
   async purgerTemporaires(avant: Date): Promise<void> {
     await traduireLesPannes(async () => {
+      // Un temporaire qui résiste n'empêche pas la purge des suivants ; la
+      // première panne est relancée à la fin.
+      let premierePanne: unknown = null;
       for (const entree of await lireDossier(this.dossierDesMagasins())) {
         const magasinId = entree.isDirectory()
           ? magasinIdDepuisNom(entree.name)
@@ -185,9 +188,16 @@ export class DisqueStockageImages extends StockageImages {
           const chemin = cheminDansLeDossier(dossier, element.name);
           const etat = await statSiPresent(chemin);
           if (etat !== null && etat.mtimeMs <= avant.getTime()) {
-            await rm(chemin, { force: true });
+            try {
+              await rm(chemin, { force: true });
+            } catch (erreur) {
+              premierePanne ??= erreur;
+            }
           }
         }
+      }
+      if (premierePanne !== null) {
+        throw premierePanne;
       }
     });
   }
