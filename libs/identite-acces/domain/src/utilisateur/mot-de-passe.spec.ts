@@ -1,7 +1,7 @@
 import {
   MotDePasse,
   MotDePasseHache,
-  MotDePasseHacheVide,
+  MotDePasseHacheInvalide,
   MotDePasseTropCourt,
   MotDePasseTropLong,
 } from './mot-de-passe';
@@ -14,7 +14,10 @@ describe('MotDePasse (RDC-ACCES-007, audit A-06)', () => {
   it('refuse moins de 12 caractères (MOT_DE_PASSE_TROP_COURT)', () => {
     expect(() => MotDePasse.creer('a'.repeat(11))).toThrow(MotDePasseTropCourt);
     expect(() => MotDePasse.creer('court')).toThrow(
-      expect.objectContaining({ code: 'MOT_DE_PASSE_TROP_COURT' }),
+      expect.objectContaining({
+        code: 'MOT_DE_PASSE_TROP_COURT',
+        name: 'MotDePasseTropCourt',
+      }),
     );
   });
 
@@ -39,14 +42,24 @@ describe('MotDePasse (RDC-ACCES-007, audit A-06)', () => {
 
 describe('MotDePasseHache', () => {
   it('garde l’empreinte telle quelle', () => {
-    expect(MotDePasseHache.creer('scrypt$abc$def').valeur).toBe(
-      'scrypt$abc$def',
-    );
+    const empreinte = 'scrypt$sel-de-16-octets$empreinte';
+    expect(MotDePasseHache.creer(empreinte).valeur).toBe(empreinte);
   });
 
-  it('refuse une empreinte vide (MOT_DE_PASSE_HACHE_VIDE)', () => {
-    expect(() => MotDePasseHache.creer('  ')).toThrow(MotDePasseHacheVide);
-  });
+  it.each(['  ', 'x'.repeat(19)])(
+    'refuse une empreinte vide ou de moins de 20 caractères (%j, PASSWORD_HASH_INVALID, code v1)',
+    (valeur) => {
+      expect(() => MotDePasseHache.creer(valeur)).toThrow(
+        MotDePasseHacheInvalide,
+      );
+      expect(() => MotDePasseHache.creer(valeur)).toThrow(
+        expect.objectContaining({
+          code: 'PASSWORD_HASH_INVALID',
+          name: 'MotDePasseHacheInvalide',
+        }),
+      );
+    },
+  );
 
   it('ne se montre jamais dans un message ou un journal', () => {
     const empreinte = MotDePasseHache.creer('scrypt$sel$valeur-secrete');

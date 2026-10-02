@@ -16,7 +16,7 @@ describe('Utilisateur', () => {
   const centreId = CentreId.creer('7f1c9d7e-2d4b-4f7a-9c1e-3b8a5d6e0f12');
   const autreCentre = CentreId.creer('0b6e3f7a-9c2d-4e1f-8a5b-6c7d8e9f0a1b');
   const adresse = AdresseConnexion.creer('ad47.agen@restosducoeur.org');
-  const motDePasse = MotDePasseHache.creer('empreinte-initiale');
+  const motDePasse = MotDePasseHache.creer('scrypt$sel$empreinte-initiale');
 
   function unCompteCentre(): Utilisateur {
     return Utilisateur.creerCompteCentre(
@@ -92,7 +92,7 @@ describe('Utilisateur', () => {
   describe('mot de passe (RDC-ACCES-009)', () => {
     it('remplace l’empreinte et date la modification', () => {
       const compte = unCompteCentre();
-      const nouveau = MotDePasseHache.creer('nouvelle-empreinte');
+      const nouveau = MotDePasseHache.creer('scrypt$sel$nouvelle-empreinte');
 
       compte.changerMotDePasse(nouveau, plusTard);
 

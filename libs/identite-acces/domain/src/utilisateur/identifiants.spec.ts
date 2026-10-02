@@ -20,19 +20,25 @@ describe('UtilisateurId', () => {
     ).toBe(true);
   });
 
-  it('refuse un identifiant vide (UTILISATEUR_ID_EMPTY)', () => {
+  it('refuse un identifiant vide (USER_ID_EMPTY, code v1)', () => {
     expect(() => UtilisateurId.creer('  ')).toThrow(UtilisateurIdVide);
     expect(() => UtilisateurId.creer('')).toThrow(
-      expect.objectContaining({ code: 'UTILISATEUR_ID_EMPTY' }),
+      expect.objectContaining({
+        code: 'USER_ID_EMPTY',
+        name: 'UtilisateurIdVide',
+      }),
     );
   });
 
   it.each(['abc', '3b8a5d6e0f124f7a9c1e7f1c9d7e2d4b'])(
-    'refuse un identifiant qui n’est pas un UUID (%j, UTILISATEUR_ID_INVALID)',
+    'refuse un identifiant qui n’est pas un UUID (%j, USER_ID_INVALID, code v1)',
     (valeur) => {
       expect(() => UtilisateurId.creer(valeur)).toThrow(UtilisateurIdInvalide);
       expect(() => UtilisateurId.creer(valeur)).toThrow(
-        expect.objectContaining({ code: 'UTILISATEUR_ID_INVALID' }),
+        expect.objectContaining({
+          code: 'USER_ID_INVALID',
+          name: 'UtilisateurIdInvalide',
+        }),
       );
     },
   );
@@ -49,6 +55,9 @@ describe('CentreId (référence locale au centre d’un compte)', () => {
 
   it('reprend les codes d’erreur du référentiel', () => {
     expect(() => CentreId.creer('')).toThrow(CentreIdVide);
+    expect(() => CentreId.creer('')).toThrow(
+      expect.objectContaining({ code: 'CENTRE_ID_EMPTY' }),
+    );
     expect(() => CentreId.creer('abc')).toThrow(
       expect.objectContaining({ code: 'CENTRE_ID_INVALID' }),
     );

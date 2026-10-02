@@ -1,6 +1,6 @@
 /** Erreur métier : l'adresse de connexion est obligatoire. */
 export class AdresseConnexionVide extends Error {
-  readonly code = 'ADRESSE_CONNEXION_VIDE';
+  readonly code = 'EMAIL_EMPTY'; // code v1
 
   constructor() {
     super("L'adresse de connexion est obligatoire");
@@ -10,7 +10,7 @@ export class AdresseConnexionVide extends Error {
 
 /** Erreur métier : une adresse de connexion ne dépasse pas 254 caractères. */
 export class AdresseConnexionTropLongue extends Error {
-  readonly code = 'ADRESSE_CONNEXION_TROP_LONGUE';
+  readonly code = 'EMAIL_TOO_LONG'; // code v1
 
   constructor(readonly longueurMaximale: number) {
     super(
@@ -22,7 +22,7 @@ export class AdresseConnexionTropLongue extends Error {
 
 /** Erreur métier : l'adresse de connexion n'a pas la forme x@y.z. */
 export class AdresseConnexionInvalide extends Error {
-  readonly code = 'ADRESSE_CONNEXION_INVALIDE';
+  readonly code = 'EMAIL_INVALID'; // code v1
 
   constructor() {
     super("L'adresse de connexion est invalide");

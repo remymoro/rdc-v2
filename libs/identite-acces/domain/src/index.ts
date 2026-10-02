@@ -15,7 +15,7 @@ export {
 export {
   MotDePasse,
   MotDePasseHache,
-  MotDePasseHacheVide,
+  MotDePasseHacheInvalide,
   MotDePasseTropCourt,
   MotDePasseTropLong,
 } from './utilisateur/mot-de-passe';

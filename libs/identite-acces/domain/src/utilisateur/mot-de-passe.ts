@@ -58,13 +58,13 @@ export class MotDePasse {
   }
 }
 
-/** Erreur métier : l'empreinte d'un mot de passe ne peut pas être vide. */
-export class MotDePasseHacheVide extends Error {
-  readonly code = 'MOT_DE_PASSE_HACHE_VIDE';
+/** Erreur métier : une empreinte est non vide et fait au moins 20 caractères. */
+export class MotDePasseHacheInvalide extends Error {
+  readonly code = 'PASSWORD_HASH_INVALID'; // code v1
 
   constructor() {
-    super("L'empreinte du mot de passe est obligatoire");
-    this.name = 'MotDePasseHacheVide';
+    super("L'empreinte du mot de passe est invalide");
+    this.name = 'MotDePasseHacheInvalide';
   }
 }
 
@@ -73,13 +73,16 @@ export class MotDePasseHacheVide extends Error {
  * à l'adapter de hachage ; le domaine ne la lit pas.
  */
 export class MotDePasseHache {
+  /** Aucune empreinte réelle n'est plus courte : en dessous, la donnée est corrompue (v1). */
+  static readonly LONGUEUR_MINIMALE = 20;
+
   private readonly type = 'MotDePasseHache';
 
   private constructor(readonly valeur: string) {}
 
   static creer(valeur: string): MotDePasseHache {
-    if (valeur.trim().length === 0) {
-      throw new MotDePasseHacheVide();
+    if (valeur.trim().length < MotDePasseHache.LONGUEUR_MINIMALE) {
+      throw new MotDePasseHacheInvalide();
     }
     return new MotDePasseHache(valeur);
   }

@@ -4,7 +4,7 @@ const FORMAT_UUID =
 
 /** Erreur métier : l'identifiant d'un utilisateur est obligatoire. */
 export class UtilisateurIdVide extends Error {
-  readonly code = 'UTILISATEUR_ID_EMPTY';
+  readonly code = 'USER_ID_EMPTY'; // code v1
 
   constructor() {
     super("L'identifiant de l'utilisateur est obligatoire");
@@ -14,7 +14,7 @@ export class UtilisateurIdVide extends Error {
 
 /** Erreur métier : l'identifiant d'un utilisateur est un UUID. */
 export class UtilisateurIdInvalide extends Error {
-  readonly code = 'UTILISATEUR_ID_INVALID';
+  readonly code = 'USER_ID_INVALID'; // code v1
 
   constructor() {
     super("L'identifiant de l'utilisateur est invalide");
