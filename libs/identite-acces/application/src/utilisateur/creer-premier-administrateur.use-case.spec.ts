@@ -27,10 +27,13 @@ describe('CreerPremierAdministrateurUseCase (RDC-ACCES-004, 011)', () => {
   let unitOfWork: UnitOfWorkEspion;
   let creerPremierAdministrateur: CreerPremierAdministrateurUseCase;
 
-  function preparer(existants: Utilisateur[] = []): void {
-    utilisateurRepository = new UtilisateurRepositoryEnMemoire(existants);
-    hacheur = new HacheurMotsDePasseFactice();
+  function preparer(
+    existants: Utilisateur[] = [],
+    repository = new UtilisateurRepositoryEnMemoire(existants),
+  ): void {
+    utilisateurRepository = repository;
     unitOfWork = new UnitOfWorkEspion();
+    hacheur = new HacheurMotsDePasseFactice(() => unitOfWork.enCours);
     creerPremierAdministrateur = new CreerPremierAdministrateurUseCase(
       utilisateurRepository,
       hacheur,
@@ -84,7 +87,18 @@ describe('CreerPremierAdministrateurUseCase (RDC-ACCES-004, 011)', () => {
       HacheurMotsDePasseFactice.empreinteDe(enClair),
     );
     expect(enregistre?.motDePasse.valeur).not.toContain(enClair);
-    expect(hacheur.motsDePasseHaches).toEqual([enClair]);
+    expect(hacheur.motsDePasseRecus).toHaveLength(1);
+    expect(hacheur.motsDePasseRecus[0]).toBeInstanceOf(MotDePasse);
+    expect(hacheur.motsDePasseRecus[0].valeur).toBe(enClair);
+  });
+
+  it('hache hors transaction : aucune connexion tenue pendant le calcul (TENETS-UOW-011)', async () => {
+    preparer();
+
+    await creerPremierAdministrateur.execute(commande());
+
+    expect(hacheur.motsDePasseRecus).toHaveLength(1);
+    expect(hacheur.hacheDansUneTransaction).toBe(false);
   });
 
   it('refuse dès qu’un administrateur existe, sans hacher ni écrire (AUTH_BOOTSTRAP_DISABLED)', async () => {
@@ -97,7 +111,7 @@ describe('CreerPremierAdministrateurUseCase (RDC-ACCES-004, 011)', () => {
     expect(erreur).toBeInstanceOf(AdministrateurDejaExistant);
     expect(erreur).toMatchObject({ code: 'AUTH_BOOTSTRAP_DISABLED' });
     // Un hachage lent n'est jamais dépensé pour une demande refusée.
-    expect(hacheur.motsDePasseHaches).toEqual([]);
+    expect(hacheur.motsDePasseRecus).toEqual([]);
     expect(unitOfWork.nombreDeCommits).toBe(0);
     expect(await utilisateurRepository.get(idGenere)).toBeNull();
   });
@@ -114,6 +128,26 @@ describe('CreerPremierAdministrateurUseCase (RDC-ACCES-004, 011)', () => {
     ).rejects.toBeInstanceOf(AdministrateurDejaExistant);
     expect(unitOfWork.nombreDeCommits).toBe(0);
     expect(await utilisateurRepository.get(idGenere)).toBeNull();
+  });
+
+  it('laisse passer le refus du stockage quand deux premiers administrateurs se croisent', async () => {
+    // Deux demandes simultanées voient « aucun admin » : la contrainte du
+    // stockage tranche, et son refus remonte tel quel, sans commit.
+    class StockageQuiRefuseLeSecond extends UtilisateurRepositoryEnMemoire {
+      override async existsAdministrateur(): Promise<boolean> {
+        return false;
+      }
+
+      override async save(): Promise<void> {
+        throw new AdministrateurDejaExistant();
+      }
+    }
+    preparer([], new StockageQuiRefuseLeSecond());
+
+    await expect(
+      creerPremierAdministrateur.execute(commande()),
+    ).rejects.toBeInstanceOf(AdministrateurDejaExistant);
+    expect(unitOfWork.nombreDeCommits).toBe(0);
   });
 
   it('refuse une adresse déjà prise par un compte de centre (AUTH_EMAIL_ALREADY_EXISTS)', async () => {

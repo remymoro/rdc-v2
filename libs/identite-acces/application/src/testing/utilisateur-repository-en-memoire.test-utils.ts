@@ -14,9 +14,11 @@ export class UtilisateurRepositoryEnMemoire extends UtilisateurRepository {
 
   constructor(utilisateursExistants: Utilisateur[] = []) {
     super();
-    utilisateursExistants.forEach((utilisateur) =>
-      this.utilisateurs.set(utilisateur.id.valeur, copie(utilisateur)),
-    );
+    // Mêmes contraintes que save() : aucun test ne part d'un état qu'une base refuserait.
+    for (const utilisateur of utilisateursExistants) {
+      this.verifierContraintes(utilisateur);
+      this.utilisateurs.set(utilisateur.id.valeur, copie(utilisateur));
+    }
   }
 
   async get(id: UtilisateurId): Promise<Utilisateur | null> {
@@ -31,8 +33,13 @@ export class UtilisateurRepositoryEnMemoire extends UtilisateurRepository {
     return utilisateur === undefined ? null : copie(utilisateur);
   }
 
-  /** Comme les contraintes uniques en base : un seul admin, une adresse par compte. */
   async save(utilisateur: Utilisateur): Promise<void> {
+    this.verifierContraintes(utilisateur);
+    this.utilisateurs.set(utilisateur.id.valeur, copie(utilisateur));
+  }
+
+  /** Comme les contraintes uniques en base : un seul admin, une adresse par compte. */
+  private verifierContraintes(utilisateur: Utilisateur): void {
     const autres = this.autres(utilisateur.id);
     if (
       utilisateur.role === Role.ADMIN &&
@@ -45,7 +52,6 @@ export class UtilisateurRepositoryEnMemoire extends UtilisateurRepository {
     ) {
       throw new AdresseConnexionDejaUtilisee();
     }
-    this.utilisateurs.set(utilisateur.id.valeur, copie(utilisateur));
   }
 
   async existsAdministrateur(): Promise<boolean> {
