@@ -1,3 +1,4 @@
+import { request } from 'node:http';
 import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -49,6 +50,10 @@ describe('Images publiques — HTTP', () => {
       expect(reponse.headers.get('content-security-policy')).toBe(
         "default-src 'none'; sandbox",
       );
+      // Nom UUID jamais réécrit : le contenu d'une URL ne change pas.
+      expect(reponse.headers.get('cache-control')).toBe(
+        'public, max-age=31536000, immutable',
+      );
     },
   );
 
@@ -61,6 +66,28 @@ describe('Images publiques — HTTP', () => {
     '/uploads/magasins/' + magasin + '/',
   ])('refuse %s', async (cible) => {
     expect((await fetch(url + cible)).status).toBe(404);
+  });
+
+  /** Requête brute : fetch normaliserait « .. » avant l'envoi. */
+  function statutBrut(cible: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      const { hostname, port } = new URL(url);
+      request({ hostname, port, path: cible }, (reponse) => {
+        reponse.resume();
+        resolve(reponse.statusCode ?? 0);
+      })
+        .on('error', reject)
+        .end();
+    });
+  }
+
+  it.each([
+    '/uploads/magasins/../secret.jpg',
+    '/uploads/magasins/%2e%2e/secret.jpg',
+    '/uploads/magasins/%2E%2E%2Fsecret.jpg',
+    '/uploads/magasins/' + magasin + '/..%2f..%2fsecret.jpg',
+  ])('refuse la traversée %s', async (cible) => {
+    expect(await statutBrut(cible)).toBe(404);
   });
 
   it('applique les protections aussi à HEAD', async () => {

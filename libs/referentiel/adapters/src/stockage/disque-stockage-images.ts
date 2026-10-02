@@ -43,7 +43,11 @@ export function cheminDansLeDossier(dossier: string, nom: string): string {
   return chemin;
 }
 
-/** Échecs du système de fichiers qui signifient « stockage indisponible ». */
+/**
+ * Échecs du système de fichiers qui signifient « stockage indisponible ».
+ * EMFILE et ENFILE n'en font pas partie : un épuisement des descripteurs du
+ * processus est un bug à voir, pas une panne du NAS (TENETS-ERROR-005).
+ */
 const CODES_INDISPONIBLE = new Set([
   'EACCES',
   'EPERM',
@@ -62,8 +66,9 @@ const CODES_INDISPONIBLE = new Set([
   'ENETUNREACH',
   'EHOSTUNREACH',
   'ENODEV',
-  'EMFILE',
-  'ENFILE',
+  'EHOSTDOWN',
+  // Partage sans liens physiques (SMB/CIFS) : la publication par link échoue.
+  'ENOSYS',
   'EOPNOTSUPP',
   'EXDEV',
 ]);
@@ -169,6 +174,9 @@ export class DisqueStockageImages extends StockageImages {
 
   async purgerTemporaires(avant: Date): Promise<void> {
     await traduireLesPannes(async () => {
+      // Un temporaire qui résiste n'empêche pas la purge des suivants ; la
+      // première panne est relancée à la fin.
+      let premierePanne: unknown = null;
       for (const entree of await lireDossier(this.dossierDesMagasins())) {
         const magasinId = entree.isDirectory()
           ? magasinIdDepuisNom(entree.name)
@@ -180,9 +188,16 @@ export class DisqueStockageImages extends StockageImages {
           const chemin = cheminDansLeDossier(dossier, element.name);
           const etat = await statSiPresent(chemin);
           if (etat !== null && etat.mtimeMs <= avant.getTime()) {
-            await rm(chemin, { force: true });
+            try {
+              await rm(chemin, { force: true });
+            } catch (erreur) {
+              premierePanne ??= erreur;
+            }
           }
         }
+      }
+      if (premierePanne !== null) {
+        throw premierePanne;
       }
     });
   }

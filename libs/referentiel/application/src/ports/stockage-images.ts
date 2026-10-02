@@ -75,7 +75,8 @@ export abstract class StockageImages {
    * Supprime les seuls temporaires privés de l'adapter dont la dernière
    * écriture est antérieure ou égale à la limite. Épargne les images publiées.
    * Sans effet pour un stockage qui ne produit pas de temporaires.
-   * Un échec peut laisser une purge partielle ; un prochain passage réessaie.
+   * Un temporaire qui résiste n'empêche pas la purge des autres ; l'échec est
+   * signalé à la fin et un prochain passage réessaie.
    * @throws StockageImagesIndisponible
    */
   abstract purgerTemporaires(avant: Date): Promise<void>;

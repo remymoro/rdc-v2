@@ -29,6 +29,8 @@ export class AjouterImageMagasinUseCase {
   ) {}
 
   async execute(commande: AjouterImageMagasinCommande): Promise<ImageMagasin> {
+    // Lecture hors unité de travail : le verrou du repository y est sans
+    // effet, la relecture sous verrou se fait plus bas (TENETS-UOW-011).
     const apercu = await this.magasinRepository.get(commande.magasinId);
     if (apercu === null) {
       throw new MagasinIntrouvable(commande.magasinId);
