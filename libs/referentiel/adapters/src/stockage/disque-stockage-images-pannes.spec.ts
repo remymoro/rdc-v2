@@ -126,8 +126,8 @@ describe('DisqueStockageImages — écriture atomique', () => {
     'ENETUNREACH',
     'EHOSTUNREACH',
     'ENODEV',
-    'EMFILE',
-    'ENFILE',
+    'EHOSTDOWN',
+    'ENOSYS',
     'EOPNOTSUPP',
     'EXDEV',
   ])(
@@ -144,6 +144,38 @@ describe('DisqueStockageImages — écriture atomique', () => {
       });
     },
   );
+
+  it.each(['EMFILE', 'ENFILE'])(
+    'laisse remonter %s tel quel : un épuisement des descripteurs du processus n’est pas une panne du NAS',
+    async (code) => {
+      const panne = Object.assign(new Error('trop de fichiers ouverts'), {
+        code,
+      });
+      jest.spyOn(fs, 'mkdir').mockRejectedValueOnce(panne);
+
+      await expect(
+        stockage.enregistrer(magasin, fichier, unContenuJpeg()),
+      ).rejects.toBe(panne);
+    },
+  );
+
+  it('retire le temporaire quand la publication échoue autrement que par une collision', async () => {
+    const panne = Object.assign(
+      new Error('liens physiques non pris en charge'),
+      {
+        code: 'EOPNOTSUPP',
+      },
+    );
+    jest.spyOn(fs, 'link').mockRejectedValueOnce(panne);
+
+    await expect(
+      stockage.enregistrer(magasin, fichier, unContenuJpeg()),
+    ).rejects.toMatchObject({
+      code: 'STOCKAGE_IMAGES_INDISPONIBLE',
+      cause: panne,
+    });
+    expect(await fs.readdir(dossier)).toEqual([]);
+  });
 
   it('ignore un fichier disparu pendant la liste et conserve les suivants', async () => {
     const autre = unFichier('1e5f3c9d-7b2a-4d4f-8c8e-6a3b9f2d5c7e');

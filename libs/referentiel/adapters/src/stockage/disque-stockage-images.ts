@@ -43,7 +43,11 @@ export function cheminDansLeDossier(dossier: string, nom: string): string {
   return chemin;
 }
 
-/** Échecs du système de fichiers qui signifient « stockage indisponible ». */
+/**
+ * Échecs du système de fichiers qui signifient « stockage indisponible ».
+ * EMFILE et ENFILE n'en font pas partie : un épuisement des descripteurs du
+ * processus est un bug à voir, pas une panne du NAS (TENETS-ERROR-005).
+ */
 const CODES_INDISPONIBLE = new Set([
   'EACCES',
   'EPERM',
@@ -62,8 +66,9 @@ const CODES_INDISPONIBLE = new Set([
   'ENETUNREACH',
   'EHOSTUNREACH',
   'ENODEV',
-  'EMFILE',
-  'ENFILE',
+  'EHOSTDOWN',
+  // Partage sans liens physiques (SMB/CIFS) : la publication par link échoue.
+  'ENOSYS',
   'EOPNOTSUPP',
   'EXDEV',
 ]);
