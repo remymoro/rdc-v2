@@ -12,4 +12,14 @@ export { GenerateurIdentifiantsUuid } from './identifiants/generateur-identifian
 export { PrismaCentreRepository } from './prisma/prisma-centre.repository';
 export { ReferentielErreursHttpFilter } from './http/referentiel-erreurs-http.filter';
 export { CentresController } from './http/centres.controller';
+export {
+  CreerMagasinRequete,
+  versCreerMagasinCommande,
+} from './http/creer-magasin.requete';
+export {
+  versMagasinReponse,
+  type MagasinReponse,
+} from './http/magasin.reponse';
+export { MagasinsController } from './http/magasins.controller';
+export { PrismaMagasinRepository } from './prisma/prisma-magasin.repository';
 export { ReferentielModule } from './referentiel.module';

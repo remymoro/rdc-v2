@@ -4,7 +4,7 @@ import { Email } from '../commun/email';
 import { Nom } from '../commun/nom';
 import { Telephone } from '../commun/telephone';
 import { Ville } from '../commun/ville';
-import { CentreArchive } from './centre.errors';
+import { CentreArchive, CentreNonActif } from './centre.errors';
 import { CentreId } from './centre-id';
 import { StatutCentre } from './statut-centre';
 
@@ -83,6 +83,16 @@ export class Centre {
       etat.creeLe,
       etat.modifieLe,
     );
+  }
+
+  /**
+   * Un nouveau magasin, bénévole ou planning ne se rattache qu'à un centre
+   * ACTIF ; un centre INACTIF ou ARCHIVE garde son historique (RDC-REF-010).
+   */
+  verifierOuvertAuxRattachements(): void {
+    if (this.statutActuel !== StatutCentre.ACTIF) {
+      throw new CentreNonActif(this.id);
+    }
   }
 
   /** Met le centre en pause : il ne participe plus aux nouvelles opérations. */

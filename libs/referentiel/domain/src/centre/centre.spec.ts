@@ -5,7 +5,7 @@ import { Nom } from '../commun/nom';
 import { Telephone } from '../commun/telephone';
 import { Ville } from '../commun/ville';
 import { Centre } from './centre';
-import { CentreArchive } from './centre.errors';
+import { CentreArchive, CentreNonActif } from './centre.errors';
 import { CentreId } from './centre-id';
 import { StatutCentre } from './statut-centre';
 
@@ -222,5 +222,32 @@ describe('Centre', () => {
         expect(centre.modifieLe).toEqual(archiveLe);
       });
     });
+  });
+
+  describe('nouveau rattachement (RDC-REF-010)', () => {
+    it('accepte un centre ACTIF', () => {
+      const centre = Centre.creer(donneesObligatoires(), maintenant);
+
+      expect(() => centre.verifierOuvertAuxRattachements()).not.toThrow();
+    });
+
+    it.each([StatutCentre.INACTIF, StatutCentre.ARCHIVE])(
+      'refuse un centre %s avec CENTRE_NON_ACTIF',
+      (statut) => {
+        const centre = Centre.reconstituer({
+          ...donneesObligatoires(),
+          statut,
+          creeLe: maintenant,
+          modifieLe: maintenant,
+        });
+
+        expect(() => centre.verifierOuvertAuxRattachements()).toThrow(
+          CentreNonActif,
+        );
+        expect(() => centre.verifierOuvertAuxRattachements()).toThrow(
+          expect.objectContaining({ code: 'CENTRE_NON_ACTIF', centreId: id }),
+        );
+      },
+    );
   });
 });

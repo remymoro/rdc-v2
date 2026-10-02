@@ -12,10 +12,12 @@ import {
   CentreId,
   CentreIdInvalide,
   CentreIdVide,
+  CentreNonActif,
   CodePostalInvalide,
   EmailInvalide,
   EmailTropLong,
   EmailVide,
+  MagasinDejaExistant,
   NomTropLong,
   NomVide,
   TelephoneInvalide,
@@ -24,6 +26,7 @@ import {
   VilleVide,
 } from '@rdc/referentiel-domain';
 import { CentrePersisteInvalide } from '../prisma/centre-persiste-invalide';
+import { MagasinPersisteInvalide } from '../prisma/magasin-persiste-invalide';
 import { ReferentielErreursHttpFilter } from './referentiel-erreurs-http.filter';
 
 function hoteHttp() {
@@ -84,6 +87,25 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
         error: 'CentreArchive',
         code: 'CENTRE_ARCHIVED',
       }),
+    );
+  });
+
+  // Magasins (lot A1) : statuts de RDC v1 (RDC-REF-001, RDC-REF-010).
+  it.each([
+    [
+      new MagasinDejaExistant(),
+      'MagasinDejaExistant',
+      'MAGASIN_ALREADY_EXISTS',
+    ],
+    [new CentreNonActif(unCentreId), 'CentreNonActif', 'CENTRE_NON_ACTIF'],
+  ])('traduit %s en 409', (erreur, nom, code) => {
+    const { hote, reponse } = hoteHttp();
+
+    filtre.catch(erreur, hote);
+
+    expect(reponse.status).toHaveBeenCalledWith(409);
+    expect(reponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({ statusCode: 409, error: nom, code }),
     );
   });
 
@@ -150,6 +172,19 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
     });
 
     expect(typesCaptures.length).toBeGreaterThan(0);
+    expect(typesCaptures.some((type) => erreur instanceof type)).toBe(false);
+  });
+
+  it('ne capture pas MagasinPersisteInvalide, même par sa cause de validation', () => {
+    const typesCaptures: Type<Error>[] = Reflect.getMetadata(
+      FILTER_CATCH_EXCEPTIONS,
+      ReferentielErreursHttpFilter,
+    );
+    const erreur = new MagasinPersisteInvalide(
+      '3b8a5d6e-0f12-4f7a-9c1e-7f1c9d7e2d4b',
+      { cause: new TelephoneInvalide() },
+    );
+
     expect(typesCaptures.some((type) => erreur instanceof type)).toBe(false);
   });
 });

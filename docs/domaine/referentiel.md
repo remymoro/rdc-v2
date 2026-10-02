@@ -15,13 +15,15 @@ ACTIF ⇄ INACTIF
 
 ## RDC-REF-001 — Un centre est unique par nom et adresse
 
-`core` · erreur · ✅ création · ⏳ filet P2002 et modification
+`core` · erreur · ✅ création (centre, magasin) · ✅ filet P2002 (magasin) · ⏳ filet P2002 (centre) et modification
 
 **Règle.** Deux centres ne partagent pas la même clé de doublon (nom, adresse,
 code postal, ville, normalisés comme en v1 : `CleDoublonCentre`). Le use case
 vérifie avant d'écrire, dans l'unité de travail ; la contrainte unique en base
 sert de filet et doit être traduite en `CentreDejaExistant`
-(`CENTRE_ALREADY_EXISTS`, 409). La même règle s'appliquera aux magasins.
+(`CENTRE_ALREADY_EXISTS`, 409). La même règle s'applique aux magasins
+(`CleDoublonMagasin`, `MagasinDejaExistant`, `MAGASIN_ALREADY_EXISTS`, 409),
+avec une clé globale qui ne contient pas le centre de rattachement.
 
 **Pourquoi.** Les doublons faussent les statistiques par centre et par magasin.
 
@@ -102,7 +104,7 @@ un impact trop large.
 
 ## RDC-REF-005 — Un magasin est rattaché à un centre
 
-`core` · erreur · ⏳ à implémenter (étape 3)
+`core` · erreur · ✅ création (étape 3, A1) · ⏳ transfert (A3)
 
 **Règle.** Tout magasin a un centre de rattachement. Le transfert de
 rattachement vers un autre centre est une opération explicite
@@ -187,7 +189,7 @@ pourra s'ajouter plus tard par une migration qui recopie le nom.
 
 ## RDC-REF-010 — Seul un centre actif reçoit un nouveau rattachement
 
-`core` · erreur · ⏳ à implémenter (étapes 3 et 6)
+`core` · erreur · ✅ création d'un magasin (étape 3, A1) · ⏳ transfert, bénévoles et plannings (étapes 3 et 6)
 
 **Règle.** Créer ou transférer un magasin, créer un bénévole, planifier des
 bénévoles au centre ou planifier un chauffeur exige un centre ACTIF. Un centre
