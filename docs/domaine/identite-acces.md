@@ -8,6 +8,15 @@ paths:
 # Règles métier — contexte `identite-acces`
 
 Deux rôles. Les bénévoles ne sont pas des utilisateurs de l'application.
+Un `RESPONSABLE_CENTRE` n'est pas une personne : c'est **le compte du centre**,
+partagé par l'équipe qui gère le centre (D-19). Les comptes sont gérés par
+l'admin seul, pour éviter toute gestion de comptes personnels alors que cette
+équipe change souvent.
+
+**Compte de centre et bénévole sont deux notions distinctes.** Un bénévole
+(contexte `benevoles`) est une personne affectée sur le terrain : il n'a pas de
+compte, ne se connecte jamais, et aucune donnée ne relie une fiche bénévole au
+compte d'un centre.
 
 | Rôle                 | Peut                                                                  |
 | -------------------- | --------------------------------------------------------------------- |
@@ -103,8 +112,8 @@ archivé ». En réaction, Identité et accès désactive ses responsables **et 
 leurs sessions** (TENETS-EVENT-002). L'événement est créé avec ce consommateur
 (ADR-0003 R13).
 
-Le refus de désactiver un responsable dont le centre participe à une collecte
-active est reporté à l'étape 5, car il dépend du contrat publié par collecte.
+Le refus de désactiver le compte d'un centre pendant une collecte est la règle
+RDC-ACCES-012.
 
 **Source v1.**
 `apps/api/src/application/use-cases/centre/archiver-centre.usecase.ts:42-58` ;
@@ -117,8 +126,9 @@ active est reporté à l'étape 5, car il dépend du contrat publié par collect
 **Règle.**
 
 - Jeton d'accès de 15 min, renvoyé en JSON et gardé en mémoire par le front.
-- Jeton de rafraîchissement de 7 jours, en cookie HttpOnly (`SameSite=Strict`,
-  `path=/api/auth`), stocké haché en base.
+- Jeton de rafraîchissement de 7 jours, en cookie `HttpOnly`, `Secure`
+  (HTTPS obligatoire, ADR-0019), `SameSite=Strict`, `path=/api/auth`, stocké
+  haché en base.
 - Rotation à chaque rafraîchissement. Un jeton déjà utilisé et présenté de
   nouveau révoque toute la famille de sessions (audit A-09).
 - Désactiver un utilisateur révoque ses sessions. Les sessions expirées sont
@@ -147,22 +157,98 @@ active est reporté à l'étape 5, car il dépend du contrat publié par collect
 
 ## RDC-ACCES-008 — Traçabilité des accès aux données personnelles
 
-`pragmatic` · avertissement · ⚠️ à trancher (D-06)
+`pragmatic` · avertissement · ⏳ connexions à l'étape 4 · ⚠️ durée de conservation et données des bénévoles à trancher (D-06)
 
 **Règle.** Connexions, échecs de connexion, consultations et modifications de
-données de bénévoles sont journalisés : qui, quoi, quand. Absent en v1 (audit
-A-04 / B-01). Forme et durée de conservation à décider.
+données de bénévoles sont journalisés : quel compte, quoi, quand. Absent en v1
+(audit A-04 / B-01). Avec un compte par centre (D-19), la trace désigne le
+centre, pas la personne.
+
+**Décision du 2026-10-02.** Les connexions et les échecs de connexion sont
+journalisés dès l'étape 4 : une trace non écrite ne se rattrape pas. Durée de
+conservation provisoire : 1 an, à confirmer avec D-06. Les consultations et
+modifications de données de bénévoles suivent à l'étape 6.
 
 **Pourquoi.** Obligation de responsabilité RGPD (art. 5.2) ; sans trace, on ne
 peut pas mesurer l'étendue d'une fuite.
 
-## RDC-ACCES-009 — Changement de mot de passe en libre-service
+## RDC-ACCES-009 — Seul l'admin définit le mot de passe d'un compte de centre
 
-`pragmatic` · avertissement · ⚠️ à trancher (D-09)
+`pragmatic` · avertissement · ⏳ à implémenter (étape 4) · D-09 et D-19 décidées
 
-**Règle.** La v1 ne permet pas à un responsable de changer lui-même son mot de
-passe ; seul l'admin peut le faire. La nécessité d'un libre-service dépend du
-mode d'exposition de la v2 et doit être décidée avant l'étape 4.
+**Règle.** L'admin définit le mot de passe du compte d'un centre et le
+transmet au centre. Le centre ne le change pas lui-même : aucune route de
+libre-service ni de mot de passe oublié. Quand une personne quitte le centre,
+l'admin change le mot de passe ; ce changement révoque les sessions en cours
+du compte.
 
-**Source v1.** Fonctionnalité absente, décision du 2026-08-24 documentée dans
-`CLAUDE.md:867-871` de la v1 (audit A-02).
+**Pourquoi.** Décisions D-09 et D-19 (2026-10-02) : la v2 reste sur le NAS
+local, accessible par VPN (ADR-0019), et le compte est partagé par l'équipe
+qui gère le centre. À revoir si l'API devient accessible depuis Internet.
+
+## RDC-ACCES-010 — Un centre a au plus un compte actif
+
+`core` · erreur · ⏳ à implémenter (étape 4) · D-19 décidée
+
+**Règle.** Le compte d'un centre (rôle `RESPONSABLE_CENTRE`) se connecte avec
+une adresse email propre au compte, choisie par l'admin : celle du centre ou
+une adresse créée pour la collecte. Cette adresse est unique parmi tous les
+comptes. Créer ou réactiver un compte pour un centre qui en a déjà un actif est
+refusé (conflit, 409). Un compte désactivé ne compte pas. Un centre peut
+n'avoir aucun compte.
+
+**Pourquoi.** Décision D-19 : un seul compte par centre, partagé, sans gestion
+de comptes personnels.
+
+**Le compte garde sa propre adresse.** Elle est préremplie avec l'email du
+centre, mais modifier l'email de contact du centre (`referentiel`) ne change
+pas l'identifiant de connexion (TENETS-CONTEXT-002 : on échange des
+identifiants, pas des agrégats).
+
+**Vérification en revue.** La règle est vérifiée dans l'unité de travail, et
+une contrainte en base sert de filet pour deux créations simultanées
+(comme RDC-REF-001).
+
+**Source v1.** La v1 ne limite pas le nombre de responsables
+(`apps/api/src/application/use-cases/auth/creer-responsable.usecase.ts:25-70`),
+mais ses comptes utilisent déjà l'adresse du centre. Écart : ADR-0020.
+
+## RDC-ACCES-011 — Un seul administrateur
+
+`core` · erreur · ⏳ à implémenter (étape 4) · D-19 décidée
+
+**Règle.** Il existe au plus un ADMIN. Il est créé par la route de premier
+administrateur (RDC-ACCES-004), qui est ensuite refusée. Aucune route ne crée
+un autre ADMIN ni ne transforme un responsable en ADMIN.
+
+**Pourquoi.** Décision du client (D-19) : le siège de l'AD47 a un seul
+administrateur de RDC.
+
+**Vérification en revue.** Aucun chemin (route, amorçage, script) ne crée un
+second ADMIN.
+
+**Source v1.** Même comportement de fait : seul `bootstrap-admin` crée un ADMIN
+(`apps/api/src/application/use-cases/auth/bootstrap-admin.usecase.ts:12-47`).
+
+## RDC-ACCES-012 — Le compte d'un centre ne se désactive pas pendant une collecte
+
+`core` · erreur · 🔁 reportée à l'étape 5 (décision du 2026-10-02)
+
+**Règle.** Désactiver le compte d'un centre est refusé dès que ce centre est
+affecté à une collecte non terminée (PREPARATION ou EN_COURS), et jusqu'à ce
+qu'elle passe TERMINEE. Un centre est affecté à une collecte quand il est
+centre gestionnaire d'au moins un magasin inscrit, ou quand il a une liste de
+vérification pour cette collecte (RDC-COLLECTE-014). Changer le mot de passe
+reste permis : c'est ce que fait l'admin quand une personne quitte le centre.
+La réponse vient du contrat publié par `collecte` (RDC-COLLECTE-013,
+TENETS-CONTEXT-006), comme RDC-REF-004.
+
+**Pourquoi.** Dès son affectation, le centre doit pouvoir remplir sa liste de
+vérification, planifier et peser : sans compte actif, il serait bloqué.
+
+**Vérification en revue.** Le contrôle passe par le contrat publié de
+`collecte`, jamais par une lecture directe de ses tables.
+
+**Source v1.** Règle déjà annoncée en v1 (« désactiver un responsable dont le
+centre participe à une collecte active »), reportée par la décision du
+2026-10-01.

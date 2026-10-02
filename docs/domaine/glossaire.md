@@ -6,12 +6,12 @@ vus dans la v1 ou tentants, qui ne doivent pas entrer dans le code v2.
 
 ## Acteurs
 
-| Terme                                            | Contexte       | Définition                                                                                                                         | À éviter                 |
-| ------------------------------------------------ | -------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
-| **Administrateur** (`ADMIN`)                     | identite-acces | Administrateur du siège de l'AD47 : pilote toutes les collectes, ouvre la vérification, inscrit les magasins, gère le référentiel. | superadmin, gestionnaire |
-| **Responsable de centre** (`RESPONSABLE_CENTRE`) | identite-acces | Utilisateur rattaché à un seul centre ; gère ses bénévoles, plannings et pesées.                                                   | manager, chef de centre  |
-| **Bénévole**                                     | benevoles      | Personne qui participe au terrain (magasin, centre, conduite). Ce n'est pas un utilisateur de l'application.                       | volontaire, user         |
-| **Chauffeur**                                    | planification  | Bénévole affecté à un créneau du planning chauffeur. Ce n'est pas un type de personne distinct.                                    | driver, livreur          |
+| Terme                                            | Contexte       | Définition                                                                                                                                                                                                 | À éviter                                                   |
+| ------------------------------------------------ | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| **Administrateur** (`ADMIN`)                     | identite-acces | Administrateur du siège de l'AD47, unique : pilote toutes les collectes, ouvre la vérification, inscrit les magasins, gère le référentiel.                                                                 | superadmin, gestionnaire                                   |
+| **Responsable de centre** (`RESPONSABLE_CENTRE`) | identite-acces | Compte unique d'un centre, partagé par l'équipe qui gère le centre ; email propre au compte, mot de passe défini par l'admin. Gère les bénévoles, plannings et pesées du centre. Ce n'est pas un bénévole. | manager, chef de centre, compte personnel, compte bénévole |
+| **Bénévole**                                     | benevoles      | Personne qui participe au terrain (magasin, centre, conduite). Ce n'est pas un utilisateur de l'application.                                                                                               | volontaire, user                                           |
+| **Chauffeur**                                    | planification  | Bénévole affecté à un créneau du planning chauffeur. Ce n'est pas un type de personne distinct.                                                                                                            | driver, livreur                                            |
 
 ## Référentiel
 

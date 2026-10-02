@@ -156,3 +156,33 @@ centre (ADR-0017, proposé).
 
 Avant la mise en production (ADR-0008) : le script de reprise calcule aussi
 `cleDoublon` pour les magasins de la v1, puis la colonne devient obligatoire.
+
+## Étape 4 — Identité et accès
+
+Décisions du 2026-10-02 : NAS local, accès par VPN, HTTPS (ADR-0019) ; un
+compte par centre, partagé, et un seul administrateur (D-19, ADR-0020) ; pas
+de libre-service de mot de passe (D-09).
+
+| Élément                                                                                                       | État |
+| ------------------------------------------------------------------------------------------------------------- | ---- |
+| Lot 1 — Premier admin, connexion, sessions, rôles (RDC-ACCES-001 à 004, 006, 007, 011)                        | ⏳   |
+| Lot 1 — Journal des connexions et des échecs de connexion (RDC-ACCES-008, durée provisoire 1 an)              | ⏳   |
+| Lot 1 — Protéger toutes les routes du référentiel, supprimer `verifierDeploiementAutorise`                    | ⏳   |
+| Lot 2 — Comptes de centre gérés par l'admin : créer, modifier, mot de passe, désactiver (RDC-ACCES-009, 010)  | ⏳   |
+| Lot 3 — Événement « centre archivé » : compte du centre désactivé, sessions révoquées (RDC-ACCES-005, un ADR) | ⏳   |
+
+Reporté à l'étape 5 : refuser de désactiver le compte d'un centre pendant une
+collecte (RDC-ACCES-012), via le contrat publié par Collecte.
+
+À décider avant la partie HTTP du lot 1 : garde-t-on le contrat
+d'authentification de la v1 (routes `/api/auth/*`, cookie `path=/api/auth`) ?
+Il n'est utile que si le front v1 est conservé ; si le front est refait
+(étape 8), le contrat peut être conçu pour la v2, et l'ADR-0009 est revu.
+
+Point ouvert : procédure de secours si l'unique administrateur perd son mot de
+passe (ADR-0020).
+
+Avant la mise en production : l'admin définit un nouveau mot de passe pour
+chaque compte de centre ; les mots de passe de la v1 ne sont pas repris. Le
+script de reprise vérifie qu'aucun centre n'a plusieurs comptes actifs et que
+chaque compte a une adresse propre (ADR-0020).
