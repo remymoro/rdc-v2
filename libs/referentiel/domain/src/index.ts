@@ -1,5 +1,9 @@
 export { Centre } from './centre/centre';
-export type { EtatCentre, NouveauCentre } from './centre/centre';
+export type {
+  EtatCentre,
+  ModificationsCentre,
+  NouveauCentre,
+} from './centre/centre';
 export { CentreArchive, CentreNonActif } from './centre/centre.errors';
 export { CentreRepository } from './ports/centre.repository';
 export {

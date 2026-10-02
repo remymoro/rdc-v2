@@ -28,19 +28,57 @@ export interface EtatCentre extends NouveauCentre {
   readonly modifieLe: Date;
 }
 
+/**
+ * Changements demandés sur un centre : champ absent = inchangé ; `null` =
+ * suppression, pour le téléphone et l'email seulement (convention v1).
+ * Les valeurs sont déjà validées par leurs value objects (TENETS-VALIDATE-001).
+ */
+export interface ModificationsCentre {
+  readonly nom?: Nom;
+  readonly adresse?: Adresse;
+  readonly codePostal?: CodePostal;
+  readonly ville?: Ville;
+  readonly telephone?: Telephone | null;
+  readonly email?: Email | null;
+}
+
 export class Centre {
   private constructor(
     readonly id: CentreId,
-    readonly nom: Nom,
-    readonly adresse: Adresse,
-    readonly codePostal: CodePostal,
-    readonly ville: Ville,
-    readonly telephone: Telephone | undefined,
-    readonly email: Email | undefined,
+    private nomActuel: Nom,
+    private adresseActuelle: Adresse,
+    private codePostalActuel: CodePostal,
+    private villeActuelle: Ville,
+    private telephoneActuel: Telephone | undefined,
+    private emailActuel: Email | undefined,
     private statutActuel: StatutCentre,
     readonly creeLe: Date,
     private derniereModification: Date,
   ) {}
+
+  get nom(): Nom {
+    return this.nomActuel;
+  }
+
+  get adresse(): Adresse {
+    return this.adresseActuelle;
+  }
+
+  get codePostal(): CodePostal {
+    return this.codePostalActuel;
+  }
+
+  get ville(): Ville {
+    return this.villeActuelle;
+  }
+
+  get telephone(): Telephone | undefined {
+    return this.telephoneActuel;
+  }
+
+  get email(): Email | undefined {
+    return this.emailActuel;
+  }
 
   get statut(): StatutCentre {
     return this.statutActuel;
@@ -121,6 +159,62 @@ export class Centre {
 
     this.statutActuel = StatutCentre.ACTIF;
     this.derniereModification = maintenant;
+  }
+
+  /**
+   * Modifie l'identité ou les contacts du centre. Une modification identique
+   * ne change pas `modifieLe`. Un centre archivé ne se modifie plus
+   * (RDC-REF-002) ; le use case vérifie l'absence de doublon (RDC-REF-001).
+   */
+  modifier(changements: ModificationsCentre, maintenant: Date): void {
+    if (this.statutActuel === StatutCentre.ARCHIVE) {
+      throw new CentreArchive(this.id);
+    }
+    let modifie = false;
+
+    if (changements.nom && changements.nom.valeur !== this.nomActuel.valeur) {
+      this.nomActuel = changements.nom;
+      modifie = true;
+    }
+    if (
+      changements.adresse &&
+      changements.adresse.valeur !== this.adresseActuelle.valeur
+    ) {
+      this.adresseActuelle = changements.adresse;
+      modifie = true;
+    }
+    if (
+      changements.codePostal &&
+      changements.codePostal.valeur !== this.codePostalActuel.valeur
+    ) {
+      this.codePostalActuel = changements.codePostal;
+      modifie = true;
+    }
+    if (
+      changements.ville &&
+      changements.ville.valeur !== this.villeActuelle.valeur
+    ) {
+      this.villeActuelle = changements.ville;
+      modifie = true;
+    }
+    if (
+      changements.telephone !== undefined &&
+      changements.telephone?.valeur !== this.telephoneActuel?.valeur
+    ) {
+      this.telephoneActuel = changements.telephone ?? undefined;
+      modifie = true;
+    }
+    if (
+      changements.email !== undefined &&
+      changements.email?.valeur !== this.emailActuel?.valeur
+    ) {
+      this.emailActuel = changements.email ?? undefined;
+      modifie = true;
+    }
+
+    if (modifie) {
+      this.derniereModification = maintenant;
+    }
   }
 
   /** Retire définitivement le centre : il ne pourra plus changer d'état. */
