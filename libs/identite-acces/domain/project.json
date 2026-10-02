@@ -1,0 +1,27 @@
+{
+  "name": "identite-acces-domain",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/identite-acces/domain/src",
+  "projectType": "library",
+  "tags": ["context:identite-acces", "layer:domain"],
+  "targets": {
+    "test": {
+      "options": {
+        "passWithNoTests": true
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", "^default"],
+      "outputs": [],
+      "options": {
+        "commands": [
+          "tsc --noEmit -p libs/identite-acces/domain/tsconfig.lib.json",
+          "tsc --noEmit -p libs/identite-acces/domain/tsconfig.spec.json"
+        ],
+        "parallel": false
+      }
+    }
+  }
+}
