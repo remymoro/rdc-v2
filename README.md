@@ -44,6 +44,7 @@ tests E2E. La décision est documentée dans
 ```text
 apps/api                      composition root NestJS
 apps/api-e2e                  tests HTTP boîte noire
+apps/web                      front Angular 22 (Tailwind, Vitest), HTTP uniquement
 libs/referentiel/domain       domaine pur du contexte Référentiel (centres, magasins, produits)
 libs/referentiel/application  use cases, requêtes de lecture et ports du contexte Référentiel
 libs/referentiel/adapters     HTTP, Prisma et module NestJS du contexte Référentiel

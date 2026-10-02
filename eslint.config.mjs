@@ -56,6 +56,16 @@ export default [
               onlyDependOnLibsWithTags: ['*'],
             },
             {
+              // Le front Angular ne connaît l'API que par HTTP : il n'importe
+              // aucune lib du domaine, de l'application ni des adapters (ADR-0023).
+              sourceTag: 'layer:frontend',
+              onlyDependOnLibsWithTags: ['layer:frontend'],
+              bannedExternalImports:
+                FRAMEWORK_AND_INFRASTRUCTURE_PACKAGES.filter(
+                  (paquet) => paquet !== 'rxjs',
+                ),
+            },
+            {
               // Les tests E2E sont boîte noire : HTTP uniquement, aucune lib.
               sourceTag: 'type:e2e',
               onlyDependOnLibsWithTags: [],

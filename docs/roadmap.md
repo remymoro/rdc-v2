@@ -36,7 +36,7 @@
 | 5     | Collecte : design doc, puis création et cycle de vie               | ⏳         |
 | 6     | Planification, saisie, bénévoles                                   | ⏳         |
 | 7     | Statistiques (modèle de lecture séparé)                            | ⏳         |
-| 8     | Front Angular 22 dans le workspace (Node ≥ 24.15)                  | ⏳         |
+| 8     | Front Angular 22 dans le workspace (Node ≥ 24.15)                  | 🚧 Socle   |
 
 L'ordre des étapes 3 à 7 reste à confirmer avec la carte des contextes.
 
@@ -211,3 +211,18 @@ Avant la mise en production : l'admin définit un nouveau mot de passe pour
 chaque compte de centre ; les mots de passe de la v1 ne sont pas repris. Le
 script de reprise vérifie qu'aucun centre n'a plusieurs comptes actifs et que
 chaque compte a une adresse propre (ADR-0020).
+
+## Étape 8 — Front Angular
+
+Socle posé le 2026-10-02, avant les étapes 4 à 7, pour que les écrans suivent
+les étapes métier (ADR-0023).
+
+| Élément                                                                            | État |
+| ---------------------------------------------------------------------------------- | ---- |
+| Node 24.20, `apps/web` Angular 22.2 (esbuild, sans SSR), Vitest, Tailwind v4       | ✅   |
+| Frontière : `layer:frontend` n'importe ni lib back-end, ni NestJS, Prisma, Express | ✅   |
+| Proxy `/api` vers l'API en développement                                           | ✅   |
+| Règles d'architecture du front (écrans, appels HTTP, erreurs `code`) : un ADR      | ⏳   |
+| Tests E2E du front (Playwright), avec le premier écran                             | ⏳   |
+| Premier écran : connexion (dépend de l'étape 4, lot 1)                             | ⏳   |
+| Servir le front sur le NAS derrière HTTPS (ADR-0019)                               | ⏳   |
