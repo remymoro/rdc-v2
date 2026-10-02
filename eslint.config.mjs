@@ -79,6 +79,13 @@ export default [
               ],
             },
             {
+              sourceTag: 'context:identite-acces',
+              onlyDependOnLibsWithTags: [
+                'context:identite-acces',
+                'context:shared-kernel',
+              ],
+            },
+            {
               sourceTag: 'context:shared-kernel',
               onlyDependOnLibsWithTags: ['context:shared-kernel'],
             },

@@ -13,6 +13,17 @@ vus dans la v1 ou tentants, qui ne doivent pas entrer dans le code v2.
 | **Bénévole**                                     | benevoles      | Personne qui participe au terrain (magasin, centre, conduite). Ce n'est pas un utilisateur de l'application.                                                                                               | volontaire, user                                           |
 | **Chauffeur**                                    | planification  | Bénévole affecté à un créneau du planning chauffeur. Ce n'est pas un type de personne distinct.                                                                                                            | driver, livreur                                            |
 
+## Identité et accès
+
+| Terme                                         | Contexte       | Définition                                                                                                               | À éviter                      |
+| --------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------ | ----------------------------- |
+| **Utilisateur** (`Utilisateur`)               | identite-acces | Ce qui se connecte à l'application : l'administrateur ou le compte d'un centre. Jamais un bénévole.                      | user, membre, personne        |
+| **Rôle** (`Role`)                             | identite-acces | `ADMIN` ou `RESPONSABLE_CENTRE` : décide de ce qu'un utilisateur peut faire.                                             | profil, permission, droit     |
+| **Compte de centre**                          | identite-acces | L'utilisateur `RESPONSABLE_CENTRE` d'un centre, partagé par son équipe. Au plus un compte actif par centre.              | compte personnel, responsable |
+| **Adresse de connexion** (`AdresseConnexion`) | identite-acces | Email qui identifie un utilisateur à la connexion, propre au compte et unique. Distinct de l'email de contact du centre. | login, identifiant, email     |
+| **Mot de passe haché** (`MotDePasseHache`)    | identite-acces | Empreinte du mot de passe, seule forme conservée. Le mot de passe en clair n'est jamais stocké.                          | hash, mot de passe chiffré    |
+| **Désactiver / Activer un compte**            | identite-acces | Empêcher ou rétablir la connexion d'un utilisateur, sans le supprimer. Désactiver coupe ses sessions.                    | supprimer, bloquer, bannir    |
+
 ## Référentiel
 
 | Terme                                   | Contexte    | Définition                                                                                                                                                                     | À éviter                            |

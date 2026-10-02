@@ -35,7 +35,10 @@
       "@rdc/shared-kernel-adapters": [
         "./libs/shared-kernel/adapters/src/index.ts"
       ],
-      "@rdc/referentiel-adapters": ["./libs/referentiel/adapters/src/index.ts"]
+      "@rdc/referentiel-adapters": ["./libs/referentiel/adapters/src/index.ts"],
+      "@rdc/identite-acces-domain": [
+        "./libs/identite-acces/domain/src/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]
