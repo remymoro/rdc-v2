@@ -33,14 +33,14 @@ Lot 1  Design doc collecte + vérification            ✅ fusionné (docs/design
 Lot 2  Créer une collecte : tranche complète, Prisma, POST /api/collectes
   │                                    Étape 3  Magasins : lots A1 et A2
   │                                      │      (hors mission, en parallèle du lot 2)
-  ├── Lot 3  Inscrire les magasins + reprise N-1 ◄──┘ (contrat publié, ADR-0014 accepté)
+  ├── Lot 3  Inscrire les magasins + reprise N-1 ◄──┘ (contrat publié, ADR-0014 à accepter)
   └── Lot 4  Domaine : ListeVerification
         │      (3 et 4 en parallèle)
         ├── Lot 2b Démarrer une collecte et figer les listes (après lot 4)
         │
       Lot 5  Use cases de la vérification              (après lots 2b, 3 et 4)
         │
-      Lot 6  Persistance Prisma de la vérification     (ADR-0015 accepté)
+      Lot 6  Persistance Prisma de la vérification     (ADR-0015 à accepter)
         │      + déclenchement du démarrage dans apps/api
       Lot 7  HTTP + E2E                               ← étape 4 (rôles) terminée
 ```

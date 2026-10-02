@@ -217,14 +217,14 @@ try {
 
 // ✅ Correct — filtre global dans apps/api (APP_FILTER)
 @Catch()
-export class ErreurInattendueFilter implements ExceptionFilter {
-  private readonly logger = new Logger(ErreurInattendueFilter.name);
+export class ErreursHttpGlobalesFilter implements ExceptionFilter {
+  private readonly logger = new Logger(ErreursHttpGlobalesFilter.name);
   catch(erreur: unknown, hote: ArgumentsHost): void {
     if (erreur instanceof HttpException) {
       /* réponse NestJS d'origine (400 de validation…) */ return;
     }
     this.logger.error('Échec non géré', erreur instanceof Error ? erreur.stack : String(erreur));
-    hote.switchToHttp().getResponse<Response>().status(500).json({ statusCode: 500, code: 'ERREUR_INTERNE' });
+    hote.switchToHttp().getResponse<Response>().status(500).json({ statusCode: 500, code: 'INTERNAL_ERROR' });
   }
 }
 ```
@@ -266,8 +266,8 @@ libs/referentiel/
   domain/src/centre/centre.errors.ts          erreurs métier (CentreArchive…)
   application/src/errors.ts                   issues de workflow (CentreIntrouvable…)
   application/src/ports/stockage-images.ts    port + StockageImagesIndisponible
-  adapters/src/http/referentiel-http-error.filter.ts   traduction HTTP du contexte
-apps/api/src/erreur-inattendue.filter.ts      unique filtre global (APP_FILTER)
+  adapters/src/http/referentiel-erreurs-http.filter.ts   traduction HTTP du contexte
+apps/api/src/http/erreurs-http-globales.filter.ts       unique filtre global (APP_FILTER)
 ```
 
 Un use case n'intercepte une erreur que s'il en fait quelque chose de

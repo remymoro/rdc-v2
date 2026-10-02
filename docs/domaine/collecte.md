@@ -380,13 +380,14 @@ avant d'écrire, et la contrainte unique en base est traduite en
 **Règle.** `collecte` publie, sous forme de port ou de requête de lecture, les
 réponses dont planification, saisie, référentiel et identité-accès ont besoin :
 
-| Question                                                                     | Utilisée par                       |
-| ---------------------------------------------------------------------------- | ---------------------------------- |
-| Le magasin M est-il inscrit à la collecte C ?                                | planification, saisie              |
-| Quel est le centre gestionnaire de M pour C ?                                | saisie, identite-acces (périmètre) |
-| La planification de C est-elle ouverte ? Sa période ?                        | planification                      |
-| Le centre X peut-il peser dans C maintenant ?                                | saisie                             |
-| Le centre X gère-t-il un magasin dans une collecte PREPARATION ou EN_COURS ? | referentiel (RDC-REF-004)          |
+| Question                                                                                         | Utilisée par                       |
+| ------------------------------------------------------------------------------------------------ | ---------------------------------- |
+| Le magasin M est-il inscrit à la collecte C ?                                                    | planification, saisie              |
+| Quel est le centre gestionnaire de M pour C ?                                                    | saisie, identite-acces (périmètre) |
+| La planification de C est-elle ouverte ? Sa période ?                                            | planification                      |
+| Le centre X peut-il peser dans C maintenant ?                                                    | saisie                             |
+| Le centre X gère-t-il un magasin dans une collecte PREPARATION ou EN_COURS ?                     | referentiel (RDC-REF-004)          |
+| Le centre X est-il affecté à une collecte non terminée (magasin géré ou liste de vérification) ? | identite-acces (RDC-ACCES-012)     |
 
 **Pourquoi.** Ces règles existent une seule fois ; en v1, elles étaient
 recopiées dans plusieurs use cases et un service de présentation (audit C-04).

@@ -352,10 +352,10 @@ annulation si le travail se termine sans elle.
 
 ```ts
 // libs/shared-kernel/adapters/src/prisma/prisma-transaction.ts
-@Injectable({ scope: Scope.REQUEST })
+// Classes simples : SharedKernelModule les construit par useFactory, en Scope.REQUEST.
 export class PrismaTransaction {
   private clientTransactionnel: Prisma.TransactionClient | null = null;
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaClient) {}
 
   /** Client à utiliser par les repositories : transactionnel pendant un run(). */
   get client(): Prisma.TransactionClient {
@@ -371,13 +371,12 @@ export class PrismaTransaction {
 
 class TravailSansCommit extends Error {}
 
-@Injectable({ scope: Scope.REQUEST })
 export class PrismaUnitOfWork extends UnitOfWork {
   private utilisee = false;
   private commitDemande = false;
 
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly prisma: PrismaClient,
     private readonly transaction: PrismaTransaction,
   ) {
     super();
@@ -407,8 +406,8 @@ export class PrismaUnitOfWork extends UnitOfWork {
   }
 }
 
-// Un repository utilise toujours la ressource partagée
-@Injectable({ scope: Scope.REQUEST })
+// Un repository utilise toujours la ressource partagée (câblé en Scope.REQUEST
+// par le module du contexte)
 export class PrismaCentreRepository extends CentreRepository {
   constructor(private readonly transaction: PrismaTransaction) {
     super();

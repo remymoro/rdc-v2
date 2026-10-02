@@ -1,7 +1,7 @@
 # Mission — Étape 3 : magasins et produits du référentiel
 
 - **Ouverte le :** 2026-10-01
-- **Règles :** RDC-REF-001 à 010 (`docs/domaine/referentiel.md`), sauf
+- **Règles :** RDC-REF-001 à 011 (`docs/domaine/referentiel.md`), sauf
   RDC-REF-004 (reportée à l'étape 5), RDC-REF-006 (reportée à l'étape 5, D-03)
   et RDC-REF-009 (statistiques, D-04)
 - **Exécutant :** Codex, un lot = une branche = une pull request
@@ -25,6 +25,7 @@ A1  Créer un magasin                   (domaine → HTTP, comme le centre)
  ├── A3  Modifier et transférer       (PATCH, transfert vers un autre centre)
  └── A4  Lire les magasins            (liste, liste d'un centre, détail)
 B   Catalogue des produits             (indépendant des lots A)
+Ctr Finir les centres                  (archivage protégé D-18, lecture, modification)
 C   Images d'un magasin                (après A1 et confirmation du lieu NAS)
 ```
 
@@ -34,7 +35,8 @@ C   Images d'un magasin                (après A1 et confirmation du lieu NAS)
 | A2  | `lot-a2-cycle-de-vie.md`        | `feat/referentiel-cycle-vie-magasin` | A1                                 | ✅ fusionné (#13) |
 | A3  | `lot-a3-modifier-transferer.md` | `feat/referentiel-modifier-magasin`  | A1                                 | ✅ fusionné (#15) |
 | A4  | `lot-a4-lire-magasins.md`       | `feat/referentiel-lire-magasins`     | A1                                 | ✅ fusionné (#16) |
-| B   | `lot-b-produits.md`             | `feat/referentiel-produits`          | —                                  | 🟣 en revue       |
+| B   | `lot-b-produits.md`             | `feat/referentiel-produits`          | —                                  | ✅ fusionné (#17) |
+| Ctr | — (sans brief, voir la roadmap) | — (PR #18)                           | A1                                 | ✅ fusionné (#18) |
 | C   | `lot-c-images.md`               | `feat/referentiel-images-magasin`    | A1 + lieu de stockage NAS confirmé | ⏸ bloqué         |
 
 A2, A3 et A4 peuvent avancer en parallèle après A1 ; A1 et B dès maintenant.
@@ -69,6 +71,8 @@ mêmes statuts et codes d'erreur que la v1 pour ce qui existe déjà.
 | `GET /api/magasins`                        | A4  | 200, `MagasinDto[]` |
 | `GET /api/centres/:centreId/magasins`      | A4  | 200, `MagasinDto[]` |
 | `GET /api/magasins/:id`                    | A4  | 200, `MagasinDto`   |
+| `GET /api/centres`, `/api/centres/:id`     | Ctr | 200, `CentreDto`    |
+| `PATCH /api/centres/:id`                   | Ctr | 200, `CentreDto`    |
 | `POST /api/magasins/:id/images`            | C   | 201                 |
 | `DELETE /api/magasins/:id/images/:imageId` | C   | 204                 |
 | `POST`, `GET`, `PATCH /api/produits…`      | B   | voir le brief B     |

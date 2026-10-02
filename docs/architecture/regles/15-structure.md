@@ -17,13 +17,16 @@ des noms de dossiers ou du nombre de classes des règles d'architecture.
 ```text
 apps/
   api/                                   composition root NestJS (layer:composition)
-    src/main.ts, app.module.ts, erreur-inattendue.filter.ts
+    src/main.ts, app/app.module.ts       démarrage et module racine
+    src/http/erreurs-http-globales.filter.ts   unique filtre global (APP_FILTER)
+    src/securite/deploiement.ts          garde-fou « pas de production avant l'étape 4 »
   api-e2e/                               tests HTTP boîte noire (type:e2e)
 libs/
   shared-kernel/                         (context:shared-kernel) : strict minimum
     domain/                              créé au premier partage réel (ex. Email utilisé par 2 contextes)
     application/                         ports techniques communs : UnitOfWork, Clock
-    adapters/                            PrismaService, PrismaTransaction, PrismaUnitOfWork, SystemClock
+    adapters/                            PrismaClient, PrismaTransaction, PrismaUnitOfWork, SystemClock,
+                                         envoyerErreur, estViolationDUnicite, SharedKernelModule
   referentiel/                           (context:referentiel)
     domain/src/
       centre/
@@ -44,14 +47,16 @@ libs/
       magasin/
         commandes.ts
         creer-magasin.use-case.ts (+ .spec.ts)
+          lectures/lectures-magasins.ts           port de lecture (vues), + suite de contrat
         lectures/lister-magasins.query.ts       lecture seule, sans unité de travail
       errors.ts                          CentreIntrouvable… (communes au contexte)
-      ports/stockage-images.ts           port applicatif + ses erreurs
+      ports/generateur-identifiants.ts   port applicatif (capacité externe), avec ses erreurs s'il en a
       testing/                           fakes partagés (*.test-utils.ts)
       index.ts                           API publique, regroupée par agrégat
     adapters/src/                        (layer:adapters), créée au premier besoin
-      http/centre.controller.ts, centre.requete.ts, centre.reponse.ts, referentiel-http-error.filter.ts
-      prisma/prisma-centre.repository.ts, centre.mapper.ts
+      http/centres.controller.ts, creer-centre.requete.ts, centre.reponse.ts,
+           referentiel-erreurs-http.filter.ts
+      prisma/prisma-centre.repository.ts, centre.mapper.ts, prisma-lectures-centres.ts
       referentiel.module.ts              module NestJS du contexte (câblage)
   collecte/ …                            même découpage
 ```
@@ -69,7 +74,8 @@ Principes :
   lit le centre, il est dans `magasin/`). Écriture : `*.use-case.ts` ; lecture
   sans modification : `*.query.ts` dans `lectures/`.
 - Câblage : dans le module NestJS du contexte (`<contexte>.module.ts`),
-  importé par `apps/api/src/app.module.ts`.
+  importé par `apps/api/src/app/app.module.ts`. Les adapters sont des classes
+  simples, construites par `useFactory` dans ce module (pas d'`@Injectable()`).
 - Le `shared-kernel` reste minuscule : tout ajout y est discuté en revue (un
   noyau partagé qui grossit recrée le couplage que les contextes évitent).
 

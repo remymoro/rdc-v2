@@ -20,15 +20,16 @@ règle concernée (état ⏳), et écrire un ADR si elle s'écarte de la v1.
 | D-03 | Magasin engagé dans une collecte active     | RDC-REF-006                      | 5              |
 | D-04 | ✅ Décidée : convention v1                  | RDC-REF-009, RDC-STATS-003       | —              |
 | D-05 | Bénévole créé depuis un planning            | RDC-PLANIF-006, RDC-BENEVOLE-005 | 6              |
-| D-06 | Conservation et traçabilité RGPD            | RDC-BENEVOLE-004, RDC-ACCES-008  | 4 et 6         |
+| D-06 | Conservation et traçabilité RGPD            | RDC-BENEVOLE-004, RDC-ACCES-008  | 6              |
 | D-07 | Fenêtre de saisie                           | RDC-COLLECTE-007                 | 5              |
 | D-08 | Sens de la validation d'une pesée           | RDC-SAISIE-004, RDC-STATS-005    | 6              |
-| D-09 | Changement de mot de passe en libre-service | RDC-ACCES-009                    | 4              |
+| D-09 | ✅ Décidée : pas de libre-service           | RDC-ACCES-009                    | —              |
 | D-10 | Centre crédité des poids                    | RDC-STATS-006                    | 7              |
 | D-11 | Référence produit libre ou catalogue        | RDC-SAISIE-005                   | 6              |
 | D-12 | ✅ Décidée : année civile Europe/Paris      | RDC-COLLECTE-022                 | —              |
 | D-13 | Raison de réouverture réellement saisie     | RDC-COLLECTE-010                 | 5              |
 | D-18 | ✅ Décidée : archiver un centre vide        | RDC-REF-011                      | —              |
+| D-19 | ✅ Décidée : un compte par centre           | RDC-ACCES-010, RDC-ACCES-011     | —              |
 
 ## D-01 — Ordre des étapes
 
@@ -169,6 +170,11 @@ journal des accès ou modifications (audit A-04 / B-01).
 consultation du journal d'audit. Question pour le responsable des traitements
 de l'association.
 
+**Décision partielle (2026-10-02).** Les connexions et les échecs de connexion
+sont journalisés dès l'étape 4, avec une durée provisoire d'un an
+(RDC-ACCES-008). La durée de conservation des données des bénévoles et celle
+du journal restent à confirmer.
+
 ## D-07 — Fenêtre de saisie
 
 **Constat.**
@@ -195,6 +201,12 @@ ne comptent-elles que les pesées validées ? Faut-il valider toutes ses pesées
 avant de déclarer la saisie du centre terminée ?
 
 ## D-09 — Changement de mot de passe en libre-service
+
+**Décision (2026-10-02).** Pas de libre-service, comme en v1 : un responsable
+ne change pas lui-même son mot de passe, il s'adresse au siège et l'admin le
+modifie. La v2 est installée sur le NAS local de l'association ; les centres y
+accèdent par VPN, sans exposition à Internet, et les échanges passent en HTTPS
+(ADR-0019). Conforme à la v1 sur le mot de passe : pas d'ADR pour ce point.
 
 **Constat.** En v1, seul l'admin modifie le mot de passe d'un responsable
 (audit A-02). Décision v1 du 2026-08-24 : non implémenté, car le déploiement
@@ -291,3 +303,29 @@ opération. (c) Archiver les magasins en cascade.
 **Pourquoi (a).** Simple, explicite, sans effet caché ; (c) archiverait des
 magasins encore utiles, et (b) mélange deux décisions en une. Règle ajoutée
 par rapport à la v1 : **ADR-0018**.
+
+## D-19 — Un compte par centre, un seul administrateur
+
+**Décision (2026-10-02).** Le responsable de centre n'est pas une personne :
+c'est **le compte du centre**, partagé par l'équipe qui gère le centre. Un
+centre a au plus un compte actif, et il existe un seul administrateur.
+Il n'a aucun lien avec un **bénévole** (contexte `benevoles`), qui n'est jamais un utilisateur de l'application.
+
+- Identifiant de connexion : une adresse email propre au compte, choisie par
+  l'admin (celle du centre ou une adresse créée pour la collecte), unique.
+- Mot de passe : défini par l'admin et transmis au centre ; l'admin le change
+  quand une personne quitte le centre. Aucun libre-service (D-09).
+- But : aucune gestion de comptes personnels, alors que l'équipe qui gère un
+  centre change souvent.
+
+Écart avec la v1 : **ADR-0020**.
+
+**Constat.** La v1 ne limite pas le nombre de responsables d'un centre, mais
+ses comptes utilisent déjà en pratique l'adresse du centre
+(`ad47.fumel1@restosducoeur.org`…). Trois centres de la v1 ont l'adresse du
+siège comme email de contact (Boé Guignard, Boé Roses, Eric MORIVAL) : ce n'est
+pas leur adresse interne, et chacun recevra une adresse propre pour son compte.
+
+**Hypothèses retenues.** Un compte désactivé ne compte pas : l'admin peut en
+créer un nouveau pour le centre. Un centre peut n'avoir aucun compte (centre
+qui vient d'être créé).

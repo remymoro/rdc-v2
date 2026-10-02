@@ -50,10 +50,33 @@ de nouvel ADR, aucune option nouvelle n'est tranchée :
 - Mêmes réserves : routes non protégées jusqu'à l'étape 4 (réservées à l'ADMIN
   en v1).
 
+### Complément du 2026-10-02 — magasins, produits et fin des centres (étape 3)
+
+Même décision appliquée aux routes de l'étape 3 ; pas de nouvel ADR :
+
+- Centres : `GET /api/centres` (`?statut`, `?recherche`, `?tri=nom|statut|magasins`,
+  `?ordre=asc|desc`), `GET /api/centres/:id`, `PATCH /api/centres/:id` (200,
+  `CentreDto`). Les lectures ajoutent `magasins: { actifs, inactifs }` au
+  `CentreDto` (ajout v2). Archiver un centre qui a encore un magasin actif ou
+  inactif → 409 `CENTRE_A_DES_MAGASINS` (ADR-0018).
+- Magasins, avec erreurs 404 `MAGASIN_NOT_FOUND`, 409 `MAGASIN_ARCHIVED` et
+  409 `CENTRE_NON_ACTIF` :
+  - `POST /api/centres/:centreId/magasins` (201) ;
+  - `PATCH /api/magasins/:id` (200) ;
+  - `PATCH /api/magasins/:id/{desactiver,activer,archiver}` (204) ;
+  - `GET /api/magasins`, `GET /api/magasins/:id`,
+    `GET /api/centres/:centreId/magasins` (200).
+- Produits, avec erreur 404 `PRODUIT_NOT_FOUND` :
+  - `POST /api/produits` (201), `GET /api/produits` (200) ;
+  - `PATCH /api/produits/:id` (200) ;
+  - `PATCH /api/produits/:id/{activer,desactiver}` (204).
+- Mêmes réserves : aucune de ces routes n'est protégée jusqu'à l'étape 4.
+
 ## Conséquences
 
-- ⚠️ **Aucun déploiement de la v2 avant l'étape 4** : les routes de création
-  et de cycle de vie doivent être réservées à l'ADMIN, avec un test « refusé »
+- ⚠️ **Aucun déploiement de la v2 avant l'étape 4** : toutes les routes du
+  référentiel (création, modification, cycle de vie et lectures) doivent être
+  protégées, les écritures réservées à l'ADMIN, avec un test « refusé »
   (ADR-0003, R11).
 - Règle appliquée par le code : `verifierDeploiementAutorise` (`apps/api/src/securite`)
   fait échouer le démarrage de l'API quand `NODE_ENV=production`. L'étape 4 le
