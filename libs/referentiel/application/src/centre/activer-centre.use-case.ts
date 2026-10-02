@@ -1,6 +1,6 @@
 import { CentreRepository } from '@rdc/referentiel-domain';
 import { Clock, UnitOfWork } from '@rdc/shared-kernel-application';
-import type { ActiverCentreCommande } from '../commands';
+import type { ActiverCentreCommande } from './commandes';
 import { CentreIntrouvable } from '../errors';
 
 /** Classe simple, sans NestJS : câblée par le module du contexte (TENETS-COMPOSE-001). */

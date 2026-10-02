@@ -4,7 +4,7 @@ import {
   CleDoublonCentre,
 } from '@rdc/referentiel-domain';
 import { Clock, UnitOfWork } from '@rdc/shared-kernel-application';
-import type { CreerCentreCommande } from '../commands';
+import type { CreerCentreCommande } from './commandes';
 import { CentreDejaExistant } from '../errors';
 import { GenerateurIdentifiants } from '../ports/generateur-identifiants';
 

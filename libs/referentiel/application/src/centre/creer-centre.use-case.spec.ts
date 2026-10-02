@@ -8,7 +8,7 @@ import {
   StatutCentre,
   Ville,
 } from '@rdc/referentiel-domain';
-import type { CreerCentreCommande } from '../commands';
+import type { CreerCentreCommande } from './commandes';
 import { CentreDejaExistant } from '../errors';
 import { CentreRepositoryEnMemoire } from '../testing/centre-repository-en-memoire.test-utils';
 import { GenerateurIdentifiantsFixe } from '../testing/generateur-identifiants-fixe.test-utils';
