@@ -10,6 +10,7 @@ import {
   CentreIntrouvable,
   MagasinIntrouvable,
   ProduitIntrouvable,
+  StockageImagesIndisponible,
 } from '@rdc/referentiel-application';
 import {
   CentreDejaExistant,
@@ -28,10 +29,16 @@ import {
   EmailVide,
   FamilleTropLongue,
   FamilleVide,
+  ImageFormatNonSupporte,
+  ImageMagasinIdInvalide,
+  ImageMagasinIdVide,
+  ImageTropVolumineuse,
   MagasinArchive,
   MagasinDejaExistant,
   MagasinIdInvalide,
   MagasinIdVide,
+  MagasinImageDejaPresente,
+  MagasinImageIntrouvable,
   NomTropLong,
   NomVide,
   ProduitIdInvalide,
@@ -51,6 +58,8 @@ type ErreurConnue = Error & { readonly code: string };
  * Seul endroit où les erreurs connues du contexte deviennent des statuts HTTP
  * (TENETS-ERROR-006). Statuts identiques à RDC v1 : validation 400, centre
  * ou magasin introuvable 404, conflit (doublon, centre archivé ou non actif) 409.
+ * Images (RDC-REF-007) : 400 comme en v1, 413 pour la taille comme le refus de
+ * taille de la v1, 503 si le stockage ne répond pas.
  */
 const STATUTS_HTTP = new Map<Type<ErreurConnue>, HttpStatus>([
   [CentreDejaExistant, HttpStatus.CONFLICT],
@@ -87,6 +96,13 @@ const STATUTS_HTTP = new Map<Type<ErreurConnue>, HttpStatus>([
   [FamilleTropLongue, HttpStatus.BAD_REQUEST],
   [SousFamilleVide, HttpStatus.BAD_REQUEST],
   [SousFamilleTropLongue, HttpStatus.BAD_REQUEST],
+  [MagasinImageDejaPresente, HttpStatus.BAD_REQUEST],
+  [MagasinImageIntrouvable, HttpStatus.BAD_REQUEST],
+  [ImageMagasinIdVide, HttpStatus.BAD_REQUEST],
+  [ImageMagasinIdInvalide, HttpStatus.BAD_REQUEST],
+  [ImageFormatNonSupporte, HttpStatus.BAD_REQUEST],
+  [ImageTropVolumineuse, HttpStatus.PAYLOAD_TOO_LARGE],
+  [StockageImagesIndisponible, HttpStatus.SERVICE_UNAVAILABLE],
 ]);
 
 /**

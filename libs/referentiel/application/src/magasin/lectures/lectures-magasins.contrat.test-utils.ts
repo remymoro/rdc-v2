@@ -3,6 +3,9 @@ import {
   CentreId,
   CodePostal,
   Email,
+  FichierImage,
+  ImageMagasin,
+  ImageMagasinId,
   Magasin,
   MagasinId,
   Nom,
@@ -44,7 +47,11 @@ export function verifierContratLecturesMagasins(
       id: string,
       nom: string,
       centreId: CentreId,
-      options: { contacts?: boolean; statut?: StatutMagasin } = {},
+      options: {
+        contacts?: boolean;
+        statut?: StatutMagasin;
+        images?: readonly ImageMagasin[];
+      } = {},
     ): Magasin {
       return Magasin.reconstituer({
         id: MagasinId.creer(id),
@@ -58,7 +65,7 @@ export function verifierContratLecturesMagasins(
           email: Email.creer('contact@magasin.fr'),
         }),
         statut: options.statut ?? StatutMagasin.ACTIF,
-        images: [],
+        images: options.images ?? [],
         creeLe: new Date('2026-10-01T09:00:00.000Z'),
         modifieLe: new Date('2026-10-02T14:30:00.000Z'),
       });
@@ -128,9 +135,37 @@ export function verifierContratLecturesMagasins(
         email: 'contact@magasin.fr',
         statut: StatutMagasin.ACTIF,
         centreId: agen.valeur,
+        images: [],
         creeLe: new Date('2026-10-01T09:00:00.000Z'),
         modifieLe: new Date('2026-10-02T14:30:00.000Z'),
       });
+    });
+
+    it('relit les images d’un magasin, dans leur ordre (RDC-REF-007)', async () => {
+      const [agen] = contexte.centres;
+      const ajouteeLe = new Date('2026-10-02T10:00:00.000Z');
+      const image = (id: string, ordre: number) =>
+        ImageMagasin.reconstituer({
+          id: ImageMagasinId.creer(id),
+          fichier: FichierImage.creer(`${id}.png`),
+          ordre,
+          ajouteeLe,
+        });
+      await contexte.enregistrer([
+        magasin(ID_A, 'Leclerc Agen Sud', agen, {
+          images: [image(ID_C, 1), image(ID_B, 0)],
+        }),
+      ]);
+
+      const vue = await contexte.lectures.get(MagasinId.creer(ID_A));
+      const [vueListe] = await contexte.lectures.list();
+
+      const attendues = [
+        { id: ID_B, fichier: `${ID_B}.png`, ordre: 0, ajouteeLe },
+        { id: ID_C, fichier: `${ID_C}.png`, ordre: 1, ajouteeLe },
+      ];
+      expect(vue?.images).toEqual(attendues);
+      expect(vueListe?.images).toEqual(attendues);
     });
 
     it('omet téléphone et email absents', async () => {

@@ -51,6 +51,12 @@ function versVueMagasin(magasin: Magasin): VueMagasin {
     ...(magasin.email && { email: magasin.email.valeur }),
     statut: magasin.statut,
     centreId: magasin.centreId.valeur,
+    images: magasin.images.map((image) => ({
+      id: image.id.valeur,
+      fichier: image.fichier.valeur,
+      ordre: image.ordre,
+      ajouteeLe: image.ajouteeLe,
+    })),
     creeLe: magasin.creeLe,
     modifieLe: magasin.modifieLe,
   };

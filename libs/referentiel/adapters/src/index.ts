@@ -17,10 +17,18 @@ export {
   versCreerMagasinCommande,
 } from './http/creer-magasin.requete';
 export {
+  versImageMagasinReponse,
   versMagasinReponse,
   vueVersMagasinReponse,
+  type ImageMagasinReponse,
   type MagasinReponse,
 } from './http/magasin.reponse';
+export {
+  versAjouterImageMagasinCommande,
+  versRetirerImageMagasinCommande,
+  type FichierTeleverse,
+} from './http/images-magasin.requete';
+export { TeleversementImageFilter } from './http/televersement-image.filter';
 export {
   versListerMagasinsDuCentreRequete,
   versObtenirMagasinRequete,

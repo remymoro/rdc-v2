@@ -54,6 +54,7 @@ export { ArchiverMagasinUseCase } from './magasin/archiver-magasin.use-case';
 export { ModifierMagasinUseCase } from './magasin/modifier-magasin.use-case';
 export {
   LecturesMagasins,
+  type VueImageMagasin,
   type VueMagasin,
 } from './magasin/lectures/lectures-magasins';
 export { ListerMagasinsQuery } from './magasin/lectures/lister-magasins.query';

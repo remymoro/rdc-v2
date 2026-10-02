@@ -6,6 +6,7 @@ import {
   CreerCentreUseCase,
   CreerMagasinUseCase,
   ActiverMagasinUseCase,
+  AjouterImageMagasinUseCase,
   ArchiverMagasinUseCase,
   DesactiverMagasinUseCase,
   LecturesCentres,
@@ -27,6 +28,7 @@ import {
   GenerateurIdentifiants,
   Journal,
   NettoyerImagesOrphelinesUseCase,
+  RetirerImageMagasinUseCase,
   StockageImages,
 } from '@rdc/referentiel-application';
 import {
@@ -86,6 +88,53 @@ import { NettoyageImagesOrphelinesTache } from './taches/nettoyage-images-orphel
     {
       provide: Journal,
       useFactory: () => new JournalNest(new Logger('ImagesMagasins')),
+    },
+    {
+      provide: AjouterImageMagasinUseCase,
+      scope: Scope.REQUEST,
+      useFactory: (
+        magasinRepository: MagasinRepository,
+        stockageImages: StockageImages,
+        generateurIdentifiants: GenerateurIdentifiants,
+        unitOfWork: UnitOfWork,
+        clock: Clock,
+        journal: Journal,
+      ) =>
+        new AjouterImageMagasinUseCase(
+          magasinRepository,
+          stockageImages,
+          generateurIdentifiants,
+          unitOfWork,
+          clock,
+          journal,
+        ),
+      inject: [
+        MagasinRepository,
+        StockageImages,
+        GenerateurIdentifiants,
+        UnitOfWork,
+        Clock,
+        Journal,
+      ],
+    },
+    {
+      provide: RetirerImageMagasinUseCase,
+      scope: Scope.REQUEST,
+      useFactory: (
+        magasinRepository: MagasinRepository,
+        stockageImages: StockageImages,
+        unitOfWork: UnitOfWork,
+        clock: Clock,
+        journal: Journal,
+      ) =>
+        new RetirerImageMagasinUseCase(
+          magasinRepository,
+          stockageImages,
+          unitOfWork,
+          clock,
+          journal,
+        ),
+      inject: [MagasinRepository, StockageImages, UnitOfWork, Clock, Journal],
     },
     {
       provide: NettoyerImagesOrphelinesUseCase,
