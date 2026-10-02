@@ -3,6 +3,7 @@ import type { CentreId, UtilisateurId } from './identifiants';
 import type { MotDePasseHache } from './mot-de-passe';
 import { Role } from './role';
 import {
+  AdministrateurInactif,
   AdministrateurNonDesactivable,
   AdministrateurRattacheAUnCentre,
   CompteCentreSansCentre,
@@ -86,6 +87,9 @@ export class Utilisateur {
     if (etat.role === Role.ADMIN && etat.centreId !== null) {
       throw new AdministrateurRattacheAUnCentre(etat.id);
     }
+    if (etat.role === Role.ADMIN && !etat.actif) {
+      throw new AdministrateurInactif(etat.id);
+    }
     return new Utilisateur(
       etat.id,
       etat.role,
@@ -125,7 +129,10 @@ export class Utilisateur {
     return this.centreId !== null && centreId.equals(this.centreId);
   }
 
-  /** Défini par l'admin, jamais par le centre lui-même (RDC-ACCES-009). */
+  /**
+   * Nouvelle empreinte. Qui a le droit de la changer (l'admin seul,
+   * RDC-ACCES-009) est vérifié par le use case, pas ici.
+   */
   changerMotDePasse(motDePasse: MotDePasseHache, maintenant: Date): void {
     this.motDePasseActuel = motDePasse;
     this.derniereModification = maintenant;

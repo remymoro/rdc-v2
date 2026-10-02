@@ -22,6 +22,7 @@ export {
 export { Role } from './utilisateur/role';
 export { type EtatUtilisateur, Utilisateur } from './utilisateur/utilisateur';
 export {
+  AdministrateurInactif,
   AdministrateurNonDesactivable,
   AdministrateurRattacheAUnCentre,
   CompteCentreSansCentre,

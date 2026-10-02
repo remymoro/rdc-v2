@@ -37,3 +37,16 @@ export class AdministrateurNonDesactivable extends Error {
     this.name = 'AdministrateurNonDesactivable';
   }
 }
+
+/**
+ * Erreur métier : l'administrateur unique est toujours actif. Une ligne qui
+ * dit le contraire est incohérente, puisque desactiver() le refuse.
+ */
+export class AdministrateurInactif extends Error {
+  readonly code = 'ADMIN_INACTIF_INTERDIT';
+
+  constructor(readonly utilisateurId: UtilisateurId) {
+    super(`L'administrateur ${utilisateurId.valeur} ne peut pas être inactif`);
+    this.name = 'AdministrateurInactif';
+  }
+}

@@ -4,6 +4,7 @@ import { MotDePasseHache } from './mot-de-passe';
 import { Role } from './role';
 import { type EtatUtilisateur, Utilisateur } from './utilisateur';
 import {
+  AdministrateurInactif,
   AdministrateurNonDesactivable,
   AdministrateurRattacheAUnCentre,
   CompteCentreSansCentre,
@@ -71,8 +72,12 @@ describe('Utilisateur', () => {
       const administrateur = unAdministrateur();
 
       expect(administrateur.role).toBe(Role.ADMIN);
+      expect(administrateur.adresse.valeur).toBe('siege@ad47.org');
+      expect(administrateur.motDePasse).toBe(motDePasse);
       expect(administrateur.centreId).toBeNull();
       expect(administrateur.estActif).toBe(true);
+      expect(administrateur.creeLe).toEqual(creation);
+      expect(administrateur.modifieLe).toEqual(creation);
     });
   });
 
@@ -90,6 +95,16 @@ describe('Utilisateur', () => {
   });
 
   describe('mot de passe (RDC-ACCES-009)', () => {
+    it('change aussi le mot de passe de l’administrateur', () => {
+      const administrateur = unAdministrateur();
+      const nouveau = MotDePasseHache.creer('scrypt$sel$empreinte-du-siege');
+
+      administrateur.changerMotDePasse(nouveau, plusTard);
+
+      expect(administrateur.motDePasse).toBe(nouveau);
+      expect(administrateur.modifieLe).toEqual(plusTard);
+    });
+
     it('remplace l’empreinte et date la modification', () => {
       const compte = unCompteCentre();
       const nouveau = MotDePasseHache.creer('scrypt$sel$nouvelle-empreinte');
@@ -184,19 +199,61 @@ describe('Utilisateur', () => {
       expect(compte.centreId?.equals(centreId)).toBe(true);
     });
 
+    it('reconstitue l’administrateur, sans centre', () => {
+      const administrateur = Utilisateur.reconstituer(
+        etatCompteCentre({ role: Role.ADMIN, centreId: null }),
+      );
+
+      expect(administrateur.role).toBe(Role.ADMIN);
+      expect(administrateur.centreId).toBeNull();
+    });
+
+    it('refuse un administrateur inactif : il ne peut pas être désactivé (ADMIN_INACTIF_INTERDIT)', () => {
+      const etat = etatCompteCentre({
+        role: Role.ADMIN,
+        centreId: null,
+        actif: false,
+      });
+
+      expect(() => Utilisateur.reconstituer(etat)).toThrow(
+        AdministrateurInactif,
+      );
+      expect(() => Utilisateur.reconstituer(etat)).toThrow(
+        expect.objectContaining({
+          code: 'ADMIN_INACTIF_INTERDIT',
+          name: 'AdministrateurInactif',
+          utilisateurId: id,
+        }),
+      );
+    });
+
     it('refuse un compte de centre sans centre (USER_CENTRE_REQUIRED, code v1)', () => {
       expect(() =>
         Utilisateur.reconstituer(etatCompteCentre({ centreId: null })),
       ).toThrow(CompteCentreSansCentre);
       expect(() =>
         Utilisateur.reconstituer(etatCompteCentre({ centreId: null })),
-      ).toThrow(expect.objectContaining({ code: 'USER_CENTRE_REQUIRED' }));
+      ).toThrow(
+        expect.objectContaining({
+          code: 'USER_CENTRE_REQUIRED',
+          name: 'CompteCentreSansCentre',
+          utilisateurId: id,
+        }),
+      );
     });
 
     it('refuse un administrateur rattaché à un centre (ADMIN_CENTRE_INTERDIT)', () => {
       expect(() =>
         Utilisateur.reconstituer(etatCompteCentre({ role: Role.ADMIN })),
       ).toThrow(AdministrateurRattacheAUnCentre);
+      expect(() =>
+        Utilisateur.reconstituer(etatCompteCentre({ role: Role.ADMIN })),
+      ).toThrow(
+        expect.objectContaining({
+          code: 'ADMIN_CENTRE_INTERDIT',
+          name: 'AdministrateurRattacheAUnCentre',
+        }),
+      );
     });
   });
 
