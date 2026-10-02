@@ -40,5 +40,10 @@
       },
       "exclude": ["apps/api-e2e/**/*"]
     }
-  ]
+  ],
+  "targetDefaults": {
+    "test-integration": {
+      "parallelism": false
+    }
+  }
 }
