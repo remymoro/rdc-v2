@@ -1,5 +1,5 @@
 // Erreurs applicatives : issues des workflows du contexte (TENETS-ERROR-003).
-import type { CentreId, MagasinId } from '@rdc/referentiel-domain';
+import type { CentreId, MagasinId, ProduitId } from '@rdc/referentiel-domain';
 
 /** Un centre de même nom, adresse, code postal et ville existe déjà. */
 export class CentreDejaExistant extends Error {
@@ -28,5 +28,15 @@ export class MagasinIntrouvable extends Error {
   constructor(readonly magasinId: MagasinId) {
     super('Le magasin demandé est introuvable.');
     this.name = 'MagasinIntrouvable';
+  }
+}
+
+/** Le workflow exige un produit qui n'existe pas (TENETS-REPO-005). */
+export class ProduitIntrouvable extends Error {
+  readonly code = 'PRODUIT_NOT_FOUND';
+
+  constructor(readonly produitId: ProduitId) {
+    super('Le produit demandé est introuvable.');
+    this.name = 'ProduitIntrouvable';
   }
 }

@@ -29,7 +29,7 @@ describe('CreerCentreUseCase', () => {
     unitOfWork = new UnitOfWorkEspion();
     creerCentre = new CreerCentreUseCase(
       centreRepository,
-      new GenerateurIdentifiantsFixe(idGenere),
+      new GenerateurIdentifiantsFixe({ centreId: idGenere }),
       unitOfWork,
       new HorlogeFixe(maintenant),
     );
@@ -81,7 +81,7 @@ describe('CreerCentreUseCase', () => {
       centreRepository = new CentreRepositoryEnMemoire([centreExistant]);
       creerCentre = new CreerCentreUseCase(
         centreRepository,
-        new GenerateurIdentifiantsFixe(idGenere),
+        new GenerateurIdentifiantsFixe({ centreId: idGenere }),
         unitOfWork,
         new HorlogeFixe(maintenant),
       );
