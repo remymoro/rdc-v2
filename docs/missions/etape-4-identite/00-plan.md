@@ -64,6 +64,8 @@ peuvent changer avant elles.
 | Secours si l'unique administrateur perd son mot de passe | Une commande lancée sur le NAS redéfinit son mot de passe et révoque ses sessions ; aucune route HTTP ; chaque usage journalisé.         | 1e      |
 | Durée de conservation du journal des connexions          | 1 an (provisoire, D-06)                                                                                                                  | 1e      |
 | Longueur du mot de passe                                 | 12 à 128 caractères : minimum repris de la v1, maximum ajouté (audit A-06)                                                               | 1a      |
+| Administrateur et désactivation                          | L'administrateur unique ne peut pas être désactivé (`ADMIN_NON_DESACTIVABLE`) : personne ne pourrait plus administrer                    | 1a      |
+| Administrateur et centre                                 | L'administrateur n'est rattaché à aucun centre ; une ligne contraire est refusée à la reconstitution (`ADMIN_CENTRE_INTERDIT`)           | 1a      |
 
 ## Ce qui ne fait pas partie de l'étape 4
 

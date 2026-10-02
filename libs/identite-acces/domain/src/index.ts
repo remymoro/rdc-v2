@@ -19,3 +19,10 @@ export {
   MotDePasseTropCourt,
   MotDePasseTropLong,
 } from './utilisateur/mot-de-passe';
+export { Role } from './utilisateur/role';
+export { type EtatUtilisateur, Utilisateur } from './utilisateur/utilisateur';
+export {
+  AdministrateurNonDesactivable,
+  AdministrateurRattacheAUnCentre,
+  CompteCentreSansCentre,
+} from './utilisateur/utilisateur.errors';
