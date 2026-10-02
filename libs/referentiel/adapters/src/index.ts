@@ -25,6 +25,10 @@ export {
   versArchiverMagasinCommande,
   versDesactiverMagasinCommande,
 } from './http/cycle-de-vie-magasin.requete';
+export {
+  ModifierMagasinRequete,
+  versModifierMagasinCommande,
+} from './http/modifier-magasin.requete';
 export { MagasinsController } from './http/magasins.controller';
 export { PrismaMagasinRepository } from './prisma/prisma-magasin.repository';
 export { ReferentielModule } from './referentiel.module';
