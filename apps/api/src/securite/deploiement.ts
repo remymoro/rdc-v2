@@ -1,6 +1,7 @@
 /**
- * Garde-fou de l'ADR-0009 : POST /api/centres n'est pas encore protégée par
- * authentification. L'API refuse donc de démarrer en production.
+ * Garde-fou de l'ADR-0009 : les routes du référentiel (centres, magasins,
+ * produits) ne sont pas encore protégées par authentification. L'API refuse
+ * donc de démarrer en production.
  * À SUPPRIMER à l'étape 4, avec l'ajout du contrôle ADMIN et de ses tests.
  */
 export function verifierDeploiementAutorise(

@@ -13,7 +13,7 @@ cp .env.example .env
 docker compose up -d postgres    # PostgreSQL 16 (bases rdc et rdc_test)
 pnpm prisma generate             # client Prisma (non versionné)
 pnpm prisma migrate deploy       # migrations v1 + v2
-pnpm verify                      # lint + tests + build
+pnpm verify                      # lint + typecheck + tests + build
 pnpm nx run-many -t test-integration   # tests sur PostgreSQL
 pnpm e2e                         # tests E2E HTTP (base rdc_test)
 pnpm nx serve api  # http://localhost:3000/api
@@ -44,8 +44,13 @@ tests E2E. La décision est documentée dans
 ```text
 apps/api                      composition root NestJS
 apps/api-e2e                  tests HTTP boîte noire
-libs/referentiel/domain       domaine pur du contexte Référentiel
-libs/referentiel/application  use cases et ports du contexte Référentiel
+libs/referentiel/domain       domaine pur du contexte Référentiel (centres, magasins, produits)
+libs/referentiel/application  use cases, requêtes de lecture et ports du contexte Référentiel
+libs/referentiel/adapters     HTTP, Prisma et module NestJS du contexte Référentiel
+libs/shared-kernel            ports techniques communs (UnitOfWork, Clock) et leurs adapters
+docs/roadmap.md               avancement : commencer par là
+docs/domaine/                 règles métier RDC-XXX-NNN et glossaire
+docs/architecture/regles/     règles d'architecture TENETS-XXX-NNN
 docs/adr/                     décisions d'architecture
 ```
 

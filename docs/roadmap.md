@@ -68,8 +68,10 @@ Avant la mise en production (ADR-0008) : script de reprise qui calcule
 violation d'unicité est traduite en `CentreDejaExistant` depuis l'étape 3
 (TENETS-ADAPTER-006).
 
-⚠️ **Avant tout déploiement** : authentification ADMIN sur `POST /api/centres`
-et les routes `PATCH` de cycle de vie (étape 4, ADR-0009). En attendant, l'API refuse de démarrer en production
+⚠️ **Avant tout déploiement** : authentification sur toutes les routes du
+référentiel (`/api/centres…`, `/api/magasins…`, `/api/produits…`), ADMIN pour
+les écritures, périmètre « son centre » pour les lectures d'un responsable
+(étape 4, ADR-0009). En attendant, l'API refuse de démarrer en production
 (`verifierDeploiementAutorise`) : à supprimer à l'étape 4.
 
 ## Étape 2 — Cycle de vie d'un centre
@@ -78,9 +80,9 @@ et les routes `PATCH` de cycle de vie (étape 4, ADR-0009). En attendant, l'API 
 | ---------------------------------------------------------------------------------------------------- | ---- |
 | Domaine : désactiver un centre actif et dater la modification                                        | ✅   |
 | Domaine : désactiver un centre déjà inactif sans modifier `modifieLe`                                | ✅   |
-| Domaine : réactiver un centre inactif et dater la modification                                       | ✅   |
+| Domaine : activer un centre inactif et dater la modification                                         | ✅   |
 | Domaine : refuser d'activer ou désactiver un centre archivé                                          | ✅   |
-| Domaine : réactiver un centre déjà actif sans modifier `modifieLe`                                   | ✅   |
+| Domaine : activer un centre déjà actif sans modifier `modifieLe`                                     | ✅   |
 | Domaine : archiver un centre actif ou inactif et dater la modification                               | ✅   |
 | Domaine : archiver un centre déjà archivé sans effet (archivage définitif)                           | ✅   |
 | Use cases : désactiver, activer, archiver (`CENTRE_NOT_FOUND` si inconnu)                            | ✅   |
@@ -99,7 +101,7 @@ doit aussi normaliser téléphones et adresses avant la mise en production.
 
 Règles de la v1 reportées (décision du 2026-10-01) :
 
-- **Étape 5 (Collecte)** : refuser de désactiver, réactiver ou archiver un centre
+- **Étape 5 (Collecte)** : refuser de désactiver, activer ou archiver un centre
   gestionnaire de magasins dans une collecte `PREPARATION` ou `EN_COURS`
   (v1 : 400 `CENTRE_STATUT_MODIFICATION_INTERDITE_COLLECTES_ACTIVES`), via un
   contrat publié par Collecte (TENETS-CONTEXT-006).
@@ -112,24 +114,24 @@ Règles de la v1 reportées (décision du 2026-10-01) :
 
 Mission : `docs/missions/etape-3-magasins/00-plan.md`.
 
-| Élément                                                                                                                      | État |
-| ---------------------------------------------------------------------------------------------------------------------------- | ---- |
-| A1 — `MagasinId`, `StatutMagasin`, `Magasin.creer()` / `reconstituer()` (rattachement au centre)                             | ✅   |
-| A1 — `CleDoublonMagasin` globale, règle de rapprochement partagée avec le centre                                             | ✅   |
-| A1 — `Centre.verifierOuvertAuxRattachements()` : `CENTRE_NON_ACTIF` (RDC-REF-010)                                            | ✅   |
-| A1 — Port `MagasinRepository`, suite de contrat, fake en mémoire                                                             | ✅   |
-| A1 — `CreerMagasinUseCase` : `CENTRE_NOT_FOUND`, `CENTRE_NON_ACTIF`, `MAGASIN_ALREADY_EXISTS`                                | ✅   |
-| A1 — Migration `Magasin.cleDoublon`, `PrismaMagasinRepository`, P2002 traduite en `MagasinDejaExistant`                      | ✅   |
-| A1 — `POST /api/centres/:centreId/magasins`, filtre d'erreurs, E2E                                                           | ✅   |
-| A2 — Cycle de vie d'un magasin : désactiver, activer, archiver (`MAGASIN_ARCHIVED`, `MAGASIN_NOT_FOUND`)                     | ✅   |
-| A3 — `PATCH /api/magasins/:id` : modifier (absent = inchangé, `null` = suppression), transférer, sans doublon                | ✅   |
-| A4 — Lire les magasins : `GET /api/magasins`, `/api/magasins/:id`, `/api/centres/:centreId/magasins` (port de lecture dédié) | ✅   |
-| B — Catalogue des produits : créer, modifier, activer, désactiver, lister (`/api/produits`)                                  | ✅   |
-| Centres — Archivage refusé tant qu'un magasin actif ou inactif est rattaché (`CENTRE_A_DES_MAGASINS`, RDC-REF-011, D-18)     | ✅   |
-| Centres — Lire : `GET /api/centres` (statut, recherche, tri), `/api/centres/:id`, avec les magasins actifs et inactifs       | ✅   |
-| Centres — `PATCH /api/centres/:id` : modifier (absent = inchangé, `null` = suppression), sans doublon, archivé refusé        | ✅   |
-| Centres — Filet P2002 : `CentreDejaExistant` déclaré par le port, deux contraintes uniques traduites                         | ✅   |
-| C — Images d'un magasin                                                                                                      | ⏳   |
+| Élément                                                                                                                         | État |
+| ------------------------------------------------------------------------------------------------------------------------------- | ---- |
+| A1 — `MagasinId`, `StatutMagasin`, `Magasin.creer()` / `reconstituer()` (rattachement au centre)                                | ✅   |
+| A1 — `CleDoublonMagasin` globale, règle de rapprochement partagée avec le centre                                                | ✅   |
+| A1 — `Centre.verifierOuvertAuxRattachements()` : `CENTRE_NON_ACTIF` (RDC-REF-010)                                               | ✅   |
+| A1 — Port `MagasinRepository`, suite de contrat, fake en mémoire                                                                | ✅   |
+| A1 — `CreerMagasinUseCase` : `CENTRE_NOT_FOUND`, `CENTRE_NON_ACTIF`, `MAGASIN_ALREADY_EXISTS`                                   | ✅   |
+| A1 — Migration `Magasin.cleDoublon`, `PrismaMagasinRepository`, P2002 traduite en `MagasinDejaExistant`                         | ✅   |
+| A1 — `POST /api/centres/:centreId/magasins`, filtre d'erreurs, E2E                                                              | ✅   |
+| A2 — Cycle de vie d'un magasin : désactiver, activer, archiver (`MAGASIN_ARCHIVED`, `MAGASIN_NOT_FOUND`)                        | ✅   |
+| A3 — `PATCH /api/magasins/:id` : modifier (absent = inchangé, `null` = suppression), transférer, sans doublon                   | ✅   |
+| A4 — Lire les magasins : `GET /api/magasins`, `/api/magasins/:id`, `/api/centres/:centreId/magasins` (port de lecture dédié)    | ✅   |
+| B — Catalogue des produits : créer, modifier, activer, désactiver, lister (`/api/produits`)                                     | ✅   |
+| Centres — Archivage refusé tant qu'un magasin actif ou inactif est rattaché (`CENTRE_A_DES_MAGASINS`, RDC-REF-011, D-18)        | ✅   |
+| Centres — Lire : `GET /api/centres` (statut, recherche, tri), `/api/centres/:id`, avec le nombre de magasins actifs et inactifs | ✅   |
+| Centres — `PATCH /api/centres/:id` : modifier (absent = inchangé, `null` = suppression), sans doublon, archivé refusé           | ✅   |
+| Centres — Filet P2002 : `CentreDejaExistant` déclaré par le port, deux contraintes uniques traduites                            | ✅   |
+| C — Images d'un magasin                                                                                                         | ⏳   |
 
 Produits : pas d'unicité du code (retirée volontairement en v1, migration
 `remove_produit_code_unique`) ; forme de `ProduitDto` et tri par code à vérifier
@@ -138,8 +140,9 @@ contre la v1.
 Lectures des centres : tri par nom par défaut, ou `?tri=statut|magasins` et
 `?ordre=desc` (tri en mémoire dans la requête applicative : une douzaine de
 centres) ; la recherche ignore la casse mais pas les
-accents (« Nerac » ne trouve pas « Nérac ») ; la réponse ajoute `magasins`
-au `CentreDto` de la v1.
+accents (« Nerac » ne trouve pas « Nérac ») et porte sur le nom ou la ville ;
+la réponse ajoute `magasins: { actifs, inactifs }` (compteurs) au `CentreDto`
+de la v1. `POST` et `PATCH` renvoient le `CentreDto` de la v1, sans ce champ.
 
 Lectures des magasins : tri par nom supposé, archivés compris ; le filtre « son
 centre » d'un responsable arrive avec l'étape 4.
