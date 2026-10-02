@@ -8,3 +8,7 @@ export {
   verifierContratMagasinRepository,
   type ContexteContratMagasinRepository,
 } from './ports/magasin.repository.contrat.test-utils';
+export {
+  verifierContratProduitRepository,
+  type ContexteContratProduitRepository,
+} from './ports/produit.repository.contrat.test-utils';

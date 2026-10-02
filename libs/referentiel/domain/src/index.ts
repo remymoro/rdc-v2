@@ -41,6 +41,7 @@ export {
 } from './commun/telephone';
 export { Email, EmailInvalide, EmailTropLong, EmailVide } from './commun/email';
 export { Produit } from './produit/produit';
+export { ProduitRepository } from './ports/produit.repository';
 export type {
   EtatProduit,
   ModificationsProduit,
