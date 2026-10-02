@@ -31,20 +31,63 @@ export interface EtatMagasin extends NouveauMagasin {
   readonly modifieLe: Date;
 }
 
+/**
+ * Changements demandés sur un magasin : champ absent = inchangé ; `null` =
+ * suppression, pour le téléphone et l'email seulement (convention v1).
+ * Les valeurs sont déjà validées par leurs value objects (TENETS-VALIDATE-001).
+ */
+export interface ModificationsMagasin {
+  readonly nom?: Nom;
+  readonly adresse?: Adresse;
+  readonly codePostal?: CodePostal;
+  readonly ville?: Ville;
+  readonly telephone?: Telephone | null;
+  readonly email?: Email | null;
+}
+
 export class Magasin {
   private constructor(
     readonly id: MagasinId,
-    readonly nom: Nom,
-    readonly adresse: Adresse,
-    readonly codePostal: CodePostal,
-    readonly ville: Ville,
-    readonly centreId: CentreId,
-    readonly telephone: Telephone | undefined,
-    readonly email: Email | undefined,
+    private nomActuel: Nom,
+    private adresseActuelle: Adresse,
+    private codePostalActuel: CodePostal,
+    private villeActuelle: Ville,
+    private centreActuel: CentreId,
+    private telephoneActuel: Telephone | undefined,
+    private emailActuel: Email | undefined,
     private statutActuel: StatutMagasin,
     readonly creeLe: Date,
     private derniereModification: Date,
   ) {}
+
+  get nom(): Nom {
+    return this.nomActuel;
+  }
+
+  get adresse(): Adresse {
+    return this.adresseActuelle;
+  }
+
+  get codePostal(): CodePostal {
+    return this.codePostalActuel;
+  }
+
+  get ville(): Ville {
+    return this.villeActuelle;
+  }
+
+  /** Centre de rattachement permanent (RDC-REF-005). */
+  get centreId(): CentreId {
+    return this.centreActuel;
+  }
+
+  get telephone(): Telephone | undefined {
+    return this.telephoneActuel;
+  }
+
+  get email(): Email | undefined {
+    return this.emailActuel;
+  }
 
   get statut(): StatutMagasin {
     return this.statutActuel;
@@ -93,9 +136,7 @@ export class Magasin {
 
   /** Met le magasin en pause : il ne participe plus aux nouvelles opérations. */
   desactiver(maintenant: Date): void {
-    if (this.statutActuel === StatutMagasin.ARCHIVE) {
-      throw new MagasinArchive(this.id);
-    }
+    this.verifierModifiable();
 
     if (this.statutActuel === StatutMagasin.INACTIF) {
       return;
@@ -107,9 +148,7 @@ export class Magasin {
 
   /** Remet en service un magasin précédemment désactivé. */
   activer(maintenant: Date): void {
-    if (this.statutActuel === StatutMagasin.ARCHIVE) {
-      throw new MagasinArchive(this.id);
-    }
+    this.verifierModifiable();
 
     if (this.statutActuel === StatutMagasin.ACTIF) {
       return;
@@ -127,5 +166,77 @@ export class Magasin {
 
     this.statutActuel = StatutMagasin.ARCHIVE;
     this.derniereModification = maintenant;
+  }
+
+  /**
+   * Modifie l'identité ou les contacts du magasin. Une modification identique
+   * ne change pas `modifieLe`. Un magasin archivé ne se modifie plus.
+   */
+  modifier(changements: ModificationsMagasin, maintenant: Date): void {
+    this.verifierModifiable();
+    let modifie = false;
+
+    if (changements.nom && changements.nom.valeur !== this.nomActuel.valeur) {
+      this.nomActuel = changements.nom;
+      modifie = true;
+    }
+    if (
+      changements.adresse &&
+      changements.adresse.valeur !== this.adresseActuelle.valeur
+    ) {
+      this.adresseActuelle = changements.adresse;
+      modifie = true;
+    }
+    if (
+      changements.codePostal &&
+      changements.codePostal.valeur !== this.codePostalActuel.valeur
+    ) {
+      this.codePostalActuel = changements.codePostal;
+      modifie = true;
+    }
+    if (
+      changements.ville &&
+      changements.ville.valeur !== this.villeActuelle.valeur
+    ) {
+      this.villeActuelle = changements.ville;
+      modifie = true;
+    }
+    if (
+      changements.telephone !== undefined &&
+      changements.telephone?.valeur !== this.telephoneActuel?.valeur
+    ) {
+      this.telephoneActuel = changements.telephone ?? undefined;
+      modifie = true;
+    }
+    if (
+      changements.email !== undefined &&
+      changements.email?.valeur !== this.emailActuel?.valeur
+    ) {
+      this.emailActuel = changements.email ?? undefined;
+      modifie = true;
+    }
+
+    if (modifie) {
+      this.derniereModification = maintenant;
+    }
+  }
+
+  /**
+   * Change le centre de rattachement permanent (RDC-REF-005). Le use case
+   * vérifie que le centre cible existe et est actif (RDC-REF-010).
+   */
+  transfererVers(centreId: CentreId, maintenant: Date): void {
+    this.verifierModifiable();
+    if (centreId.equals(this.centreActuel)) {
+      return;
+    }
+    this.centreActuel = centreId;
+    this.derniereModification = maintenant;
+  }
+
+  private verifierModifiable(): void {
+    if (this.statutActuel === StatutMagasin.ARCHIVE) {
+      throw new MagasinArchive(this.id);
+    }
   }
 }
