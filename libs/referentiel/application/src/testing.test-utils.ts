@@ -19,5 +19,6 @@ export {
   type ContexteContratStockageImages,
 } from './ports/stockage-images.contrat.test-utils';
 export { JournalEnMemoire } from './testing/journal-en-memoire.test-utils';
+export { unMagasinExistant } from './testing/magasin-existant.test-utils';
 export { MagasinRepositoryEnMemoire } from './testing/magasin-repository-en-memoire.test-utils';
 export { StockageImagesEnMemoire } from './testing/stockage-images-en-memoire.test-utils';

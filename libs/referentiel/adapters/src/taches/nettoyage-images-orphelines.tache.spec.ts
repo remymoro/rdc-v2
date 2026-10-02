@@ -2,12 +2,17 @@ import {
   type BilanNettoyageImages,
   NettoyerImagesOrphelinesUseCase,
 } from '@rdc/referentiel-application';
-import { FichierImage, MagasinId } from '@rdc/referentiel-domain';
+import {
+  FichierImage,
+  MagasinId,
+  StatutMagasin,
+} from '@rdc/referentiel-domain';
 import { Clock } from '@rdc/shared-kernel-application';
 import {
   JournalEnMemoire,
   MagasinRepositoryEnMemoire,
   StockageImagesEnMemoire,
+  unMagasinExistant,
 } from '@rdc/referentiel-application/testing';
 import {
   INTERVALLE_NETTOYAGE_MS,
@@ -118,13 +123,15 @@ describe('NettoyageImagesOrphelinesTache — au démarrage puis toutes les heure
   it('supprime, au passage horaire, un orphelin créé après le démarrage une fois qu’il a dépassé une heure', async () => {
     const horloge = new HorlogeDesMinuteries();
     const stockage = new StockageImagesEnMemoire(horloge);
+    const magasinId = MagasinId.creer('3b8a5d6e-0f12-4f7a-9c1e-7f1c9d7e2d4b');
     const nettoyer = new NettoyerImagesOrphelinesUseCase(
-      new MagasinRepositoryEnMemoire(),
+      new MagasinRepositoryEnMemoire([
+        unMagasinExistant(magasinId, StatutMagasin.ACTIF),
+      ]),
       stockage,
       horloge,
       new JournalEnMemoire(),
     );
-    const magasinId = MagasinId.creer('3b8a5d6e-0f12-4f7a-9c1e-7f1c9d7e2d4b');
     const orpheline = FichierImage.creer(
       '1e5f3c9d-7b2a-4d4f-8c8e-6a3b9f2d5c7e.jpg',
     );
