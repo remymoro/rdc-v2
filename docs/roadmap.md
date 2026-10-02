@@ -166,7 +166,9 @@ purge des temporaires séparée de la liste, échec journalisé sans interrompre
 les orphelins (IMP-1), tests d'absence d'écriture renforcés (IMP-2), reprise
 bloquante (IMP-3), guide d'exploitation unique, auto-revue retirée et port
 `Journal` injecté dans le stockage (SIMP-1 à SIMP-3). Les onze points mineurs
-MIN-1 à MIN-11 restent à traiter dans un lot suivant ; R1 reste ouvert.
+MIN-1 à MIN-11 sont traités dans le lot suivant (codes NAS, cache immuable,
+extensions servies liées au domaine, tests de collision, de traversée et
+multipart, glossaire, purge qui continue après un échec) ; R1 reste ouvert.
 
 Images (lot C, ADR-0021) : dossier lu dans `UPLOADS_DIR` (`./uploads` par
 défaut) ; le rendez-vous NAS ne fixe que sa valeur. `MagasinDto.images` suit le
