@@ -4,6 +4,7 @@ import {
   CentreDejaExistant,
   CentreIntrouvable,
   MagasinIntrouvable,
+  ProduitIntrouvable,
 } from '@rdc/referentiel-application';
 import {
   AdresseAbreviationInterdite,
@@ -15,9 +16,13 @@ import {
   CentreIdVide,
   CentreNonActif,
   CodePostalInvalide,
+  CodeProduitInvalide,
+  CodeProduitVide,
   EmailInvalide,
   EmailTropLong,
   EmailVide,
+  FamilleTropLongue,
+  FamilleVide,
   MagasinArchive,
   MagasinDejaExistant,
   MagasinId,
@@ -25,6 +30,11 @@ import {
   MagasinIdVide,
   NomTropLong,
   NomVide,
+  ProduitId,
+  ProduitIdInvalide,
+  ProduitIdVide,
+  SousFamilleTropLongue,
+  SousFamilleVide,
   TelephoneInvalide,
   TelephoneVide,
   VilleTropLongue,
@@ -130,6 +140,22 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
     );
   });
 
+  it('traduit un produit inconnu en 404 PRODUIT_NOT_FOUND', () => {
+    const { hote, reponse } = hoteHttp();
+
+    filtre.catch(
+      new ProduitIntrouvable(
+        ProduitId.creer('9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d'),
+      ),
+      hote,
+    );
+
+    expect(reponse.status).toHaveBeenCalledWith(404);
+    expect(reponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({ code: 'PRODUIT_NOT_FOUND' }),
+    );
+  });
+
   // @Catch filtre par instanceof : une sous-classe d'une erreur listée doit
   // garder le statut de son parent, pas retomber sur un statut par défaut.
   it.each([
@@ -168,6 +194,14 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
     [new EmailVide(), 'EMAIL_EMPTY'],
     [new EmailTropLong(254), 'EMAIL_TOO_LONG'],
     [new EmailInvalide(), 'EMAIL_INVALID'],
+    [new ProduitIdVide(), 'PRODUIT_ID_EMPTY'],
+    [new ProduitIdInvalide(), 'PRODUIT_ID_INVALID'],
+    [new CodeProduitVide(), 'CODE_PRODUIT_EMPTY'],
+    [new CodeProduitInvalide(), 'CODE_PRODUIT_INVALID'],
+    [new FamilleVide(), 'FAMILLE_EMPTY'],
+    [new FamilleTropLongue(100), 'FAMILLE_TOO_LONG'],
+    [new SousFamilleVide(), 'SOUS_FAMILLE_EMPTY'],
+    [new SousFamilleTropLongue(100), 'SOUS_FAMILLE_TOO_LONG'],
   ])('traduit %s en 400 %s', (erreur, code) => {
     const { hote, reponse } = hoteHttp();
 

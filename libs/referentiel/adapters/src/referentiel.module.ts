@@ -11,18 +11,31 @@ import {
   ListerMagasinsDuCentreQuery,
   ListerMagasinsQuery,
   ModifierMagasinUseCase,
+  ActiverProduitUseCase,
+  CreerProduitUseCase,
+  DesactiverProduitUseCase,
+  LecturesProduits,
+  ListerProduitsQuery,
+  ModifierProduitUseCase,
   ObtenirMagasinQuery,
   DesactiverCentreUseCase,
   GenerateurIdentifiants,
 } from '@rdc/referentiel-application';
-import { CentreRepository, MagasinRepository } from '@rdc/referentiel-domain';
+import {
+  CentreRepository,
+  MagasinRepository,
+  ProduitRepository,
+} from '@rdc/referentiel-domain';
 import { Clock, UnitOfWork } from '@rdc/shared-kernel-application';
 import { PrismaTransaction } from '@rdc/shared-kernel-adapters';
 import { CentresController } from './http/centres.controller';
 import { MagasinsController } from './http/magasins.controller';
+import { ProduitsController } from './http/produits.controller';
 import { GenerateurIdentifiantsUuid } from './identifiants/generateur-identifiants-uuid';
 import { PrismaCentreRepository } from './prisma/prisma-centre.repository';
 import { PrismaLecturesMagasins } from './prisma/prisma-lectures-magasins';
+import { PrismaLecturesProduits } from './prisma/prisma-lectures-produits';
+import { PrismaProduitRepository } from './prisma/prisma-produit.repository';
 import { PrismaMagasinRepository } from './prisma/prisma-magasin.repository';
 
 /**
@@ -31,7 +44,7 @@ import { PrismaMagasinRepository } from './prisma/prisma-magasin.repository';
  * classes simples, construites par useFactory.
  */
 @Module({
-  controllers: [CentresController, MagasinsController],
+  controllers: [CentresController, MagasinsController, ProduitsController],
   providers: [
     {
       provide: CentreRepository,
@@ -197,6 +210,58 @@ import { PrismaMagasinRepository } from './prisma/prisma-magasin.repository';
       useFactory: (lectures: LecturesMagasins) =>
         new ObtenirMagasinQuery(lectures),
       inject: [LecturesMagasins],
+    },
+    {
+      provide: ProduitRepository,
+      scope: Scope.REQUEST,
+      useFactory: (transaction: PrismaTransaction) =>
+        new PrismaProduitRepository(transaction),
+      inject: [PrismaTransaction],
+    },
+    {
+      provide: LecturesProduits,
+      scope: Scope.REQUEST,
+      useFactory: (transaction: PrismaTransaction) =>
+        new PrismaLecturesProduits(transaction),
+      inject: [PrismaTransaction],
+    },
+    {
+      provide: CreerProduitUseCase,
+      scope: Scope.REQUEST,
+      useFactory: (
+        produitRepository: ProduitRepository,
+        generateurIdentifiants: GenerateurIdentifiants,
+        unitOfWork: UnitOfWork,
+        clock: Clock,
+      ) =>
+        new CreerProduitUseCase(
+          produitRepository,
+          generateurIdentifiants,
+          unitOfWork,
+          clock,
+        ),
+      inject: [ProduitRepository, GenerateurIdentifiants, UnitOfWork, Clock],
+    },
+    ...[
+      ModifierProduitUseCase,
+      ActiverProduitUseCase,
+      DesactiverProduitUseCase,
+    ].map((UseCase) => ({
+      provide: UseCase,
+      scope: Scope.REQUEST,
+      useFactory: (
+        produitRepository: ProduitRepository,
+        unitOfWork: UnitOfWork,
+        clock: Clock,
+      ) => new UseCase(produitRepository, unitOfWork, clock),
+      inject: [ProduitRepository, UnitOfWork, Clock],
+    })),
+    {
+      provide: ListerProduitsQuery,
+      scope: Scope.REQUEST,
+      useFactory: (lectures: LecturesProduits) =>
+        new ListerProduitsQuery(lectures),
+      inject: [LecturesProduits],
     },
   ],
 })
