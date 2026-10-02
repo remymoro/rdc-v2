@@ -95,5 +95,6 @@ export { Journal, type DetailsJournal } from './ports/journal';
 export {
   StockageImages,
   StockageImagesIndisponible,
+  FichierImageDejaExistant,
   type FichierImageStocke,
 } from './ports/stockage-images';

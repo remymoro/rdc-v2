@@ -4,6 +4,7 @@ import {
   type FichierImageStocke,
   StockageImages,
   StockageImagesIndisponible,
+  FichierImageDejaExistant,
 } from '@rdc/referentiel-application';
 import {
   ContenuImage,
@@ -76,7 +77,14 @@ export class DisqueStockageImages extends StockageImages {
     await traduireLesPannes(async () => {
       await mkdir(dossier, { recursive: true });
       // « wx » : un fichier existant n'est jamais écrasé.
-      await writeFile(chemin, contenu.octets, { flag: 'wx' });
+      try {
+        await writeFile(chemin, contenu.octets, { flag: 'wx' });
+      } catch (erreur) {
+        if (codeSysteme(erreur) === 'EEXIST') {
+          throw new FichierImageDejaExistant({ cause: erreur });
+        }
+        throw erreur;
+      }
     });
   }
 

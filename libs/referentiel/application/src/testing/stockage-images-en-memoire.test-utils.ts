@@ -4,6 +4,7 @@ import {
   type FichierImageStocke,
   StockageImages,
   StockageImagesIndisponible,
+  FichierImageDejaExistant,
 } from '../ports/stockage-images';
 
 interface Fichier {
@@ -33,6 +34,9 @@ export class StockageImagesEnMemoire extends StockageImages {
   ): Promise<void> {
     if (this.enregistrementEnPanne) {
       throw new StockageImagesIndisponible();
+    }
+    if (this.fichiers.has(cle(magasinId, fichier))) {
+      throw new FichierImageDejaExistant();
     }
     this.fichiers.set(cle(magasinId, fichier), {
       magasinId,

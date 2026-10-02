@@ -63,6 +63,18 @@ export function verifierContratStockageImages(
       );
     });
 
+    it('refuse une collision sans modifier le fichier existant', async () => {
+      await contexte.stockage.enregistrer(MAGASIN, fichier, unContenuJpeg(42));
+
+      await expect(
+        contexte.stockage.enregistrer(MAGASIN, fichier, unContenuJpeg(99)),
+      ).rejects.toMatchObject({ code: 'IMAGE_FICHIER_DEJA_EXISTANT' });
+
+      expect(await contexte.lireFichier(MAGASIN, fichier)).toEqual(
+        unContenuJpeg(42).octets,
+      );
+    });
+
     it('liste les fichiers stockés, avec leur magasin et leur date', async () => {
       await contexte.stockage.enregistrer(MAGASIN, fichier, unContenuJpeg());
       await contexte.stockage.enregistrer(

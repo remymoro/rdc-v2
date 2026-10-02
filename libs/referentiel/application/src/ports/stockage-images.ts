@@ -20,6 +20,15 @@ export class StockageImagesIndisponible extends Error {
   }
 }
 
+export class FichierImageDejaExistant extends Error {
+  readonly code = 'IMAGE_FICHIER_DEJA_EXISTANT';
+
+  constructor(options?: { readonly cause?: unknown }) {
+    super('Le fichier de cette image existe déjà.', options);
+    this.name = 'FichierImageDejaExistant';
+  }
+}
+
 /** Un fichier d'image présent dans le stockage, vu par le nettoyage. */
 export interface FichierImageStocke {
   readonly magasinId: MagasinId;
@@ -36,6 +45,8 @@ export interface FichierImageStocke {
 export abstract class StockageImages {
   /**
    * Écrit le fichier d'une nouvelle image dans le dossier de son magasin.
+   * Ne remplace jamais un fichier existant, même avec un contenu identique.
+   * @throws FichierImageDejaExistant
    * @throws StockageImagesIndisponible
    */
   abstract enregistrer(
