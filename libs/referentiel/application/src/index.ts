@@ -21,6 +21,8 @@ export {
 } from './centre/lectures/lectures-centres';
 export {
   ListerCentresQuery,
+  OrdreTri,
+  TriCentres,
   type ListerCentresRequete,
 } from './centre/lectures/lister-centres.query';
 export {
