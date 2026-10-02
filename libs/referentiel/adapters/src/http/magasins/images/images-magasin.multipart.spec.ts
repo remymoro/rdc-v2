@@ -5,7 +5,7 @@ import {
   type Type,
 } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { MagasinsController } from './magasins.controller';
+import { MagasinsController } from '../magasins.controller';
 
 describe('Images magasin — limites multipart réelles', () => {
   let app: INestApplication;

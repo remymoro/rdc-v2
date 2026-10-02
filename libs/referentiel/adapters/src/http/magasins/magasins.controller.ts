@@ -30,34 +30,34 @@ import { TAILLE_MAXIMALE_IMAGE } from '@rdc/referentiel-domain';
 import {
   CreerMagasinRequete,
   versCreerMagasinCommande,
-} from './creer-magasin.requete';
+} from './requetes/creer-magasin.requete';
 import {
   versActiverMagasinCommande,
   versArchiverMagasinCommande,
   versDesactiverMagasinCommande,
-} from './cycle-de-vie-magasin.requete';
+} from './requetes/cycle-de-vie-magasin.requete';
 import {
   versListerMagasinsDuCentreRequete,
   versObtenirMagasinRequete,
-} from './lire-magasins.requete';
+} from './requetes/lire-magasins.requete';
 import {
   type FichierTeleverse,
   versAjouterImageMagasinCommande,
   versRetirerImageMagasinCommande,
-} from './images-magasin.requete';
+} from './images/images-magasin.requete';
 import {
   type ImageMagasinReponse,
   type MagasinReponse,
   versImageMagasinReponse,
   versMagasinReponse,
   vueVersMagasinReponse,
-} from './magasin.reponse';
+} from './reponses/magasin.reponse';
 import {
   ModifierMagasinRequete,
   versModifierMagasinCommande,
-} from './modifier-magasin.requete';
-import { ReferentielErreursHttpFilter } from './referentiel-erreurs-http.filter';
-import { TeleversementImageFilter } from './televersement-image.filter';
+} from './requetes/modifier-magasin.requete';
+import { ReferentielErreursHttpFilter } from '../commun/filtres/referentiel-erreurs-http.filter';
+import { TeleversementImageFilter } from './images/televersement-image.filter';
 
 /**
  * Adapter primaire des magasins : traduit HTTP → use case → HTTP, sans

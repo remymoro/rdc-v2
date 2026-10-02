@@ -1,6 +1,6 @@
 import type { VueImageMagasin, VueMagasin } from '@rdc/referentiel-application';
 import type { ImageMagasin, Magasin, MagasinId } from '@rdc/referentiel-domain';
-import { PREFIXE_PUBLIC_IMAGES } from '../stockage/configuration-images';
+import { PREFIXE_PUBLIC_IMAGES } from '../../../stockage/configuration-images';
 
 /** Contrat MagasinImageDto de RDC v1 (ADR-0009). */
 export interface ImageMagasinReponse {

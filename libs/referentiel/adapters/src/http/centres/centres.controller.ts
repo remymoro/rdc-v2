@@ -24,26 +24,26 @@ import {
   type CentreReponse,
   versCentreReponse,
   vueVersCentreReponse,
-} from './centre.reponse';
+} from './reponses/centre.reponse';
 import {
   CreerCentreRequete,
   versCreerCentreCommande,
-} from './creer-centre.requete';
+} from './requetes/creer-centre.requete';
 import {
   versActiverCentreCommande,
   versArchiverCentreCommande,
   versDesactiverCentreCommande,
-} from './cycle-de-vie-centre.requete';
+} from './requetes/cycle-de-vie-centre.requete';
 import {
   LireCentresRequete,
   versListerCentresRequete,
   versObtenirCentreRequete,
-} from './lire-centres.requete';
+} from './requetes/lire-centres.requete';
 import {
   ModifierCentreRequete,
   versModifierCentreCommande,
-} from './modifier-centre.requete';
-import { ReferentielErreursHttpFilter } from './referentiel-erreurs-http.filter';
+} from './requetes/modifier-centre.requete';
+import { ReferentielErreursHttpFilter } from '../commun/filtres/referentiel-erreurs-http.filter';
 
 /**
  * Adapter primaire : traduit HTTP → use case → HTTP, sans logique métier

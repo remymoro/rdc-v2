@@ -250,7 +250,7 @@ sérialisation qui doivent évoluer indépendamment.
 
 ```text
 ❌ libs/referentiel/domain/src/centre.reponse.ts          (décorateurs class-validator)
-✅ libs/referentiel/adapters/src/http/centre.reponse.ts
+✅ libs/referentiel/adapters/src/http/centres/reponses/centre.reponse.ts
 ```
 
 **Correction.** Déplacer les DTO dans l'adapter et les mapper vers et depuis les

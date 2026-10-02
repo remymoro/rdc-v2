@@ -114,6 +114,11 @@ Règles de la v1 reportées (décision du 2026-10-01) :
 
 Mission : `docs/missions/etape-3-magasins/00-plan.md`.
 
+Organisation HTTP : ressources `centres/`, `magasins/`, `produits/`, avec
+`requetes/` et `reponses/` ; téléversement dans `magasins/images/`, filtres et
+transformations partagés dans `commun/`. Tests conservés à côté des fichiers,
+sans changement de comportement (TENETS-PATTERN-013, TENETS-API-002/003).
+
 | Élément                                                                                                                            | État |
 | ---------------------------------------------------------------------------------------------------------------------------------- | ---- |
 | A1 — `MagasinId`, `StatutMagasin`, `Magasin.creer()` / `reconstituer()` (rattachement au centre)                                   | ✅   |

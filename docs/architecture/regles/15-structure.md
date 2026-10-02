@@ -54,8 +54,20 @@ libs/
       testing/                           fakes partagés (*.test-utils.ts)
       index.ts                           API publique, regroupée par agrégat
     adapters/src/                        (layer:adapters), créée au premier besoin
-      http/centres.controller.ts, creer-centre.requete.ts, centre.reponse.ts,
-           referentiel-erreurs-http.filter.ts
+      http/
+        centres/centres.controller.ts
+          requetes/creer-centre.requete.ts, modifier-centre.requete.ts…
+          reponses/centre.reponse.ts
+        magasins/magasins.controller.ts
+          requetes/creer-magasin.requete.ts, modifier-magasin.requete.ts…
+          reponses/magasin.reponse.ts
+          images/images-magasin.requete.ts, televersement-image.filter.ts
+        produits/produits.controller.ts
+          requetes/produit.requetes.ts
+          reponses/produit.reponse.ts
+        commun/
+          filtres/referentiel-erreurs-http.filter.ts
+          transformations/champ-facultatif.ts
       prisma/prisma-centre.repository.ts, centre.mapper.ts, prisma-lectures-centres.ts
       referentiel.module.ts              module NestJS du contexte (câblage)
   collecte/ …                            même découpage
@@ -67,6 +79,10 @@ Principes :
   ses erreurs), pas « une classe par fichier ».
 - `index.ts` ne fait que réexporter l'API publique ; aucune logique dedans.
 - Modèles Prisma, clients et mappers restent dans l'adapter qui les possède.
+- HTTP du référentiel : regroupement par ressource, puis `requetes/` et
+  `reponses/` avec leurs mappings. Les particularités du téléversement restent
+  dans `magasins/images/` ; `commun/` ne contient que les éléments partagés du
+  HTTP du contexte. Les tests restent à côté des fichiers testés.
 - Ports de repository : avec le modèle du domaine. Ports de capacités externes :
   avec le workflow applicatif qui les consomme.
 - Couche application rangée **par agrégat** : un use case va dans le dossier de

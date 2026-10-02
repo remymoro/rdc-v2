@@ -11,7 +11,7 @@ import {
 } from '@rdc/referentiel-domain';
 import { Transform } from 'class-transformer';
 import { IsString, ValidateIf } from 'class-validator';
-import { videVersSuppression } from './champ-facultatif';
+import { videVersSuppression } from '../../commun/transformations/champ-facultatif';
 
 const fourni =
   (champ: keyof ModifierMagasinRequete) => (o: ModifierMagasinRequete) =>

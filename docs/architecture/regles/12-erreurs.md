@@ -266,7 +266,7 @@ libs/referentiel/
   domain/src/centre/centre.errors.ts          erreurs métier (CentreArchive…)
   application/src/errors.ts                   issues de workflow (CentreIntrouvable…)
   application/src/ports/stockage-images.ts    port + StockageImagesIndisponible
-  adapters/src/http/referentiel-erreurs-http.filter.ts   traduction HTTP du contexte
+  adapters/src/http/commun/filtres/referentiel-erreurs-http.filter.ts   traduction HTTP du contexte
 apps/api/src/http/erreurs-http-globales.filter.ts       unique filtre global (APP_FILTER)
 ```
 
