@@ -54,6 +54,18 @@ const CODES_INDISPONIBLE = new Set([
   'EBUSY',
   'ENOTDIR',
   'ETIMEDOUT',
+  'ENOENT',
+  'ESTALE',
+  'ENOTCONN',
+  'ECONNRESET',
+  'ECONNREFUSED',
+  'ENETUNREACH',
+  'EHOSTUNREACH',
+  'ENODEV',
+  'EMFILE',
+  'ENFILE',
+  'EOPNOTSUPP',
+  'EXDEV',
 ]);
 
 /**
@@ -131,8 +143,8 @@ export class DisqueStockageImages extends StockageImages {
         for (const element of await lireDossier(dossier)) {
           if (element.isFile() && estTemporaire(element.name)) {
             const chemin = cheminDansLeDossier(dossier, element.name);
-            const { mtimeMs } = await stat(chemin);
-            if (mtimeMs <= Date.now() - 60 * 60 * 1000) {
+            const etat = await statSiPresent(chemin);
+            if (etat !== null && etat.mtimeMs <= Date.now() - 60 * 60 * 1000) {
               await rm(chemin, { force: true });
             }
             continue;
@@ -141,10 +153,16 @@ export class DisqueStockageImages extends StockageImages {
             ? fichierDepuisNom(element.name)
             : null;
           if (fichier !== null) {
-            const { mtimeMs } = await stat(
+            const etat = await statSiPresent(
               cheminDansLeDossier(dossier, fichier.valeur),
             );
-            stockes.push({ magasinId, fichier, modifieLe: new Date(mtimeMs) });
+            if (etat !== null) {
+              stockes.push({
+                magasinId,
+                fichier,
+                modifieLe: new Date(etat.mtimeMs),
+              });
+            }
           }
         }
       }
@@ -228,4 +246,14 @@ function estTemporaire(nom: string): boolean {
   return (
     correspondance !== null && fichierDepuisNom(correspondance[1]) !== null
   );
+}
+
+/** Une suppression concurrente n'est pas une panne de la liste. */
+async function statSiPresent(chemin: string) {
+  try {
+    return await stat(chemin);
+  } catch (erreur) {
+    if (codeSysteme(erreur) === 'ENOENT') return null;
+    throw erreur;
+  }
 }

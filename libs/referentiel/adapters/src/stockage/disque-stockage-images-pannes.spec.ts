@@ -62,6 +62,52 @@ describe('DisqueStockageImages — écriture atomique', () => {
     );
   });
 
+  it.each([
+    'ENOENT',
+    'ESTALE',
+    'ENOTCONN',
+    'ECONNRESET',
+    'ECONNREFUSED',
+    'ENETUNREACH',
+    'EHOSTUNREACH',
+    'ENODEV',
+    'EMFILE',
+    'ENFILE',
+    'EOPNOTSUPP',
+    'EXDEV',
+  ])(
+    'traduit %s à l’écriture en indisponibilité avec sa cause',
+    async (code) => {
+      const panne = Object.assign(new Error('NAS indisponible'), { code });
+      jest.spyOn(fs, 'mkdir').mockRejectedValueOnce(panne);
+
+      await expect(
+        stockage.enregistrer(magasin, fichier, unContenuJpeg()),
+      ).rejects.toMatchObject({
+        code: 'STOCKAGE_IMAGES_INDISPONIBLE',
+        cause: panne,
+      });
+    },
+  );
+
+  it('ignore un fichier disparu pendant la liste et conserve les suivants', async () => {
+    const autre = unFichier('1e5f3c9d-7b2a-4d4f-8c8e-6a3b9f2d5c7e');
+    await stockage.enregistrer(magasin, fichier, unContenuJpeg());
+    await stockage.enregistrer(magasin, autre, unContenuJpeg());
+    const stat = fs.stat;
+    jest
+      .spyOn(fs, 'stat')
+      .mockImplementation(async (...args: Parameters<typeof fs.stat>) => {
+        if (String(args[0]).endsWith(fichier.valeur)) {
+          throw Object.assign(new Error('disparu'), { code: 'ENOENT' });
+        }
+        return stat(...args);
+      });
+
+    const liste = await stockage.lister();
+    expect(liste.map((f) => f.fichier.valeur)).toEqual([autre.valeur]);
+  });
+
   it('deux écritures concurrentes ne publient qu’un seul contenu complet', async () => {
     const resultats = await Promise.allSettled([
       stockage.enregistrer(magasin, fichier, unContenuJpeg(42)),
