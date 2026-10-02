@@ -162,6 +162,75 @@ export function verifierContratUtilisateurRepository(
           ),
         ),
       ).rejects.toBeInstanceOf(AdministrateurDejaExistant);
+      expect(
+        await contexte.repository.get(
+          id('0b6e3f7a-9c2d-4e1f-8a5b-6c7d8e9f0a1b'),
+        ),
+      ).toBeNull();
+    });
+
+    it('enregistre les modifications de l’administrateur sans le prendre pour un second', async () => {
+      const administrateur = unAdministrateur();
+      await contexte.repository.save(administrateur);
+
+      administrateur.changerMotDePasse(
+        MotDePasseHache.creer('scrypt$sel$empreinte-de-secours'),
+        plusTard,
+      );
+      await contexte.repository.save(administrateur);
+
+      const relu = await contexte.repository.get(administrateur.id);
+      expect(relu?.motDePasse.valeur).toBe('scrypt$sel$empreinte-de-secours');
+      expect(await contexte.repository.existsAdministrateur()).toBe(true);
+    });
+
+    it('ne voit pas une modification qui n’a pas été enregistrée', async () => {
+      const compte = unCompteCentre(contexte.centreId);
+      await contexte.repository.save(compte);
+
+      compte.desactiver(plusTard);
+
+      expect((await contexte.repository.get(compte.id))?.estActif).toBe(true);
+    });
+
+    it('retrouve un utilisateur par sa nouvelle adresse après un changement, plus par l’ancienne', async () => {
+      const compte = unCompteCentre(contexte.centreId);
+      await contexte.repository.save(compte);
+
+      compte.changerAdresse(
+        AdresseConnexion.creer('collecte.agen@ad47.org'),
+        plusTard,
+      );
+      await contexte.repository.save(compte);
+
+      expect(
+        (
+          await contexte.repository.getByAdresse(
+            AdresseConnexion.creer('collecte.agen@ad47.org'),
+          )
+        )?.id.equals(compte.id),
+      ).toBe(true);
+      expect(
+        await contexte.repository.getByAdresse(
+          AdresseConnexion.creer('ad47.agen@restosducoeur.org'),
+        ),
+      ).toBeNull();
+    });
+
+    it('refuse de changer l’adresse pour celle d’un autre utilisateur (AUTH_EMAIL_ALREADY_EXISTS)', async () => {
+      const administrateur = unAdministrateur();
+      const compte = unCompteCentre(contexte.centreId);
+      await contexte.repository.save(administrateur);
+      await contexte.repository.save(compte);
+
+      compte.changerAdresse(administrateur.adresse, plusTard);
+
+      await expect(contexte.repository.save(compte)).rejects.toBeInstanceOf(
+        AdresseConnexionDejaUtilisee,
+      );
+      expect((await contexte.repository.get(compte.id))?.adresse.valeur).toBe(
+        'ad47.agen@restosducoeur.org',
+      );
     });
 
     it('refuse une adresse déjà utilisée par un autre utilisateur (AUTH_EMAIL_ALREADY_EXISTS, RDC-ACCES-010)', async () => {
