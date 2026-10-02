@@ -54,3 +54,9 @@ export { ProduitsController } from './http/produits.controller';
 export { PrismaProduitRepository } from './prisma/prisma-produit.repository';
 export { PrismaLecturesProduits } from './prisma/prisma-lectures-produits';
 export { DisqueStockageImages } from './stockage/disque-stockage-images';
+export { JournalNest } from './journal/journal-nest';
+export {
+  dossierDesImages,
+  PREFIXE_PUBLIC_IMAGES,
+} from './stockage/configuration-images';
+export { NettoyageImagesOrphelinesTache } from './taches/nettoyage-images-orphelines.tache';
