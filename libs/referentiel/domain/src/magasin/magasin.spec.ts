@@ -6,7 +6,14 @@ import { Nom } from '../commun/nom';
 import { Telephone } from '../commun/telephone';
 import { Ville } from '../commun/ville';
 import { Magasin } from './magasin';
-import { MagasinArchive } from './magasin.errors';
+import { FichierImage } from './image/fichier-image';
+import { ImageMagasin } from './image/image-magasin';
+import { ImageMagasinId } from './image/image-magasin-id';
+import {
+  MagasinArchive,
+  MagasinImageDejaPresente,
+  MagasinImageIntrouvable,
+} from './magasin.errors';
 import { MagasinId } from './magasin-id';
 import { StatutMagasin } from './statut-magasin';
 
@@ -78,6 +85,7 @@ describe('Magasin', () => {
         ...donneesObligatoires(),
         telephone: Telephone.creer('05 53 98 76 54'),
         statut: StatutMagasin.ARCHIVE,
+        images: [],
         creeLe,
         modifieLe,
       });
@@ -100,6 +108,7 @@ describe('Magasin', () => {
       return Magasin.reconstituer({
         ...donneesObligatoires(),
         statut,
+        images: [],
         creeLe: maintenant,
         modifieLe: precedemment,
       });
@@ -174,6 +183,7 @@ describe('Magasin', () => {
         telephone: Telephone.creer('05 53 98 76 54'),
         email: Email.creer('agen-sud@leclerc.fr'),
         statut,
+        images: [],
         creeLe: maintenant,
         modifieLe: precedemment,
       });
@@ -257,5 +267,175 @@ describe('Magasin', () => {
         expect(magasin.modifieLe).toEqual(precedemment);
       },
     );
+  });
+
+  describe('images (RDC-REF-007)', () => {
+    const plusTard = new Date('2026-10-25T10:00:00.000Z');
+    const precedemment = new Date('2026-10-20T14:00:00.000Z');
+    const ID_IMAGE_1 = '0d4e2b8c-6a1f-4c3e-9b7d-5f2a8e1c4b6d';
+    const ID_IMAGE_2 = '1e5f3c9d-7b2a-4d4f-8c8e-6a3b9f2d5c7e';
+    const ID_IMAGE_3 = '2f6a4dae-8c3b-4e5a-9d9f-7b4cae3e6d8f';
+
+    function nouvelleImage(id: string) {
+      return {
+        id: ImageMagasinId.creer(id),
+        fichier: FichierImage.creer(`${id}.jpg`),
+      };
+    }
+
+    function imagePersistee(id: string, ordre: number): ImageMagasin {
+      return ImageMagasin.reconstituer({
+        ...nouvelleImage(id),
+        ordre,
+        ajouteeLe: precedemment,
+      });
+    }
+
+    function existant(
+      images: readonly ImageMagasin[] = [],
+      statut = StatutMagasin.ACTIF,
+    ): Magasin {
+      return Magasin.reconstituer({
+        ...donneesObligatoires(),
+        statut,
+        images,
+        creeLe: maintenant,
+        modifieLe: precedemment,
+      });
+    }
+
+    it('un nouveau magasin n’a pas d’image', () => {
+      expect(Magasin.creer(donneesObligatoires(), maintenant).images).toEqual(
+        [],
+      );
+    });
+
+    it('reconstitue les images triées par ordre', () => {
+      const magasin = existant([
+        imagePersistee(ID_IMAGE_2, 1),
+        imagePersistee(ID_IMAGE_1, 0),
+      ]);
+
+      expect(magasin.images.map((image) => image.id.valeur)).toEqual([
+        ID_IMAGE_1,
+        ID_IMAGE_2,
+      ]);
+    });
+
+    it('ajoute une image à la fin, datée, et date la modification du magasin', () => {
+      const magasin = existant([imagePersistee(ID_IMAGE_1, 0)]);
+
+      const ajoutee = magasin.ajouterImage(nouvelleImage(ID_IMAGE_2), plusTard);
+
+      expect(ajoutee.ordre).toBe(1);
+      expect(ajoutee.ajouteeLe).toEqual(plusTard);
+      expect(ajoutee.fichier.valeur).toBe(`${ID_IMAGE_2}.jpg`);
+      expect(magasin.images.map((image) => image.id.valeur)).toEqual([
+        ID_IMAGE_1,
+        ID_IMAGE_2,
+      ]);
+      expect(magasin.modifieLe).toEqual(plusTard);
+    });
+
+    it('donne l’ordre 0 à la première image', () => {
+      const magasin = existant();
+
+      expect(
+        magasin.ajouterImage(nouvelleImage(ID_IMAGE_1), plusTard).ordre,
+      ).toBe(0);
+    });
+
+    it('place une nouvelle image après la plus grande position, même après un retrait', () => {
+      const magasin = existant([
+        imagePersistee(ID_IMAGE_1, 0),
+        imagePersistee(ID_IMAGE_2, 1),
+      ]);
+      magasin.retirerImage(ImageMagasinId.creer(ID_IMAGE_1), plusTard);
+
+      expect(
+        magasin.ajouterImage(nouvelleImage(ID_IMAGE_3), plusTard).ordre,
+      ).toBe(2);
+    });
+
+    it('refuse un identifiant déjà présent (MAGASIN_IMAGE_DEJA_PRESENTE)', () => {
+      const magasin = existant([imagePersistee(ID_IMAGE_1, 0)]);
+
+      let erreur: unknown;
+      try {
+        magasin.ajouterImage(nouvelleImage(ID_IMAGE_1), plusTard);
+      } catch (cause) {
+        erreur = cause;
+      }
+
+      expect(erreur).toBeInstanceOf(MagasinImageDejaPresente);
+      expect(erreur).toMatchObject({ code: 'MAGASIN_IMAGE_DEJA_PRESENTE' });
+      expect(magasin.images).toHaveLength(1);
+      expect(magasin.modifieLe).toEqual(precedemment);
+    });
+
+    it('retire une image, renvoie l’image retirée et date la modification', () => {
+      const magasin = existant([
+        imagePersistee(ID_IMAGE_1, 0),
+        imagePersistee(ID_IMAGE_2, 1),
+      ]);
+
+      const retiree = magasin.retirerImage(
+        ImageMagasinId.creer(ID_IMAGE_1),
+        plusTard,
+      );
+
+      expect(retiree.fichier.valeur).toBe(`${ID_IMAGE_1}.jpg`);
+      expect(magasin.images.map((image) => image.id.valeur)).toEqual([
+        ID_IMAGE_2,
+      ]);
+      expect(magasin.modifieLe).toEqual(plusTard);
+    });
+
+    it('refuse de retirer une image absente (MAGASIN_IMAGE_INTROUVABLE)', () => {
+      const magasin = existant([imagePersistee(ID_IMAGE_1, 0)]);
+
+      let erreur: unknown;
+      try {
+        magasin.retirerImage(ImageMagasinId.creer(ID_IMAGE_2), plusTard);
+      } catch (cause) {
+        erreur = cause;
+      }
+
+      expect(erreur).toBeInstanceOf(MagasinImageIntrouvable);
+      expect(erreur).toMatchObject({ code: 'MAGASIN_IMAGE_INTROUVABLE' });
+      expect(magasin.images).toHaveLength(1);
+      expect(magasin.modifieLe).toEqual(precedemment);
+    });
+
+    it.each([
+      [
+        'ajouter',
+        (m: Magasin) => m.ajouterImage(nouvelleImage(ID_IMAGE_2), plusTard),
+      ],
+      [
+        'retirer',
+        (m: Magasin) =>
+          m.retirerImage(ImageMagasinId.creer(ID_IMAGE_1), plusTard),
+      ],
+    ] as const)(
+      'refuse d’%s une image d’un magasin archivé (MAGASIN_ARCHIVED)',
+      (_action, executer) => {
+        const magasin = existant(
+          [imagePersistee(ID_IMAGE_1, 0)],
+          StatutMagasin.ARCHIVE,
+        );
+
+        expect(() => executer(magasin)).toThrow(MagasinArchive);
+        expect(magasin.images).toHaveLength(1);
+      },
+    );
+
+    it('protège sa liste d’images contre une modification extérieure', () => {
+      const magasin = existant([imagePersistee(ID_IMAGE_1, 0)]);
+
+      (magasin.images as ImageMagasin[]).pop();
+
+      expect(magasin.images).toHaveLength(1);
+    });
   });
 });

@@ -111,6 +111,7 @@ function reconstituerMagasin(ligne: Prisma.MagasinModel): Magasin {
     }),
     ...(ligne.email !== null && { email: Email.creer(ligne.email) }),
     statut: versStatutDomaine(ligne.statut),
+    images: [],
     creeLe: ligne.createdAt,
     modifieLe: ligne.updatedAt,
   });

@@ -58,6 +58,7 @@ export function verifierContratLecturesMagasins(
           email: Email.creer('contact@magasin.fr'),
         }),
         statut: options.statut ?? StatutMagasin.ACTIF,
+        images: [],
         creeLe: new Date('2026-10-01T09:00:00.000Z'),
         modifieLe: new Date('2026-10-02T14:30:00.000Z'),
       });

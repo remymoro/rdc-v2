@@ -75,6 +75,7 @@ function copie(magasin: Magasin): Magasin {
     telephone: magasin.telephone,
     email: magasin.email,
     statut: magasin.statut,
+    images: magasin.images,
     creeLe: new Date(magasin.creeLe.getTime()),
     modifieLe: new Date(magasin.modifieLe.getTime()),
   });
