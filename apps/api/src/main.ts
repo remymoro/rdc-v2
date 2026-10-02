@@ -1,10 +1,8 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import {
-  dossierDesImages,
-  PREFIXE_PUBLIC_IMAGES,
-} from '@rdc/referentiel-adapters';
+import { dossierDesImages } from '@rdc/referentiel-adapters';
+import { servirImagesPubliques } from './securite/images-publiques';
 import { AppModule } from './app/app.module';
 import { verifierDeploiementAutorise } from './securite/deploiement';
 
@@ -19,13 +17,7 @@ try {
 async function bootstrap(): Promise<void> {
   verifierDeploiementAutorise(process.env);
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  // Images des magasins (ADR-0021) : sur le NAS, nginx sert /uploads avant
-  // l'API ; en développement, l'API les sert elle-même. Hors préfixe /api.
-  app.useStaticAssets(dossierDesImages(process.env), {
-    prefix: PREFIXE_PUBLIC_IMAGES,
-    index: false,
-    dotfiles: 'deny',
-  });
+  servirImagesPubliques(app, dossierDesImages(process.env));
   const prefixe = 'api';
   app.setGlobalPrefix(prefixe);
   app.enableShutdownHooks();
