@@ -2,6 +2,7 @@
 
 - **Statut :** proposé
 - **Date :** 2026-10-02
+- **Complément :** [ADR-0022](0022-durcissement-images-magasins.md) : transaction courte, publication atomique, service restreint et contrôle préalable de la reprise.
 
 ## Contexte
 
@@ -31,7 +32,8 @@ Deux autres points demandent une décision :
    `/uploads/magasins/<magasinId>/<fichier>`, servie par nginx sur le NAS et
    par l'API elle-même (`useStaticAssets`) quand aucun nginx n'est devant,
    hors du préfixe `/api`. La colonne `MagasinImage.url` garde ce format v1 :
-   les images et le volume de la v1 se reprennent tels quels (ADR-0008).
+   les images et le volume de la v1 se reprennent après contrôle et correction
+   des noms et formats incompatibles (ADR-0008, ADR-0022).
 3. **Nom généré (audit A-18).** Le fichier se nomme `<id de l'image>.<ext>` :
    un UUID généré par `GenerateurIdentifiants`, et l'extension du format
    reconnu par la signature du contenu (JPEG `FF D8 FF`, PNG

@@ -151,6 +151,15 @@ centre » d'un responsable arrive avec l'étape 4.
 `MagasinDto` (reprise du `CentreDto`, plus `centreId` et `images`) et les codes
 `MAGASIN_ID_EMPTY` / `MAGASIN_ID_INVALID`.
 
+Durcissement des images (revue I1 à I7, ADR-0022) : transaction courte après
+écriture du fichier, publication atomique sans écrasement, contrat de collision
+commun, limites multipart, service public restreint avec CSP/nosniff, nettoyage
+isolé par magasin et traduction des pannes NAS. Tests de régression ajoutés.
+Avant reprise, exécuter le [contrôle des URL v1](exploitation/reprise-images-v1.md) ;
+avant déploiement, appliquer les [restrictions nginx](exploitation/images-nas.md)
+et vérifier les liens physiques sur le volume. Le cas de COMMIT incertain R1
+et la limite effective des en-têtes Busboy sont explicités dans l'ADR-0022.
+
 Images (lot C, ADR-0021) : dossier lu dans `UPLOADS_DIR` (`./uploads` par
 défaut) ; le rendez-vous NAS ne fixe que sa valeur. `MagasinDto.images` suit le
 `MagasinImageDto` de la v1 (`id`, `url`, `ordre`, `createdAt`), URL publique
