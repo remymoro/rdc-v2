@@ -13,6 +13,7 @@ export class MagasinRepositoryEnMemoire extends MagasinRepository {
   private readonly magasins = new Map<string, Magasin>();
   /** Clés reçues, pour vérifier le contrat sémantique du port (TENETS-TEST-006). */
   readonly clesDemandees: CleDoublonMagasin[] = [];
+  private echecProchainSave: Error | null = null;
 
   constructor(magasinsExistants: Magasin[] = []) {
     super();
@@ -28,6 +29,11 @@ export class MagasinRepositoryEnMemoire extends MagasinRepository {
 
   /** Comme la contrainte unique en base : un autre magasin de même clé est refusé. */
   async save(magasin: Magasin): Promise<void> {
+    if (this.echecProchainSave !== null) {
+      const echec = this.echecProchainSave;
+      this.echecProchainSave = null;
+      throw echec;
+    }
     const cle = CleDoublonMagasin.depuis(magasin);
     const doublon = [...this.magasins.values()].some(
       (existant) =>
@@ -53,6 +59,11 @@ export class MagasinRepositoryEnMemoire extends MagasinRepository {
         magasin.centreId.equals(centreId) &&
         magasin.statut !== StatutMagasin.ARCHIVE,
     );
+  }
+
+  /** Le prochain save() échoue sans rien enregistrer (base indisponible…). */
+  echouerAuProchainSave(echec: Error): void {
+    this.echecProchainSave = echec;
   }
 
   magasinsEnregistres(): Magasin[] {

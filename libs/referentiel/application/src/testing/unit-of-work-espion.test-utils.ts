@@ -12,3 +12,18 @@ export class UnitOfWorkEspion extends UnitOfWork {
     this.nombreDeCommits += 1;
   }
 }
+
+/**
+ * Comme PrismaUnitOfWork quand la base refuse la validation : le travail
+ * s'exécute, puis run() échoue au moment du commit réel.
+ */
+export class UnitOfWorkQuiEchoueAuCommit extends UnitOfWorkEspion {
+  constructor(private readonly echec: Error) {
+    super();
+  }
+
+  override async run<T>(travail: () => Promise<T>): Promise<T> {
+    await travail();
+    throw this.echec;
+  }
+}
