@@ -42,3 +42,17 @@ export async function lireCentre(id: string): Promise<CentrePersiste | null> {
     await client.end();
   }
 }
+
+/** Relit le statut d'un magasin (base de test uniquement). */
+export async function lireStatutMagasin(id: string): Promise<string | null> {
+  const client = await connecterLaBaseDeTest();
+  try {
+    const resultat = await client.query<{ statut: string }>(
+      'SELECT "statut" FROM "Magasin" WHERE "id" = $1',
+      [id],
+    );
+    return resultat.rows[0]?.statut ?? null;
+  } finally {
+    await client.end();
+  }
+}
