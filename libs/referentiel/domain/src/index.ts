@@ -37,6 +37,13 @@ export {
   FichierImage,
   FichierImageInvalide,
 } from './magasin/image/fichier-image';
+export {
+  ContenuImage,
+  FormatImage,
+  ImageFormatNonSupporte,
+  ImageTropVolumineuse,
+  TAILLE_MAXIMALE_IMAGE,
+} from './magasin/image/contenu-image';
 export type {
   EtatMagasin,
   ModificationsMagasin,

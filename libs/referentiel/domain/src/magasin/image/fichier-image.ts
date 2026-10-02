@@ -1,3 +1,13 @@
+import { FormatImage } from './contenu-image';
+import type { ImageMagasinId } from './image-magasin-id';
+
+/** Extension du fichier stocké, déduite du format reconnu par le contenu. */
+const EXTENSIONS: Readonly<Record<FormatImage, string>> = {
+  [FormatImage.JPEG]: 'jpg',
+  [FormatImage.PNG]: 'png',
+  [FormatImage.WEBP]: 'webp',
+};
+
 /**
  * UUID (toute casse) suivi d'une extension alphanumérique : aucun séparateur
  * de chemin ni « .. » ne peut y figurer (audit A-18). L'extension reste libre
@@ -23,6 +33,11 @@ export class FichierImageInvalide extends Error {
  */
 export class FichierImage {
   private constructor(readonly valeur: string) {}
+
+  /** Nom d'une nouvelle image : son identifiant et l'extension de son format. */
+  static pour(id: ImageMagasinId, format: FormatImage): FichierImage {
+    return FichierImage.creer(`${id.valeur}.${EXTENSIONS[format]}`);
+  }
 
   static creer(nom: string): FichierImage {
     if (!FORMAT_FICHIER.test(nom)) {
