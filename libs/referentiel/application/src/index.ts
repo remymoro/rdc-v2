@@ -17,6 +17,14 @@ export {
   type MagasinsDuCentre,
   type VueCentre,
 } from './centre/lectures/lectures-centres';
+export {
+  ListerCentresQuery,
+  type ListerCentresRequete,
+} from './centre/lectures/lister-centres.query';
+export {
+  ObtenirCentreQuery,
+  type ObtenirCentreRequete,
+} from './centre/lectures/obtenir-centre.query';
 
 // Magasin
 export type {
