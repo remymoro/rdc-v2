@@ -289,4 +289,5 @@ reprise ici ne mentionne pas ce cas.
 opération. (c) Archiver les magasins en cascade.
 
 **Pourquoi (a).** Simple, explicite, sans effet caché ; (c) archiverait des
-magasins encore utiles, et (b) mélange deux décisions en une.
+magasins encore utiles, et (b) mélange deux décisions en une. Règle ajoutée
+par rapport à la v1 : **ADR-0018**.

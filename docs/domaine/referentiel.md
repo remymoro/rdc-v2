@@ -15,7 +15,7 @@ ACTIF ⇄ INACTIF
 
 ## RDC-REF-001 — Un centre est unique par nom et adresse
 
-`core` · erreur · ✅ création (centre, magasin) · ✅ filet P2002 (magasin) · ⏳ filet P2002 (centre) et modification
+`core` · erreur · ✅ création, modification et filet P2002 (centre, magasin)
 
 **Règle.** Deux centres ne partagent pas la même clé de doublon (nom, adresse,
 code postal, ville, normalisés comme en v1 : `CleDoublonCentre`). Le use case
@@ -27,8 +27,8 @@ avec une clé globale qui ne contient pas le centre de rattachement.
 
 **Pourquoi.** Les doublons faussent les statistiques par centre et par magasin.
 
-**Vérification en revue.** Aucune erreur Prisma P2002 ne remonte brute à l'API
-(reste à faire, voir `docs/roadmap.md`).
+**Vérification en revue.** Aucune erreur Prisma P2002 ne remonte brute à l'API :
+`save` lève `CentreDejaExistant` / `MagasinDejaExistant`, déclarées par le port.
 
 **Source v1.** `apps/api/prisma/schema.prisma:12-33` ;
 `apps/api/src/application/use-cases/centre/modifier-centre.usecase.ts:48-58`.
@@ -214,7 +214,7 @@ nouvelle activité opérationnelle.
 
 ## RDC-REF-011 — Un centre ne s'archive pas tant qu'il a des magasins
 
-`core` · erreur · ⏳ à implémenter (étape 3, décision D-18)
+`core` · erreur · ✅ implémentée (étape 3, décision D-18)
 
 **Règle.** Archiver un centre qui a au moins un magasin ACTIF ou INACTIF est
 refusé avec `CENTRE_A_DES_MAGASINS` (409). Les magasins archivés ne comptent
