@@ -113,12 +113,24 @@ describe('NettoyerImagesOrphelinesUseCase (RDC-REF-007)', () => {
     expect(stockage.noms()).toEqual([nom(magasinId, referencee)]);
   });
 
-  it('supprime les anciens fichiers d’un magasin inconnu en base', async () => {
+  it('garde et signale les fichiers d’un magasin inconnu en base : base et dossier ne correspondent pas', async () => {
+    // Un magasin n'est jamais supprimé : son absence signale une base vide,
+    // en cours de reprise ou une autre base que celle du dossier (revue B1).
     stockage.deposer(magasinInconnu, referencee, ilYA(2 * HEURE));
+    stockage.deposer(magasinInconnu, orpheline, ilYA(2 * HEURE));
 
-    await nettoyer.execute();
+    const bilan = await nettoyer.execute();
 
-    expect(stockage.noms()).toEqual([]);
+    expect(stockage.noms()).toEqual([
+      nom(magasinInconnu, referencee),
+      nom(magasinInconnu, orpheline),
+    ]);
+    expect(bilan).toEqual({ supprimes: 0, echecs: 0 });
+    expect(journal.avertissements).toEqual([
+      expect.objectContaining({
+        details: { magasinId: magasinInconnu.valeur },
+      }),
+    ]);
   });
 
   it('est idempotent : relancé, il ne fait plus rien', async () => {

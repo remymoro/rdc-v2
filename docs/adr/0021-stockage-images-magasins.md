@@ -88,6 +88,12 @@ Deux autres points demandent une décision :
   `STOCKAGE_IMAGES_INDISPONIBLE` (503).
 - La tâche de nettoyage tourne dans chaque instance de l'API ; elle est
   idempotente, donc sans risque si l'API est un jour lancée deux fois.
+- Le nettoyage ne supprime jamais les fichiers d'un magasin inconnu en base :
+  un magasin n'est jamais supprimé, son absence signale une base vide, en
+  cours de reprise ou qui n'est pas celle du dossier. Il le journalise et
+  passe (revue du lot C, B1). Consigne de déploiement : reprendre la base
+  avant de monter le volume v1 ; chaque base a son propre `UPLOADS_DIR`
+  (les E2E utilisent `tmp/uploads-e2e`).
 - Le front v1 reçoit les mêmes URL et le même `MagasinDto` ; à confirmer :
   la lecture des nouveaux codes d'erreur (413, 400) par l'écran d'envoi.
 - Vérifié par : tests du domaine (signatures, `x./../evil`), suite de contrat

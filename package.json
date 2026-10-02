@@ -15,7 +15,7 @@
     "test:agent-gate": "node --test tools/agent-gate/agent-gate.spec.mjs",
     "verify": "pnpm test:agent-gate && nx run-many -t lint typecheck test build",
     "agent:gate": "node tools/agent-gate/cli.mjs",
-    "e2e": "DATABASE_URL=postgresql://rdc:rdc@localhost:5432/rdc_test nx e2e api-e2e"
+    "e2e": "DATABASE_URL=postgresql://rdc:rdc@localhost:5432/rdc_test UPLOADS_DIR=tmp/uploads-e2e nx e2e api-e2e"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",

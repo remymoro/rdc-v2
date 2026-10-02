@@ -3,7 +3,7 @@ import { viderLesCentres } from '../support/base-de-donnees';
 import { api } from '../support/client-http';
 
 // Parcours HTTP complet, en boîte noire : API NestJS + PostgreSQL (rdc_test)
-// + dossier des images (UPLOADS_DIR, ./uploads par défaut). RDC-REF-007.
+// + dossier des images propre aux E2E (UPLOADS_DIR=tmp/uploads-e2e). RDC-REF-007.
 describe('POST et DELETE /api/magasins/:id/images', () => {
   const magasinInconnu = '5c9b6e7f-1a23-4b8c-8d2f-8a2d0e8f3e5c';
   const imageInconnue = '0d4e2b8c-6a1f-4c3e-9b7d-5f2a8e1c4b6d';

@@ -44,8 +44,18 @@ export class NettoyerImagesOrphelinesUseCase {
     for (const fichiers of parMagasin(anciens)) {
       const magasinId = fichiers[0].magasinId;
       const magasin = await this.magasinRepository.get(magasinId);
+      if (magasin === null) {
+        // Un magasin n'est jamais supprimé : son absence signale une base
+        // vide, en cours de reprise ou qui n'est pas celle du dossier.
+        // Rien n'est effacé (ADR-0021).
+        this.journal.avertir(
+          "Nettoyage des images : dossier d'un magasin inconnu en base, fichiers conservés.",
+          { magasinId: magasinId.valeur },
+        );
+        continue;
+      }
       const references = new Set(
-        magasin?.images.map((image) => image.fichier.valeur) ?? [],
+        magasin.images.map((image) => image.fichier.valeur),
       );
 
       for (const { fichier } of fichiers) {
