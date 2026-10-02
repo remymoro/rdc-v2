@@ -1,4 +1,8 @@
-import type { CentreId, NouveauCentre } from '@rdc/referentiel-domain';
+import type {
+  CentreId,
+  ModificationsCentre,
+  NouveauCentre,
+} from '@rdc/referentiel-domain';
 
 /**
  * Création d'un centre : tout l'état initial sauf l'identifiant, généré par
@@ -19,4 +23,10 @@ export interface ActiverCentreCommande {
 /** Archivage définitif d'un centre. */
 export interface ArchiverCentreCommande {
   readonly centreId: CentreId;
+}
+
+/** Modification d'un centre (PATCH v1) : identité et contacts. */
+export interface ModifierCentreCommande {
+  readonly centreId: CentreId;
+  readonly changements: ModificationsCentre;
 }

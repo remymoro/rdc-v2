@@ -6,11 +6,13 @@ export type {
   ArchiverCentreCommande,
   CreerCentreCommande,
   DesactiverCentreCommande,
+  ModifierCentreCommande,
 } from './centre/commandes';
 export { CreerCentreUseCase } from './centre/creer-centre.use-case';
 export { DesactiverCentreUseCase } from './centre/desactiver-centre.use-case';
 export { ActiverCentreUseCase } from './centre/activer-centre.use-case';
 export { ArchiverCentreUseCase } from './centre/archiver-centre.use-case';
+export { ModifierCentreUseCase } from './centre/modifier-centre.use-case';
 export {
   LecturesCentres,
   type FiltreCentres,
