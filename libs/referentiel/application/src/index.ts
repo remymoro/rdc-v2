@@ -42,6 +42,11 @@ export type {
 } from './magasin/commandes';
 export { AjouterImageMagasinUseCase } from './magasin/ajouter-image-magasin.use-case';
 export { RetirerImageMagasinUseCase } from './magasin/retirer-image-magasin.use-case';
+export {
+  AGE_MINIMAL_ORPHELIN_MS,
+  NettoyerImagesOrphelinesUseCase,
+  type BilanNettoyageImages,
+} from './magasin/nettoyer-images-orphelines.use-case';
 export { CreerMagasinUseCase } from './magasin/creer-magasin.use-case';
 export { DesactiverMagasinUseCase } from './magasin/desactiver-magasin.use-case';
 export { ActiverMagasinUseCase } from './magasin/activer-magasin.use-case';
