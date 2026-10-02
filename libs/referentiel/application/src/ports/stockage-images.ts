@@ -65,9 +65,18 @@ export abstract class StockageImages {
   ): Promise<void>;
 
   /**
-   * Tous les fichiers d'images présents. Ce qui n'a pas la forme d'un fichier
+   * Lecture seule : tous les fichiers d'images présents. Ce qui n'a pas la forme d'un fichier
    * d'image (autre nom, autre dossier) est ignoré, donc jamais supprimé.
    * @throws StockageImagesIndisponible
    */
   abstract lister(): Promise<readonly FichierImageStocke[]>;
+
+  /**
+   * Supprime les seuls temporaires privés de l'adapter dont la dernière
+   * écriture est antérieure ou égale à la limite. Épargne les images publiées.
+   * Sans effet pour un stockage qui ne produit pas de temporaires.
+   * Un échec peut laisser une purge partielle ; un prochain passage réessaie.
+   * @throws StockageImagesIndisponible
+   */
+  abstract purgerTemporaires(avant: Date): Promise<void>;
 }

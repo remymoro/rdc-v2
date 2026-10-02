@@ -35,12 +35,22 @@ export class NettoyerImagesOrphelinesUseCase {
 
   async execute(): Promise<BilanNettoyageImages> {
     const limite = this.clock.now().getTime() - AGE_MINIMAL_ORPHELIN_MS;
+    let echecs = 0;
+    try {
+      await this.stockageImages.purgerTemporaires(new Date(limite));
+    } catch (erreur) {
+      echecs += 1;
+      this.journal.avertir(
+        'Nettoyage des temporaires en échec, poursuite du nettoyage des images.',
+        {},
+        erreur,
+      );
+    }
     const anciens = (await this.stockageImages.lister()).filter(
       (stocke) => stocke.modifieLe.getTime() <= limite,
     );
 
     let supprimes = 0;
-    let echecs = 0;
     for (const fichiers of parMagasin(anciens)) {
       const magasinId = fichiers[0].magasinId;
       let magasin: Magasin | null;

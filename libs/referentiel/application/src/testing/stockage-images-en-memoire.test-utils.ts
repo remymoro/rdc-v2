@@ -63,6 +63,10 @@ export class StockageImagesEnMemoire extends StockageImages {
     );
   }
 
+  async purgerTemporaires(_avant: Date): Promise<void> {
+    // Les écritures en mémoire ne produisent aucun temporaire.
+  }
+
   /** Octets d'un fichier stocké, ou null. */
   contenu(magasinId: MagasinId, fichier: FichierImage): Uint8Array | null {
     return this.fichiers.get(cle(magasinId, fichier))?.octets ?? null;

@@ -45,6 +45,30 @@ describe('DisqueStockageImages — écriture atomique', () => {
     expect(await fs.readdir(dossier)).toEqual([]);
   });
 
+  it('liste les images sans tenter de supprimer un temporaire ancien inaccessible (IMP-1)', async () => {
+    await stockage.enregistrer(magasin, fichier, unContenuJpeg());
+    const temporaire = join(
+      dossier,
+      fichier.valeur + '.11111111-1111-4111-8111-111111111111.tmp',
+    );
+    await fs.writeFile(temporaire, 'partiel');
+    const ancien = new Date('2020-01-01T00:00:00Z');
+    await fs.utimes(temporaire, ancien, ancien);
+    const supprimer = jest
+      .spyOn(fs, 'rm')
+      .mockRejectedValueOnce(
+        Object.assign(new Error('accès refusé'), { code: 'EACCES' }),
+      );
+
+    expect(await stockage.lister()).toHaveLength(1);
+    expect(supprimer).not.toHaveBeenCalled();
+    await expect(stockage.purgerTemporaires(ancien)).rejects.toMatchObject({
+      code: 'STOCKAGE_IMAGES_INDISPONIBLE',
+      cause: expect.objectContaining({ code: 'EACCES' }),
+    });
+    expect(await stockage.lister()).toHaveLength(1);
+  });
+
   it('nettoie seulement ses temporaires anciens, sans toucher les fichiers publiés ou récents', async () => {
     const ancien = fichier.valeur + '.11111111-1111-4111-8111-111111111111.tmp';
     const recent = fichier.valeur + '.22222222-2222-4222-8222-222222222222.tmp';
@@ -56,6 +80,7 @@ describe('DisqueStockageImages — écriture atomique', () => {
     await fs.utimes(join(dossier, ancien), dateAncienne, dateAncienne);
     await fs.utimes(join(dossier, 'notes.tmp'), dateAncienne, dateAncienne);
 
+    await stockage.purgerTemporaires(dateAncienne);
     expect(await stockage.lister()).toHaveLength(1);
     expect((await fs.readdir(dossier)).sort()).toEqual(
       [fichier.valeur, recent, 'notes.tmp'].sort(),

@@ -107,6 +107,32 @@ describe('NettoyerImagesOrphelinesUseCase (RDC-REF-007)', () => {
     ]);
   });
 
+  it('poursuit les orphelins et journalise une purge des temporaires en échec (IMP-1)', async () => {
+    const panne = new StockageImagesIndisponible();
+    class StockageAvecPurgeEnPanne extends StockageImagesEnMemoire {
+      limiteRecue?: Date;
+      override async purgerTemporaires(avant: Date): Promise<void> {
+        this.limiteRecue = avant;
+        throw panne;
+      }
+    }
+    const stockageAvecPurge = new StockageAvecPurgeEnPanne(horloge);
+    stockageAvecPurge.deposer(magasinId, orpheline, ilYA(2 * HEURE));
+    nettoyer = new NettoyerImagesOrphelinesUseCase(
+      new MagasinRepositoryEnMemoire([unMagasinAvecImage()]),
+      stockageAvecPurge,
+      horloge,
+      journal,
+    );
+
+    expect(await nettoyer.execute()).toEqual({ supprimes: 1, echecs: 1 });
+    expect(stockageAvecPurge.limiteRecue).toEqual(ilYA(HEURE));
+    expect(stockageAvecPurge.noms()).toEqual([]);
+    expect(journal.avertissements).toEqual([
+      expect.objectContaining({ cause: panne }),
+    ]);
+  });
+
   it('supprime un orphelin de plus d’une heure', async () => {
     stockage.deposer(magasinId, orpheline, ilYA(2 * HEURE));
 

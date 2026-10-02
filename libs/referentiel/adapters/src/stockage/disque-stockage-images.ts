@@ -141,14 +141,6 @@ export class DisqueStockageImages extends StockageImages {
         }
         const dossier = this.dossierDuMagasin(magasinId);
         for (const element of await lireDossier(dossier)) {
-          if (element.isFile() && estTemporaire(element.name)) {
-            const chemin = cheminDansLeDossier(dossier, element.name);
-            const etat = await statSiPresent(chemin);
-            if (etat !== null && etat.mtimeMs <= Date.now() - 60 * 60 * 1000) {
-              await rm(chemin, { force: true });
-            }
-            continue;
-          }
           const fichier = element.isFile()
             ? fichierDepuisNom(element.name)
             : null;
@@ -167,6 +159,26 @@ export class DisqueStockageImages extends StockageImages {
         }
       }
       return stockes;
+    });
+  }
+
+  async purgerTemporaires(avant: Date): Promise<void> {
+    await traduireLesPannes(async () => {
+      for (const entree of await lireDossier(this.dossierDesMagasins())) {
+        const magasinId = entree.isDirectory()
+          ? magasinIdDepuisNom(entree.name)
+          : null;
+        if (magasinId === null) continue;
+        const dossier = this.dossierDuMagasin(magasinId);
+        for (const element of await lireDossier(dossier)) {
+          if (!element.isFile() || !estTemporaire(element.name)) continue;
+          const chemin = cheminDansLeDossier(dossier, element.name);
+          const etat = await statSiPresent(chemin);
+          if (etat !== null && etat.mtimeMs <= avant.getTime()) {
+            await rm(chemin, { force: true });
+          }
+        }
+      }
     });
   }
 
