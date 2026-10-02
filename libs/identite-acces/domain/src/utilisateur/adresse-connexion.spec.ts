@@ -43,4 +43,10 @@ describe('AdresseConnexion (RDC-ACCES-010)', () => {
       AdresseConnexionTropLongue,
     );
   });
+
+  it('refuse à la compilation un objet qui imite une adresse sans être validé', () => {
+    // @ts-expect-error : un objet littéral n'est pas une AdresseConnexion.
+    const imitation: AdresseConnexion = { valeur: 'x', equals: () => true };
+    expect(imitation).toBeDefined();
+  });
 });

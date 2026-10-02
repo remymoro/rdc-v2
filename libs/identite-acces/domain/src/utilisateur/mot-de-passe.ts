@@ -34,6 +34,9 @@ export class MotDePasse {
   static readonly LONGUEUR_MINIMALE = 12;
   static readonly LONGUEUR_MAXIMALE = 128;
 
+  // Rend le type nominal : jamais confondu avec son empreinte (et inversement).
+  private readonly type = 'MotDePasse';
+
   private constructor(readonly valeur: string) {}
 
   static creer(valeur: string): MotDePasse {
@@ -70,6 +73,8 @@ export class MotDePasseHacheVide extends Error {
  * à l'adapter de hachage ; le domaine ne la lit pas.
  */
 export class MotDePasseHache {
+  private readonly type = 'MotDePasseHache';
+
   private constructor(readonly valeur: string) {}
 
   static creer(valeur: string): MotDePasseHache {

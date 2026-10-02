@@ -38,6 +38,9 @@ export class AdresseConnexionInvalide extends Error {
 export class AdresseConnexion {
   static readonly LONGUEUR_MAXIMALE = 254;
 
+  // Rend le type nominal : seule une adresse validée par creer() en est une.
+  private readonly type = 'AdresseConnexion';
+
   private constructor(readonly valeur: string) {}
 
   static creer(valeur: string): AdresseConnexion {

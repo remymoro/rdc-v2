@@ -54,3 +54,13 @@ describe('MotDePasseHache', () => {
     expect(JSON.stringify({ empreinte })).not.toContain('valeur-secrete');
   });
 });
+
+describe('types distincts : le mot de passe en clair n’est jamais pris pour son empreinte', () => {
+  it('refuse à la compilation un mot de passe en clair là où une empreinte est attendue', () => {
+    // @ts-expect-error : MotDePasse n'est pas un MotDePasseHache.
+    const empreinte: MotDePasseHache = MotDePasse.creer('a'.repeat(12));
+    // @ts-expect-error : MotDePasseHache n'est pas un MotDePasse.
+    const enClair: MotDePasse = MotDePasseHache.creer('x'.repeat(20));
+    expect([empreinte, enClair]).toHaveLength(2);
+  });
+});
