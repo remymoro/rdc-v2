@@ -13,6 +13,12 @@ import {
   EmailInvalide,
   EmailTropLong,
   EmailVide,
+  FichierImage,
+  FichierImageInvalide,
+  ImageMagasin,
+  ImageMagasinId,
+  ImageMagasinIdInvalide,
+  ImageMagasinIdVide,
   Magasin,
   MagasinId,
   MagasinIdInvalide,
@@ -20,6 +26,7 @@ import {
   Nom,
   NomTropLong,
   NomVide,
+  OrdreImageInvalide,
   StatutMagasin,
   Telephone,
   TelephoneInvalide,
@@ -33,6 +40,17 @@ import { MagasinPersisteInvalide } from './magasin-persiste-invalide';
 
 // La table v1 réutilise l'enum StatutCentre pour les magasins (ADR-0008).
 type StatutMagasinPrisma = Prisma.MagasinModel['statut'];
+
+/** Ligne `Magasin` lue avec ses images : l'agrégat se relit en entier. */
+export type LigneMagasinAvecImages = Prisma.MagasinModel & {
+  readonly images: readonly Prisma.MagasinImageModel[];
+};
+
+/**
+ * La colonne `url` garde le format v1 (`/uploads/magasins/<id>/<fichier>`) :
+ * les lignes reprises de la v1 et celles de la v2 restent identiques.
+ */
+const PREFIXE_URL_IMAGES = '/uploads/magasins';
 
 /** Magasin du domaine → ligne Prisma (mapper directionnel, TENETS-LIFECYCLE-005). */
 export function versLigneMagasin(
@@ -52,6 +70,28 @@ export function versLigneMagasin(
     updatedAt: magasin.modifieLe,
     cleDoublon: CleDoublonMagasin.depuis(magasin).valeur,
   };
+}
+
+/** Images du magasin → lignes `MagasinImage` (mapper directionnel). */
+export function versLignesImagesMagasin(
+  magasin: Magasin,
+): Prisma.MagasinImageUncheckedCreateInput[] {
+  return magasin.images.map((image) => ({
+    id: image.id.valeur,
+    url: `${PREFIXE_URL_IMAGES}/${magasin.id.valeur}/${image.fichier.valeur}`,
+    ordre: image.ordre,
+    magasinId: magasin.id.valeur,
+    createdAt: image.ajouteeLe,
+  }));
+}
+
+/**
+ * Nom du fichier : dernier segment du chemin de l'URL. Accepte aussi les URL
+ * absolues d'avant le stockage local (ADR-0008). Le nom n'est pas validé ici.
+ */
+export function fichierDepuisUrl(url: string): string {
+  const chemin = new URL(url, 'http://images.invalid').pathname;
+  return chemin.slice(chemin.lastIndexOf('/') + 1);
 }
 
 /**
@@ -76,6 +116,10 @@ const ERREURS_VALIDATION_VALEURS = [
   EmailVide,
   EmailTropLong,
   EmailInvalide,
+  ImageMagasinIdVide,
+  ImageMagasinIdInvalide,
+  FichierImageInvalide,
+  OrdreImageInvalide,
 ];
 
 /**
@@ -83,7 +127,7 @@ const ERREURS_VALIDATION_VALEURS = [
  * (TENETS-LIFECYCLE-005, REPO-007). Une ligne invalide devient
  * `MagasinPersisteInvalide` (TENETS-VALUE-003).
  */
-export function versMagasin(ligne: Prisma.MagasinModel): Magasin {
+export function versMagasin(ligne: LigneMagasinAvecImages): Magasin {
   try {
     return reconstituerMagasin(ligne);
   } catch (erreur) {
@@ -98,7 +142,7 @@ function estErreurValidationValeur(erreur: unknown): erreur is Error {
   return ERREURS_VALIDATION_VALEURS.some((type) => erreur instanceof type);
 }
 
-function reconstituerMagasin(ligne: Prisma.MagasinModel): Magasin {
+function reconstituerMagasin(ligne: LigneMagasinAvecImages): Magasin {
   return Magasin.reconstituer({
     id: MagasinId.creer(ligne.id),
     nom: Nom.creer(ligne.nom),
@@ -111,9 +155,18 @@ function reconstituerMagasin(ligne: Prisma.MagasinModel): Magasin {
     }),
     ...(ligne.email !== null && { email: Email.creer(ligne.email) }),
     statut: versStatutDomaine(ligne.statut),
-    images: [],
+    images: ligne.images.map(versImageMagasin),
     creeLe: ligne.createdAt,
     modifieLe: ligne.updatedAt,
+  });
+}
+
+function versImageMagasin(ligne: Prisma.MagasinImageModel): ImageMagasin {
+  return ImageMagasin.reconstituer({
+    id: ImageMagasinId.creer(ligne.id),
+    fichier: FichierImage.creer(fichierDepuisUrl(ligne.url)),
+    ordre: ligne.ordre,
+    ajouteeLe: ligne.createdAt,
   });
 }
 
