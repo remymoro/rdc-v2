@@ -7,12 +7,12 @@ import {
 } from '@nestjs/common';
 import {
   CentreADesMagasins,
-  CentreDejaExistant,
   CentreIntrouvable,
   MagasinIntrouvable,
   ProduitIntrouvable,
 } from '@rdc/referentiel-application';
 import {
+  CentreDejaExistant,
   AdresseAbreviationInterdite,
   AdresseTropLongue,
   AdresseVide,

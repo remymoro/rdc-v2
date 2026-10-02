@@ -1,10 +1,11 @@
 import {
+  CentreDejaExistant,
   Centre,
   CentreRepository,
   CleDoublonCentre,
 } from '@rdc/referentiel-domain';
 import { Clock, UnitOfWork } from '@rdc/shared-kernel-application';
-import { CentreDejaExistant, CentreIntrouvable } from '../errors';
+import { CentreIntrouvable } from '../errors';
 import type { ModifierCentreCommande } from './commandes';
 
 /**

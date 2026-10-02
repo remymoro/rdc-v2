@@ -1,5 +1,6 @@
 import {
   Centre,
+  CentreDejaExistant,
   CentreId,
   CentreRepository,
   CleDoublonCentre,
@@ -23,7 +24,17 @@ export class CentreRepositoryEnMemoire extends CentreRepository {
     return centre === undefined ? null : copie(centre);
   }
 
+  /** Comme la contrainte unique en base : un autre centre de même clé est refusé. */
   async save(centre: Centre): Promise<void> {
+    const cle = CleDoublonCentre.depuis(centre);
+    const doublon = [...this.centres.values()].some(
+      (existant) =>
+        !existant.id.equals(centre.id) &&
+        CleDoublonCentre.depuis(existant).equals(cle),
+    );
+    if (doublon) {
+      throw new CentreDejaExistant();
+    }
     this.centres.set(centre.id.valeur, copie(centre));
   }
 

@@ -5,7 +5,10 @@ export type {
   NouveauCentre,
 } from './centre/centre';
 export { CentreArchive, CentreNonActif } from './centre/centre.errors';
-export { CentreRepository } from './ports/centre.repository';
+export {
+  CentreDejaExistant,
+  CentreRepository,
+} from './ports/centre.repository';
 export {
   MagasinDejaExistant,
   MagasinRepository,

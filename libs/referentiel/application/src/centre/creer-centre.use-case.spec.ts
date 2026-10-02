@@ -1,4 +1,5 @@
 import {
+  CentreDejaExistant,
   Adresse,
   Centre,
   CentreId,
@@ -9,7 +10,6 @@ import {
   Ville,
 } from '@rdc/referentiel-domain';
 import type { CreerCentreCommande } from './commandes';
-import { CentreDejaExistant } from '../errors';
 import { CentreRepositoryEnMemoire } from '../testing/centre-repository-en-memoire.test-utils';
 import { GenerateurIdentifiantsFixe } from '../testing/generateur-identifiants-fixe.test-utils';
 import { HorlogeFixe } from '../testing/horloge-fixe.test-utils';

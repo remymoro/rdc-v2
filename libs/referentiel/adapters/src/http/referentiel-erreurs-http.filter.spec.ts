@@ -2,12 +2,12 @@ import type { ArgumentsHost, Type } from '@nestjs/common';
 import { FILTER_CATCH_EXCEPTIONS } from '@nestjs/common/constants';
 import {
   CentreADesMagasins,
-  CentreDejaExistant,
   CentreIntrouvable,
   MagasinIntrouvable,
   ProduitIntrouvable,
 } from '@rdc/referentiel-application';
 import {
+  CentreDejaExistant,
   AdresseAbreviationInterdite,
   AdresseTropLongue,
   AdresseVide,

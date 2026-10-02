@@ -74,7 +74,6 @@ export { ListerProduitsQuery } from './produit/lectures/lister-produits.query';
 // Commun au contexte
 export {
   CentreADesMagasins,
-  CentreDejaExistant,
   CentreIntrouvable,
   MagasinIntrouvable,
   ProduitIntrouvable,

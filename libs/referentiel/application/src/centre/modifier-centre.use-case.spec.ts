@@ -1,4 +1,5 @@
 import {
+  CentreDejaExistant,
   Adresse,
   Centre,
   CentreArchive,
@@ -10,7 +11,7 @@ import {
   StatutCentre,
   Ville,
 } from '@rdc/referentiel-domain';
-import { CentreDejaExistant, CentreIntrouvable } from '../errors';
+import { CentreIntrouvable } from '../errors';
 import { unCentreExistant } from '../testing/centre-existant.test-utils';
 import { CentreRepositoryEnMemoire } from '../testing/centre-repository-en-memoire.test-utils';
 import { HorlogeFixe } from '../testing/horloge-fixe.test-utils';
