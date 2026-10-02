@@ -126,7 +126,7 @@ Mission : `docs/missions/etape-3-magasins/00-plan.md`.
 | A4 — Lire les magasins : `GET /api/magasins`, `/api/magasins/:id`, `/api/centres/:centreId/magasins` (port de lecture dédié) | ✅   |
 | B — Catalogue des produits : créer, modifier, activer, désactiver, lister (`/api/produits`)                                  | ✅   |
 | Centres — Archivage refusé tant qu'un magasin actif ou inactif est rattaché (`CENTRE_A_DES_MAGASINS`, RDC-REF-011, D-18)     | ✅   |
-| Centres — Lire : `GET /api/centres` (statut, recherche), `/api/centres/:id`, avec les magasins actifs et inactifs            | ✅   |
+| Centres — Lire : `GET /api/centres` (statut, recherche, tri), `/api/centres/:id`, avec les magasins actifs et inactifs       | ✅   |
 | Centres — `PATCH /api/centres/:id` : modifier (absent = inchangé, `null` = suppression), sans doublon, archivé refusé        | ✅   |
 | Centres — Filet P2002 : `CentreDejaExistant` déclaré par le port, deux contraintes uniques traduites                         | ✅   |
 | C — Images d'un magasin                                                                                                      | ⏳   |
@@ -135,7 +135,9 @@ Produits : pas d'unicité du code (retirée volontairement en v1, migration
 `remove_produit_code_unique`) ; forme de `ProduitDto` et tri par code à vérifier
 contre la v1.
 
-Lectures des centres : tri par nom ; la recherche ignore la casse mais pas les
+Lectures des centres : tri par nom par défaut, ou `?tri=statut|magasins` et
+`?ordre=desc` (tri en mémoire dans la requête applicative : une douzaine de
+centres) ; la recherche ignore la casse mais pas les
 accents (« Nerac » ne trouve pas « Nérac ») ; la réponse ajoute `magasins`
 au `CentreDto` de la v1.
 

@@ -78,8 +78,29 @@ describe('GET /api/centres, /api/centres/:id', () => {
     expect(recherche.data.map((c: { id: string }) => c.id)).toEqual([agen]);
   });
 
-  it('refuse un statut inconnu ou un paramètre non prévu (400 REQUEST_VALIDATION)', async () => {
-    for (const params of [{ statut: 'SUPPRIME' }, { tri: 'nom' }]) {
+  it('trie par nombre de magasins rattachés ou par statut, dans les deux sens', async () => {
+    await api.patch(`/centres/${agen}/desactiver`, {});
+    const ids = async (params: Record<string, string>) =>
+      (await api.get('/centres', { params })).data.map(
+        (c: { id: string }) => c.id,
+      );
+
+    expect(await ids({ tri: 'magasins' })).toEqual([marmande, agen]);
+    expect(await ids({ tri: 'magasins', ordre: 'desc' })).toEqual([
+      agen,
+      marmande,
+    ]);
+    expect(await ids({ tri: 'statut' })).toEqual([marmande, agen]);
+    expect(await ids({ ordre: 'desc' })).toEqual([marmande, agen]);
+  });
+
+  it('refuse un statut, un tri ou un ordre inconnus, ou un paramètre non prévu (400 REQUEST_VALIDATION)', async () => {
+    for (const params of [
+      { statut: 'SUPPRIME' },
+      { tri: 'ville' },
+      { ordre: 'haut' },
+      { page: '2' },
+    ]) {
       const reponse = await api.get('/centres', { params });
 
       expect(reponse.status).toBe(400);
