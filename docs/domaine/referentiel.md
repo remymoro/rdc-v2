@@ -104,7 +104,7 @@ un impact trop large.
 
 ## RDC-REF-005 — Un magasin est rattaché à un centre
 
-`core` · erreur · ✅ création (étape 3, A1) · ⏳ transfert (A3)
+`core` · erreur · ✅ création et transfert (étape 3, A1 et A3)
 
 **Règle.** Tout magasin a un centre de rattachement. Le transfert de
 rattachement vers un autre centre est une opération explicite
@@ -189,7 +189,7 @@ pourra s'ajouter plus tard par une migration qui recopie le nom.
 
 ## RDC-REF-010 — Seul un centre actif reçoit un nouveau rattachement
 
-`core` · erreur · ✅ création d'un magasin (étape 3, A1) · ⏳ transfert, bénévoles et plannings (étapes 3 et 6)
+`core` · erreur · ✅ création et transfert d'un magasin (étape 3) · ⏳ bénévoles et plannings (étape 6)
 
 **Règle.** Créer ou transférer un magasin, créer un bénévole, planifier des
 bénévoles au centre ou planifier un chauffeur exige un centre ACTIF. Un centre
