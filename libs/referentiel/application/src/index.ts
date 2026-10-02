@@ -13,9 +13,21 @@ export { ActiverCentreUseCase } from './centre/activer-centre.use-case';
 export { ArchiverCentreUseCase } from './centre/archiver-centre.use-case';
 
 // Magasin
-export type { CreerMagasinCommande } from './magasin/commandes';
+export type {
+  ActiverMagasinCommande,
+  ArchiverMagasinCommande,
+  CreerMagasinCommande,
+  DesactiverMagasinCommande,
+} from './magasin/commandes';
 export { CreerMagasinUseCase } from './magasin/creer-magasin.use-case';
+export { DesactiverMagasinUseCase } from './magasin/desactiver-magasin.use-case';
+export { ActiverMagasinUseCase } from './magasin/activer-magasin.use-case';
+export { ArchiverMagasinUseCase } from './magasin/archiver-magasin.use-case';
 
 // Commun au contexte
-export { CentreDejaExistant, CentreIntrouvable } from './errors';
+export {
+  CentreDejaExistant,
+  CentreIntrouvable,
+  MagasinIntrouvable,
+} from './errors';
 export { GenerateurIdentifiants } from './ports/generateur-identifiants';

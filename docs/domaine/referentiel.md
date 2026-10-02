@@ -35,7 +35,7 @@ avec une clé globale qui ne contient pas le centre de rattachement.
 
 ## RDC-REF-002 — Un élément archivé ne change plus jamais d'état
 
-`core` · erreur · ✅ centre (domaine, application, HTTP) · ⏳ magasin
+`core` · erreur · ✅ centre et magasin (domaine, application, HTTP)
 
 **Règle.** Centre et magasin : ACTIF ⇄ INACTIF, et archivage possible depuis
 les deux. Désactiver un inactif, activer un actif ou archiver un archivé est
