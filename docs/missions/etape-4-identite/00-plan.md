@@ -77,7 +77,7 @@ Les codes de la v1 sont repris quand l'erreur existait (`12-erreurs.md`) :
 `MOT_DE_PASSE_TROP_COURT`, `MOT_DE_PASSE_TROP_LONG` (la v1 le vérifiait dans
 les DTO, en `REQUEST_VALIDATION`), `ADMIN_CENTRE_INTERDIT`,
 `ADMIN_NON_DESACTIVABLE`, `ADMIN_INACTIF_INTERDIT`. Tranches suivantes :
-`AUTH_BOOTSTRAP_DISABLED` (1b), `AUTH_EMAIL_ALREADY_EXISTS` et
+`AUTH_BOOTSTRAP_DISABLED` et `AUTH_EMAIL_ALREADY_EXISTS` (1b),
 `USER_ROLE_INCONNU` (1c), `AUTH_INVALID_CREDENTIALS`, `AUTH_USER_INACTIVE`,
 `AUTH_REFRESH_INVALID`, `AUTH_REFRESH_REUSE` (1d).
 
@@ -85,6 +85,14 @@ les DTO, en `REQUEST_VALIDATION`), `ADMIN_CENTRE_INTERDIT`,
 `MotDePasse.creer` : un refus « trop court » révélerait la règle et
 contournerait le hachage factice (audit A-07). Seule la longueur maximale
 (protection du hachage) est vérifiée, puis le hachage décide.
+
+**Course entre deux premiers administrateurs (1c).** La revérification dans
+la transaction ne fait que réduire la fenêtre : en READ COMMITTED, deux
+demandes simultanées peuvent toutes deux voir « aucun admin ». C'est un index
+unique partiel (`role` WHERE `role = 'ADMIN'`), écrit à la main dans la
+migration, qui tranche ; sa violation est traduite en
+`AdministrateurDejaExistant`, et celle de l'adresse en
+`AdresseConnexionDejaUtilisee`, selon la contrainte en cause.
 
 ## Ce qui ne fait pas partie de l'étape 4
 
