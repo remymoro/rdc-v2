@@ -53,3 +53,4 @@ export {
 export { ProduitsController } from './http/produits.controller';
 export { PrismaProduitRepository } from './prisma/prisma-produit.repository';
 export { PrismaLecturesProduits } from './prisma/prisma-lectures-produits';
+export { DisqueStockageImages } from './stockage/disque-stockage-images';

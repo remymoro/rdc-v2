@@ -12,3 +12,9 @@ export {
   verifierContratLecturesProduits,
   type ContexteContratLecturesProduits,
 } from './produit/lectures/lectures-produits.contrat.test-utils';
+export {
+  unContenuJpeg,
+  unFichier,
+  verifierContratStockageImages,
+  type ContexteContratStockageImages,
+} from './ports/stockage-images.contrat.test-utils';

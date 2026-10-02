@@ -81,3 +81,8 @@ export {
   ProduitIntrouvable,
 } from './errors';
 export { GenerateurIdentifiants } from './ports/generateur-identifiants';
+export {
+  StockageImages,
+  StockageImagesIndisponible,
+  type FichierImageStocke,
+} from './ports/stockage-images';
