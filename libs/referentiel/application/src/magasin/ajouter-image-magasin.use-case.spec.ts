@@ -78,6 +78,67 @@ describe('AjouterImageMagasinUseCase (RDC-REF-007)', () => {
     expect(unitOfWork.nombreDeCommits).toBe(1);
   });
 
+  it('termine l’écriture du fichier avant d’ouvrir la transaction', async () => {
+    const useCase = preparer();
+    const run = jest.spyOn(unitOfWork, 'run');
+    const enregistrer = stockage.enregistrer.bind(stockage);
+    jest.spyOn(stockage, 'enregistrer').mockImplementation(async (...args) => {
+      expect(run).not.toHaveBeenCalled();
+      await enregistrer(...args);
+    });
+
+    await useCase.execute({ magasinId, contenu: unContenuJpeg() });
+
+    expect(run).toHaveBeenCalledTimes(1);
+  });
+
+  it('relit les images ajoutées pendant l’écriture disque', async () => {
+    const useCase = preparer();
+    const autreId = ImageMagasinId.creer(
+      '1e5f3c9d-7b2a-4d4f-8c8e-6a3b9f2d5c7e',
+    );
+    const enregistrer = stockage.enregistrer.bind(stockage);
+    jest.spyOn(stockage, 'enregistrer').mockImplementation(async (...args) => {
+      await enregistrer(...args);
+      const concurrent = (await magasinRepository.get(magasinId))!;
+      concurrent.ajouterImage(
+        {
+          id: autreId,
+          fichier: FichierImage.creer(autreId.valeur + '.jpg'),
+        },
+        maintenant,
+      );
+      await magasinRepository.save(concurrent);
+    });
+
+    const image = await useCase.execute({
+      magasinId,
+      contenu: unContenuJpeg(),
+    });
+
+    expect(image.ordre).toBe(1);
+    expect(
+      (await magasinRepository.get(magasinId))?.images.map((i) => i.id.valeur),
+    ).toEqual([autreId.valeur, imageId.valeur]);
+  });
+
+  it('compense le fichier si le magasin est archivé pendant l’écriture disque', async () => {
+    const useCase = preparer();
+    const enregistrer = stockage.enregistrer.bind(stockage);
+    jest.spyOn(stockage, 'enregistrer').mockImplementation(async (...args) => {
+      await enregistrer(...args);
+      const concurrent = (await magasinRepository.get(magasinId))!;
+      concurrent.archiver(maintenant);
+      await magasinRepository.save(concurrent);
+    });
+
+    await expect(
+      useCase.execute({ magasinId, contenu: unContenuJpeg() }),
+    ).rejects.toBeInstanceOf(MagasinArchive);
+    expect(stockage.noms()).toEqual([]);
+    expect(unitOfWork.nombreDeCommits).toBe(0);
+  });
+
   it('nomme le fichier d’après le format reconnu, pas d’après le client', async () => {
     const png = ContenuImage.creer(
       new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0]),
