@@ -20,15 +20,15 @@ import {
   type ProduitReponse,
   versProduitReponse,
   vueVersProduitReponse,
-} from './produit.reponse';
+} from './reponses/produit.reponse';
 import {
   CreerProduitRequete,
   ModifierProduitRequete,
   versChangerActiviteProduitCommande,
   versCreerProduitCommande,
   versModifierProduitCommande,
-} from './produit.requetes';
-import { ReferentielErreursHttpFilter } from './referentiel-erreurs-http.filter';
+} from './requetes/produit.requetes';
+import { ReferentielErreursHttpFilter } from '../commun/filtres/referentiel-erreurs-http.filter';
 
 /**
  * Adapter primaire du catalogue (contrat v1, ADR-0009) : traduit HTTP → use

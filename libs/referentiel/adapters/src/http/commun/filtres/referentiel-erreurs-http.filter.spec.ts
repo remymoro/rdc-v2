@@ -50,8 +50,8 @@ import {
   VilleTropLongue,
   VilleVide,
 } from '@rdc/referentiel-domain';
-import { CentrePersisteInvalide } from '../prisma/centre-persiste-invalide';
-import { MagasinPersisteInvalide } from '../prisma/magasin-persiste-invalide';
+import { CentrePersisteInvalide } from '../../../prisma/centre-persiste-invalide';
+import { MagasinPersisteInvalide } from '../../../prisma/magasin-persiste-invalide';
 import { ReferentielErreursHttpFilter } from './referentiel-erreurs-http.filter';
 
 function hoteHttp() {

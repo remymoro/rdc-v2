@@ -38,9 +38,9 @@ import {
 } from '@rdc/referentiel-domain';
 import { Clock, UnitOfWork } from '@rdc/shared-kernel-application';
 import { PrismaTransaction } from '@rdc/shared-kernel-adapters';
-import { CentresController } from './http/centres.controller';
-import { MagasinsController } from './http/magasins.controller';
-import { ProduitsController } from './http/produits.controller';
+import { CentresController } from './http/centres/centres.controller';
+import { MagasinsController } from './http/magasins/magasins.controller';
+import { ProduitsController } from './http/produits/produits.controller';
 import { GenerateurIdentifiantsUuid } from './identifiants/generateur-identifiants-uuid';
 import { PrismaCentreRepository } from './prisma/prisma-centre.repository';
 import { PrismaLecturesCentres } from './prisma/prisma-lectures-centres';

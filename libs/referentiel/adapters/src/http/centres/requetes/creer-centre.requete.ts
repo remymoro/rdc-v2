@@ -9,7 +9,7 @@ import {
 } from '@rdc/referentiel-domain';
 import { Transform } from 'class-transformer';
 import { IsOptional, IsString } from 'class-validator';
-import { videVersAbsent } from './champ-facultatif';
+import { videVersAbsent } from '../../commun/transformations/champ-facultatif';
 
 /**
  * Corps de POST /api/centres. Ne vérifie que la FORME (présence, texte) :
