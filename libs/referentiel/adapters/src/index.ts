@@ -18,8 +18,14 @@ export {
 } from './http/creer-magasin.requete';
 export {
   versMagasinReponse,
+  vueVersMagasinReponse,
   type MagasinReponse,
 } from './http/magasin.reponse';
+export {
+  versListerMagasinsDuCentreRequete,
+  versObtenirMagasinRequete,
+} from './http/lire-magasins.requete';
+export { PrismaLecturesMagasins } from './prisma/prisma-lectures-magasins';
 export {
   versActiverMagasinCommande,
   versArchiverMagasinCommande,

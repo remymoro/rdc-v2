@@ -9,7 +9,8 @@ import {
   Telephone,
   Ville,
 } from '@rdc/referentiel-domain';
-import { versMagasinReponse } from './magasin.reponse';
+import { StatutMagasin } from '@rdc/referentiel-domain';
+import { versMagasinReponse, vueVersMagasinReponse } from './magasin.reponse';
 
 describe('versMagasinReponse — format MagasinDto de RDC v1', () => {
   const identite = {
@@ -53,5 +54,36 @@ describe('versMagasinReponse — format MagasinDto de RDC v1', () => {
 
     expect(reponse).not.toHaveProperty('telephone');
     expect(reponse).not.toHaveProperty('email');
+  });
+});
+
+describe('vueVersMagasinReponse — même MagasinDto depuis une vue de lecture', () => {
+  it('expose les mêmes champs que la réponse de création', () => {
+    expect(
+      vueVersMagasinReponse({
+        id: '3b8a5d6e-0f12-4f7a-9c1e-7f1c9d7e2d4b',
+        nom: 'Leclerc Agen Sud',
+        adresse: '1 avenue du Général de Gaulle',
+        codePostal: '47000',
+        ville: 'Agen',
+        email: 'agen-sud@leclerc.fr',
+        statut: StatutMagasin.INACTIF,
+        centreId: '7f1c9d7e-2d4b-4f7a-9c1e-3b8a5d6e0f12',
+        creeLe: new Date('2026-10-01T09:00:00.000Z'),
+        modifieLe: new Date('2026-10-02T14:30:00.000Z'),
+      }),
+    ).toEqual({
+      id: '3b8a5d6e-0f12-4f7a-9c1e-7f1c9d7e2d4b',
+      nom: 'Leclerc Agen Sud',
+      ville: 'Agen',
+      codePostal: '47000',
+      adresse: '1 avenue du Général de Gaulle',
+      email: 'agen-sud@leclerc.fr',
+      statut: 'INACTIF',
+      centreId: '7f1c9d7e-2d4b-4f7a-9c1e-3b8a5d6e0f12',
+      images: [],
+      createdAt: '2026-10-01T09:00:00.000Z',
+      updatedAt: '2026-10-02T14:30:00.000Z',
+    });
   });
 });

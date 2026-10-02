@@ -7,7 +7,11 @@ import {
   ActiverMagasinUseCase,
   ArchiverMagasinUseCase,
   DesactiverMagasinUseCase,
+  LecturesMagasins,
+  ListerMagasinsDuCentreQuery,
+  ListerMagasinsQuery,
   ModifierMagasinUseCase,
+  ObtenirMagasinQuery,
   DesactiverCentreUseCase,
   GenerateurIdentifiants,
 } from '@rdc/referentiel-application';
@@ -18,6 +22,7 @@ import { CentresController } from './http/centres.controller';
 import { MagasinsController } from './http/magasins.controller';
 import { GenerateurIdentifiantsUuid } from './identifiants/generateur-identifiants-uuid';
 import { PrismaCentreRepository } from './prisma/prisma-centre.repository';
+import { PrismaLecturesMagasins } from './prisma/prisma-lectures-magasins';
 import { PrismaMagasinRepository } from './prisma/prisma-magasin.repository';
 
 /**
@@ -164,6 +169,34 @@ import { PrismaMagasinRepository } from './prisma/prisma-magasin.repository';
           clock,
         ),
       inject: [MagasinRepository, CentreRepository, UnitOfWork, Clock],
+    },
+    {
+      provide: LecturesMagasins,
+      scope: Scope.REQUEST,
+      useFactory: (transaction: PrismaTransaction) =>
+        new PrismaLecturesMagasins(transaction),
+      inject: [PrismaTransaction],
+    },
+    {
+      provide: ListerMagasinsQuery,
+      scope: Scope.REQUEST,
+      useFactory: (lectures: LecturesMagasins) =>
+        new ListerMagasinsQuery(lectures),
+      inject: [LecturesMagasins],
+    },
+    {
+      provide: ListerMagasinsDuCentreQuery,
+      scope: Scope.REQUEST,
+      useFactory: (lectures: LecturesMagasins) =>
+        new ListerMagasinsDuCentreQuery(lectures),
+      inject: [LecturesMagasins],
+    },
+    {
+      provide: ObtenirMagasinQuery,
+      scope: Scope.REQUEST,
+      useFactory: (lectures: LecturesMagasins) =>
+        new ObtenirMagasinQuery(lectures),
+      inject: [LecturesMagasins],
     },
   ],
 })

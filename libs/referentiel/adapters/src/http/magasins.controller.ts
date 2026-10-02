@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
@@ -13,7 +14,10 @@ import {
   ArchiverMagasinUseCase,
   CreerMagasinUseCase,
   DesactiverMagasinUseCase,
+  ListerMagasinsDuCentreQuery,
+  ListerMagasinsQuery,
   ModifierMagasinUseCase,
+  ObtenirMagasinQuery,
 } from '@rdc/referentiel-application';
 import {
   CreerMagasinRequete,
@@ -24,7 +28,15 @@ import {
   versArchiverMagasinCommande,
   versDesactiverMagasinCommande,
 } from './cycle-de-vie-magasin.requete';
-import { type MagasinReponse, versMagasinReponse } from './magasin.reponse';
+import {
+  versListerMagasinsDuCentreRequete,
+  versObtenirMagasinRequete,
+} from './lire-magasins.requete';
+import {
+  type MagasinReponse,
+  versMagasinReponse,
+  vueVersMagasinReponse,
+} from './magasin.reponse';
 import {
   ModifierMagasinRequete,
   versModifierMagasinCommande,
@@ -45,7 +57,36 @@ export class MagasinsController {
     private readonly activerMagasin: ActiverMagasinUseCase,
     private readonly archiverMagasin: ArchiverMagasinUseCase,
     private readonly modifierMagasin: ModifierMagasinUseCase,
+    private readonly listerMagasins: ListerMagasinsQuery,
+    private readonly listerMagasinsDuCentre: ListerMagasinsDuCentreQuery,
+    private readonly obtenirMagasin: ObtenirMagasinQuery,
   ) {}
+
+  // Lectures (contrat v1, ADR-0009). Pas encore de filtre « son centre » :
+  // il dépend du jeton et arrive à l'étape 4.
+  @Get('magasins')
+  async lister(): Promise<MagasinReponse[]> {
+    const vues = await this.listerMagasins.execute();
+    return vues.map(vueVersMagasinReponse);
+  }
+
+  @Get('centres/:centreId/magasins')
+  async listerDuCentre(
+    @Param('centreId') centreId: string,
+  ): Promise<MagasinReponse[]> {
+    const vues = await this.listerMagasinsDuCentre.execute(
+      versListerMagasinsDuCentreRequete(centreId),
+    );
+    return vues.map(vueVersMagasinReponse);
+  }
+
+  @Get('magasins/:id')
+  async obtenir(@Param('id') id: string): Promise<MagasinReponse> {
+    const vue = await this.obtenirMagasin.execute(
+      versObtenirMagasinRequete(id),
+    );
+    return vueVersMagasinReponse(vue);
+  }
 
   @Post('centres/:centreId/magasins')
   @HttpCode(HttpStatus.CREATED)
