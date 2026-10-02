@@ -46,6 +46,11 @@ différemment ne sont pas bloquées.
 - **Avant la mise en production** : un script de reprise calcule `cleDoublon`
   pour les centres existants, signale les doublons déjà présents en v1, puis une
   migration rend la colonne obligatoire.
+- **Images v1, préalable bloquant avant mise en production (ADR-0022, IMP-3)** :
+  suivre le [guide d'exploitation](../exploitation/images.md#reprise-v1--contrôle-bloquant-avant-la-mise-en-production).
+  Corriger les fichiers et URL invalides sur une copie sauvegardée, réexporter
+  puis obtenir le code 0 du contrôle. Un code 1 ou 2 interdit la bascule ;
+  conserver le rapport validé avant import définitif et démarrage v2.
 - `prisma migrate dev` étant interactif, une migration se crée avec
   `prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --script`
   dans un dossier `AAAAMMJJHHMMSS_nom/migration.sql`.

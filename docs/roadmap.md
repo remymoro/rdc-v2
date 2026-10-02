@@ -155,10 +155,18 @@ Durcissement des images (revue I1 à I7, ADR-0022) : transaction courte après
 écriture du fichier, publication atomique sans écrasement, contrat de collision
 commun, limites multipart, service public restreint avec CSP/nosniff, nettoyage
 isolé par magasin et traduction des pannes NAS. Tests de régression ajoutés.
-Avant reprise, exécuter le [contrôle des URL v1](exploitation/reprise-images-v1.md) ;
-avant déploiement, appliquer les [restrictions nginx](exploitation/images-nas.md)
+**Avant la mise en production (ADR-0008), étape bloquante :** exécuter le [contrôle des URL v1](exploitation/images.md#reprise-v1--contrôle-bloquant-avant-la-mise-en-production) ;
+corriger manuellement toute anomalie, réexporter puis obtenir le code **0**.
+Un code **1 ou 2** interdit la bascule. Avant déploiement, appliquer les [restrictions nginx](exploitation/images.md)
 et vérifier les liens physiques sur le volume. Le cas de COMMIT incertain R1
 et la limite effective des en-têtes Busboy sont explicités dans l'ADR-0022.
+
+Suite à la [revue indépendante de la PR #21](https://github.com/remymoro/rdc-v2/pull/21#issuecomment-5953800615) :
+purge des temporaires séparée de la liste, échec journalisé sans interrompre
+les orphelins (IMP-1), tests d'absence d'écriture renforcés (IMP-2), reprise
+bloquante (IMP-3), guide d'exploitation unique, auto-revue retirée et port
+`Journal` injecté dans le stockage (SIMP-1 à SIMP-3). Les onze points mineurs
+MIN-1 à MIN-11 restent à traiter dans un lot suivant ; R1 reste ouvert.
 
 Images (lot C, ADR-0021) : dossier lu dans `UPLOADS_DIR` (`./uploads` par
 défaut) ; le rendez-vous NAS ne fixe que sa valeur. `MagasinDto.images` suit le

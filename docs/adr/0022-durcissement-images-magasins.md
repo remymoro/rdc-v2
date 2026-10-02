@@ -24,9 +24,14 @@
    ERROR-004/006).
 
    Les échecs nettoient le temporaire sans masquer la panne initiale.
-   Un échec de nettoyage est journalisé ; `lister()` retente la suppression
-   des seuls noms temporaires générés par l'adapter, après une heure. Ils
-   restent privés et ne sont jamais considérés comme des images du domaine.
+   Un échec de nettoyage est journalisé via le port `Journal`, injecté dans
+   l'adapter (SIMP-3). `lister()` est une lecture sans suppression (IMP-1,
+   TENETS-PORT-011). Le use case appelle `purgerTemporaires(avant)` avec la
+   même limite que les orphelins, calculée par `Clock` : une heure. La purge
+   ne touche que les noms temporaires privés générés par l'adapter. Son échec
+   est journalisé et incrémente `echecs`, sans empêcher le nettoyage des
+   images ; une purge partielle est retentée au passage suivant.
+   Les temporaires ne sont jamais considérés comme des images du domaine.
    La publication précède la transaction, conformément à la demande de
    correction : pas de fenêtre « base validée, fichier pas encore publié ».
 
@@ -44,13 +49,18 @@
    `Content-Security-Policy: default-src 'none'; sandbox`.
    Les autres fichiers du volume et les temporaires sont inaccessibles.
    nginx doit appliquer la même politique ; voir
-   [configuration du NAS](../exploitation/images-nas.md).
+   [configuration du NAS](../exploitation/images.md).
 
 5. **Reprise et nettoyage (I5).** Un chargement de magasin en échec conserve
    ses fichiers, incrémente `echecs` une fois pour ce magasin et journalise
    la cause avant de poursuivre. Le contrôle des noms et URL v1 est un
    préalable bloquant de la reprise, via
-   [le script et sa procédure](../exploitation/reprise-images-v1.md).
+   [le script et sa procédure](../exploitation/images.md#reprise-v1--contrôle-bloquant-avant-la-mise-en-production).
+   IMP-3 : tout code de sortie 1 ou 2 interdit la bascule en production.
+   Corriger manuellement les fichiers et les URL sur une copie sauvegardée,
+   réexporter les références puis obtenir un contrôle à 0 et conserver son
+   rapport avant import définitif et démarrage. Le script détecte les erreurs,
+   il ne les répare pas. Cette obligation complète la reprise ADR-0008.
    Il ne relâche pas les invariants du domaine (TENETS-VALIDATE-001,
    RDC-REF-007).
 
