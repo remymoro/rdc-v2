@@ -22,18 +22,22 @@ import { PrismaMagasinRepository } from './prisma-magasin.repository';
 // exécutée contre PostgreSQL (base rdc_test, TENETS-TEST-003, ADR-0003 R10).
 const prisma = creerPrismaClient(exigerVariable('DATABASE_URL_TEST'));
 const centreId = CentreId.creer('7f1c9d7e-2d4b-4f7a-9c1e-3b8a5d6e0f12');
+const autreCentreId = CentreId.creer('0b6e3f7a-9c2d-4e1f-8a5b-6c7d8e9f0a1b');
 
 async function viderLaBase(): Promise<void> {
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "Magasin", "Centre" CASCADE');
 }
 
 /** Le magasin référence son centre : clé étrangère en base. */
-async function enregistrerLeCentre(): Promise<void> {
+async function enregistrerLeCentre(
+  id: CentreId = centreId,
+  nom = "Centre d'Agen",
+): Promise<void> {
   await new PrismaCentreRepository(new PrismaTransaction(prisma)).save(
     Centre.creer(
       {
-        id: centreId,
-        nom: Nom.creer("Centre d'Agen"),
+        id,
+        nom: Nom.creer(nom),
         adresse: Adresse.creer('12 avenue Jean Jaurès'),
         codePostal: CodePostal.creer('47000'),
         ville: Ville.creer('Agen'),
@@ -50,9 +54,11 @@ afterAll(async () => {
 verifierContratMagasinRepository('PrismaMagasinRepository', async () => {
   await viderLaBase();
   await enregistrerLeCentre();
+  await enregistrerLeCentre(autreCentreId, 'Centre de Villeneuve');
   return {
     repository: new PrismaMagasinRepository(new PrismaTransaction(prisma)),
     centreId,
+    autreCentreId,
     nettoyer: viderLaBase,
   };
 });

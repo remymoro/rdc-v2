@@ -1,4 +1,5 @@
 import {
+  CentreId,
   CleDoublonMagasin,
   Magasin,
   MagasinDejaExistant,
@@ -48,6 +49,14 @@ export class PrismaMagasinRepository extends MagasinRepository {
   async existsByCleDoublon(cle: CleDoublonMagasin): Promise<boolean> {
     const magasin = await this.transaction.client.magasin.findUnique({
       where: { cleDoublon: cle.valeur },
+      select: { id: true },
+    });
+    return magasin !== null;
+  }
+
+  async existsNonArchiveDuCentre(centreId: CentreId): Promise<boolean> {
+    const magasin = await this.transaction.client.magasin.findFirst({
+      where: { centreId: centreId.valeur, statut: { not: 'ARCHIVE' } },
       select: { id: true },
     });
     return magasin !== null;
