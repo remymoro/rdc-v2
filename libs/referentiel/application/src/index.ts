@@ -39,10 +39,27 @@ export {
   type ObtenirMagasinRequete,
 } from './magasin/lectures/obtenir-magasin.query';
 
+// Produit
+export type {
+  ChangerActiviteProduitCommande,
+  CreerProduitCommande,
+  ModifierProduitCommande,
+} from './produit/commandes';
+export { CreerProduitUseCase } from './produit/creer-produit.use-case';
+export { ModifierProduitUseCase } from './produit/modifier-produit.use-case';
+export { DesactiverProduitUseCase } from './produit/desactiver-produit.use-case';
+export { ActiverProduitUseCase } from './produit/activer-produit.use-case';
+export {
+  LecturesProduits,
+  type VueProduit,
+} from './produit/lectures/lectures-produits';
+export { ListerProduitsQuery } from './produit/lectures/lister-produits.query';
+
 // Commun au contexte
 export {
   CentreDejaExistant,
   CentreIntrouvable,
   MagasinIntrouvable,
+  ProduitIntrouvable,
 } from './errors';
 export { GenerateurIdentifiants } from './ports/generateur-identifiants';

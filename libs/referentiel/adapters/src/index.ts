@@ -38,3 +38,18 @@ export {
 export { MagasinsController } from './http/magasins.controller';
 export { PrismaMagasinRepository } from './prisma/prisma-magasin.repository';
 export { ReferentielModule } from './referentiel.module';
+export {
+  CreerProduitRequete,
+  ModifierProduitRequete,
+  versChangerActiviteProduitCommande,
+  versCreerProduitCommande,
+  versModifierProduitCommande,
+} from './http/produit.requetes';
+export {
+  versProduitReponse,
+  vueVersProduitReponse,
+  type ProduitReponse,
+} from './http/produit.reponse';
+export { ProduitsController } from './http/produits.controller';
+export { PrismaProduitRepository } from './prisma/prisma-produit.repository';
+export { PrismaLecturesProduits } from './prisma/prisma-lectures-produits';

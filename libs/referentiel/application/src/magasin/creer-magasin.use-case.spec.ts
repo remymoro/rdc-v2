@@ -41,7 +41,7 @@ describe('CreerMagasinUseCase', () => {
     return new CreerMagasinUseCase(
       magasinRepository,
       new CentreRepositoryEnMemoire(centres),
-      new GenerateurIdentifiantsFixe(centreId, idGenere),
+      new GenerateurIdentifiantsFixe({ centreId, magasinId: idGenere }),
       unitOfWork,
       new HorlogeFixe(maintenant),
     );

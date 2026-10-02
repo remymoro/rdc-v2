@@ -40,3 +40,28 @@ export {
   TelephoneVide,
 } from './commun/telephone';
 export { Email, EmailInvalide, EmailTropLong, EmailVide } from './commun/email';
+export { Produit } from './produit/produit';
+export { ProduitRepository } from './ports/produit.repository';
+export type {
+  EtatProduit,
+  ModificationsProduit,
+  NouveauProduit,
+} from './produit/produit';
+export {
+  ProduitId,
+  ProduitIdInvalide,
+  ProduitIdVide,
+} from './produit/produit-id';
+export {
+  CodeProduit,
+  CodeProduitInvalide,
+  CodeProduitVide,
+} from './produit/code-produit';
+export {
+  Famille,
+  FamilleTropLongue,
+  FamilleVide,
+  SousFamille,
+  SousFamilleTropLongue,
+  SousFamilleVide,
+} from './produit/famille';
