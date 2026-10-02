@@ -4,14 +4,25 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   UseFilters,
 } from '@nestjs/common';
-import { CreerMagasinUseCase } from '@rdc/referentiel-application';
+import {
+  ActiverMagasinUseCase,
+  ArchiverMagasinUseCase,
+  CreerMagasinUseCase,
+  DesactiverMagasinUseCase,
+} from '@rdc/referentiel-application';
 import {
   CreerMagasinRequete,
   versCreerMagasinCommande,
 } from './creer-magasin.requete';
+import {
+  versActiverMagasinCommande,
+  versArchiverMagasinCommande,
+  versDesactiverMagasinCommande,
+} from './cycle-de-vie-magasin.requete';
 import { type MagasinReponse, versMagasinReponse } from './magasin.reponse';
 import { ReferentielErreursHttpFilter } from './referentiel-erreurs-http.filter';
 
@@ -23,7 +34,12 @@ import { ReferentielErreursHttpFilter } from './referentiel-erreurs-http.filter'
 @Controller()
 @UseFilters(ReferentielErreursHttpFilter)
 export class MagasinsController {
-  constructor(private readonly creerMagasin: CreerMagasinUseCase) {}
+  constructor(
+    private readonly creerMagasin: CreerMagasinUseCase,
+    private readonly desactiverMagasin: DesactiverMagasinUseCase,
+    private readonly activerMagasin: ActiverMagasinUseCase,
+    private readonly archiverMagasin: ArchiverMagasinUseCase,
+  ) {}
 
   @Post('centres/:centreId/magasins')
   @HttpCode(HttpStatus.CREATED)
@@ -35,5 +51,24 @@ export class MagasinsController {
       versCreerMagasinCommande(centreId, requete),
     );
     return versMagasinReponse(magasin);
+  }
+
+  // Cycle de vie (contrat v1, ADR-0009) : corps ignoré, 204 sans corps.
+  @Patch('magasins/:id/desactiver')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async desactiver(@Param('id') id: string): Promise<void> {
+    await this.desactiverMagasin.execute(versDesactiverMagasinCommande(id));
+  }
+
+  @Patch('magasins/:id/activer')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async activer(@Param('id') id: string): Promise<void> {
+    await this.activerMagasin.execute(versActiverMagasinCommande(id));
+  }
+
+  @Patch('magasins/:id/archiver')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async archiver(@Param('id') id: string): Promise<void> {
+    await this.archiverMagasin.execute(versArchiverMagasinCommande(id));
   }
 }
