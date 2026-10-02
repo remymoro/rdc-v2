@@ -21,6 +21,21 @@ export class CentreIntrouvable extends Error {
   }
 }
 
+/**
+ * Un centre qui a encore un magasin ACTIF ou INACTIF ne s'archive pas : ses
+ * magasins n'auraient plus de centre (RDC-REF-011, décision D-18).
+ */
+export class CentreADesMagasins extends Error {
+  readonly code = 'CENTRE_A_DES_MAGASINS';
+
+  constructor(readonly centreId: CentreId) {
+    super(
+      "Ce centre a encore des magasins : transférez-les ou archivez-les avant d'archiver le centre.",
+    );
+    this.name = 'CentreADesMagasins';
+  }
+}
+
 /** Le workflow exige un magasin qui n'existe pas (TENETS-REPO-005). */
 export class MagasinIntrouvable extends Error {
   readonly code = 'MAGASIN_NOT_FOUND';

@@ -106,10 +106,17 @@ import { PrismaMagasinRepository } from './prisma/prisma-magasin.repository';
       scope: Scope.REQUEST,
       useFactory: (
         centreRepository: CentreRepository,
+        magasinRepository: MagasinRepository,
         unitOfWork: UnitOfWork,
         clock: Clock,
-      ) => new ArchiverCentreUseCase(centreRepository, unitOfWork, clock),
-      inject: [CentreRepository, UnitOfWork, Clock],
+      ) =>
+        new ArchiverCentreUseCase(
+          centreRepository,
+          magasinRepository,
+          unitOfWork,
+          clock,
+        ),
+      inject: [CentreRepository, MagasinRepository, UnitOfWork, Clock],
     },
     {
       provide: CreerMagasinUseCase,
