@@ -116,7 +116,7 @@ function reconstituerMagasin(ligne: Prisma.MagasinModel): Magasin {
   });
 }
 
-function versStatutDomaine(statut: StatutMagasinPrisma): StatutMagasin {
+export function versStatutDomaine(statut: StatutMagasinPrisma): StatutMagasin {
   switch (statut) {
     case 'ACTIF':
       return StatutMagasin.ACTIF;

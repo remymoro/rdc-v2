@@ -25,6 +25,19 @@ export { DesactiverMagasinUseCase } from './magasin/desactiver-magasin.use-case'
 export { ActiverMagasinUseCase } from './magasin/activer-magasin.use-case';
 export { ArchiverMagasinUseCase } from './magasin/archiver-magasin.use-case';
 export { ModifierMagasinUseCase } from './magasin/modifier-magasin.use-case';
+export {
+  LecturesMagasins,
+  type VueMagasin,
+} from './magasin/lectures/lectures-magasins';
+export { ListerMagasinsQuery } from './magasin/lectures/lister-magasins.query';
+export {
+  ListerMagasinsDuCentreQuery,
+  type ListerMagasinsDuCentreRequete,
+} from './magasin/lectures/lister-magasins-du-centre.query';
+export {
+  ObtenirMagasinQuery,
+  type ObtenirMagasinRequete,
+} from './magasin/lectures/obtenir-magasin.query';
 
 // Commun au contexte
 export {
