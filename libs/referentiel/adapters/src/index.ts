@@ -17,10 +17,18 @@ export {
   versCreerMagasinCommande,
 } from './http/creer-magasin.requete';
 export {
+  versImageMagasinReponse,
   versMagasinReponse,
   vueVersMagasinReponse,
+  type ImageMagasinReponse,
   type MagasinReponse,
 } from './http/magasin.reponse';
+export {
+  versAjouterImageMagasinCommande,
+  versRetirerImageMagasinCommande,
+  type FichierTeleverse,
+} from './http/images-magasin.requete';
+export { TeleversementImageFilter } from './http/televersement-image.filter';
 export {
   versListerMagasinsDuCentreRequete,
   versObtenirMagasinRequete,
@@ -53,3 +61,10 @@ export {
 export { ProduitsController } from './http/produits.controller';
 export { PrismaProduitRepository } from './prisma/prisma-produit.repository';
 export { PrismaLecturesProduits } from './prisma/prisma-lectures-produits';
+export { DisqueStockageImages } from './stockage/disque-stockage-images';
+export { JournalNest } from './journal/journal-nest';
+export {
+  dossierDesImages,
+  PREFIXE_PUBLIC_IMAGES,
+} from './stockage/configuration-images';
+export { NettoyageImagesOrphelinesTache } from './taches/nettoyage-images-orphelines.tache';

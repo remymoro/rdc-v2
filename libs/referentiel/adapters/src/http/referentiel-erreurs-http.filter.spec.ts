@@ -5,6 +5,7 @@ import {
   CentreIntrouvable,
   MagasinIntrouvable,
   ProduitIntrouvable,
+  StockageImagesIndisponible,
 } from '@rdc/referentiel-application';
 import {
   CentreDejaExistant,
@@ -24,11 +25,18 @@ import {
   EmailVide,
   FamilleTropLongue,
   FamilleVide,
+  ImageFormatNonSupporte,
+  ImageMagasinId,
+  ImageMagasinIdInvalide,
+  ImageMagasinIdVide,
+  ImageTropVolumineuse,
   MagasinArchive,
   MagasinDejaExistant,
   MagasinId,
   MagasinIdInvalide,
   MagasinIdVide,
+  MagasinImageDejaPresente,
+  MagasinImageIntrouvable,
   NomTropLong,
   NomVide,
   ProduitId,
@@ -221,6 +229,39 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
         code,
         message: erreur.message,
       }),
+    );
+  });
+
+  // Images d'un magasin (lot C, RDC-REF-007) : 400 comme en v1, 413 pour la
+  // taille comme le refus de taille de la v1, 503 si le stockage ne répond pas.
+  it.each([
+    [
+      new MagasinImageDejaPresente(
+        ImageMagasinId.creer('0d4e2b8c-6a1f-4c3e-9b7d-5f2a8e1c4b6d'),
+      ),
+      400,
+      'MAGASIN_IMAGE_DEJA_PRESENTE',
+    ],
+    [
+      new MagasinImageIntrouvable(
+        ImageMagasinId.creer('0d4e2b8c-6a1f-4c3e-9b7d-5f2a8e1c4b6d'),
+      ),
+      400,
+      'MAGASIN_IMAGE_INTROUVABLE',
+    ],
+    [new ImageMagasinIdVide(), 400, 'IMAGE_ID_EMPTY'],
+    [new ImageMagasinIdInvalide(), 400, 'IMAGE_ID_INVALID'],
+    [new ImageFormatNonSupporte(), 400, 'IMAGE_FORMAT_NON_SUPPORTE'],
+    [new ImageTropVolumineuse(), 413, 'IMAGE_TROP_VOLUMINEUSE'],
+    [new StockageImagesIndisponible(), 503, 'STOCKAGE_IMAGES_INDISPONIBLE'],
+  ] as const)('traduit %s en %i %s', (erreur, statut, code) => {
+    const { hote, reponse } = hoteHttp();
+
+    filtre.catch(erreur, hote);
+
+    expect(reponse.status).toHaveBeenCalledWith(statut);
+    expect(reponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({ statusCode: statut, code }),
     );
   });
 

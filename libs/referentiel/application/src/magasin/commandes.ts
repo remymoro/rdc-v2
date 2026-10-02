@@ -1,5 +1,7 @@
 import type {
   CentreId,
+  ContenuImage,
+  ImageMagasinId,
   MagasinId,
   ModificationsMagasin,
   NouveauMagasin,
@@ -35,4 +37,19 @@ export interface ModifierMagasinCommande {
   readonly changements: ModificationsMagasin;
   /** Absent = pas de transfert ; identique au centre actuel = sans effet. */
   readonly centreId?: CentreId;
+}
+
+/**
+ * Ajout d'une image (RDC-REF-007) : le contenu est déjà vérifié (taille,
+ * format reconnu par la signature) ; le nom envoyé par le client n'y figure pas.
+ */
+export interface AjouterImageMagasinCommande {
+  readonly magasinId: MagasinId;
+  readonly contenu: ContenuImage;
+}
+
+/** Retrait d'une image d'un magasin (RDC-REF-007). */
+export interface RetirerImageMagasinCommande {
+  readonly magasinId: MagasinId;
+  readonly imageId: ImageMagasinId;
 }

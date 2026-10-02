@@ -1,4 +1,9 @@
-import { CentreId, MagasinId, ProduitId } from '@rdc/referentiel-domain';
+import {
+  CentreId,
+  ImageMagasinId,
+  MagasinId,
+  ProduitId,
+} from '@rdc/referentiel-domain';
 import { GenerateurIdentifiants } from '../ports/generateur-identifiants';
 
 /** Renvoie toujours les mêmes identifiants : les tests restent déterministes. */
@@ -6,12 +11,14 @@ export class GenerateurIdentifiantsFixe extends GenerateurIdentifiants {
   private readonly centreId: CentreId;
   private readonly magasinId: MagasinId;
   private readonly produitId: ProduitId;
+  private readonly imageMagasinId: ImageMagasinId;
 
   constructor(
     identifiants: {
       centreId?: CentreId;
       magasinId?: MagasinId;
       produitId?: ProduitId;
+      imageMagasinId?: ImageMagasinId;
     } = {},
   ) {
     super();
@@ -24,6 +31,9 @@ export class GenerateurIdentifiantsFixe extends GenerateurIdentifiants {
     this.produitId =
       identifiants.produitId ??
       ProduitId.creer('9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d');
+    this.imageMagasinId =
+      identifiants.imageMagasinId ??
+      ImageMagasinId.creer('0d4e2b8c-6a1f-4c3e-9b7d-5f2a8e1c4b6d');
   }
 
   nouveauCentreId(): CentreId {
@@ -36,5 +46,9 @@ export class GenerateurIdentifiantsFixe extends GenerateurIdentifiants {
 
   nouveauProduitId(): ProduitId {
     return this.produitId;
+  }
+
+  nouvelleImageMagasinId(): ImageMagasinId {
+    return this.imageMagasinId;
   }
 }

@@ -37,7 +37,16 @@ export type {
   CreerMagasinCommande,
   DesactiverMagasinCommande,
   ModifierMagasinCommande,
+  AjouterImageMagasinCommande,
+  RetirerImageMagasinCommande,
 } from './magasin/commandes';
+export { AjouterImageMagasinUseCase } from './magasin/ajouter-image-magasin.use-case';
+export { RetirerImageMagasinUseCase } from './magasin/retirer-image-magasin.use-case';
+export {
+  AGE_MINIMAL_ORPHELIN_MS,
+  NettoyerImagesOrphelinesUseCase,
+  type BilanNettoyageImages,
+} from './magasin/nettoyer-images-orphelines.use-case';
 export { CreerMagasinUseCase } from './magasin/creer-magasin.use-case';
 export { DesactiverMagasinUseCase } from './magasin/desactiver-magasin.use-case';
 export { ActiverMagasinUseCase } from './magasin/activer-magasin.use-case';
@@ -45,6 +54,7 @@ export { ArchiverMagasinUseCase } from './magasin/archiver-magasin.use-case';
 export { ModifierMagasinUseCase } from './magasin/modifier-magasin.use-case';
 export {
   LecturesMagasins,
+  type VueImageMagasin,
   type VueMagasin,
 } from './magasin/lectures/lectures-magasins';
 export { ListerMagasinsQuery } from './magasin/lectures/lister-magasins.query';
@@ -81,3 +91,9 @@ export {
   ProduitIntrouvable,
 } from './errors';
 export { GenerateurIdentifiants } from './ports/generateur-identifiants';
+export { Journal, type DetailsJournal } from './ports/journal';
+export {
+  StockageImages,
+  StockageImagesIndisponible,
+  type FichierImageStocke,
+} from './ports/stockage-images';

@@ -22,6 +22,7 @@ export function unMagasinExistant(
     ville: Ville.creer('Agen'),
     centreId: CentreId.creer('7f1c9d7e-2d4b-4f7a-9c1e-3b8a5d6e0f12'),
     statut,
+    images: [],
     creeLe: new Date('2026-10-01T09:00:00.000Z'),
     modifieLe: new Date('2026-10-01T09:00:00.000Z'),
   });

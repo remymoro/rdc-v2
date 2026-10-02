@@ -217,6 +217,7 @@ function magasin(
     ville: Ville.creer('Agen'),
     centreId: rattachement.id,
     statut: options.statut ?? StatutMagasin.ACTIF,
+    images: [],
     creeLe: new Date('2026-10-01T09:00:00.000Z'),
     modifieLe: new Date('2026-10-01T09:00:00.000Z'),
   });

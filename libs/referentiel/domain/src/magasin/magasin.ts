@@ -5,8 +5,14 @@ import type { Email } from '../commun/email';
 import type { Nom } from '../commun/nom';
 import type { Telephone } from '../commun/telephone';
 import type { Ville } from '../commun/ville';
+import { ImageMagasin, type NouvelleImageMagasin } from './image/image-magasin';
+import type { ImageMagasinId } from './image/image-magasin-id';
 import type { MagasinId } from './magasin-id';
-import { MagasinArchive } from './magasin.errors';
+import {
+  MagasinArchive,
+  MagasinImageDejaPresente,
+  MagasinImageIntrouvable,
+} from './magasin.errors';
 import { StatutMagasin } from './statut-magasin';
 
 /** État initial complet d'un nouveau magasin (TENETS-LIFECYCLE-003). */
@@ -27,6 +33,8 @@ export interface NouveauMagasin {
 /** État persisté complet d'un magasin existant (TENETS-LIFECYCLE-005). */
 export interface EtatMagasin extends NouveauMagasin {
   readonly statut: StatutMagasin;
+  /** Images du magasin, dans n'importe quel ordre : l'agrégat les trie. */
+  readonly images: readonly ImageMagasin[];
   readonly creeLe: Date;
   readonly modifieLe: Date;
 }
@@ -56,6 +64,7 @@ export class Magasin {
     private telephoneActuel: Telephone | undefined,
     private emailActuel: Email | undefined,
     private statutActuel: StatutMagasin,
+    private imagesActuelles: ImageMagasin[],
     readonly creeLe: Date,
     private derniereModification: Date,
   ) {}
@@ -97,6 +106,11 @@ export class Magasin {
     return this.derniereModification;
   }
 
+  /** Images du magasin, dans leur ordre d'affichage (RDC-REF-007). */
+  get images(): readonly ImageMagasin[] {
+    return [...this.imagesActuelles];
+  }
+
   /** Nouveau magasin : le statut initial est décidé ici (TENETS-LIFECYCLE-004). */
   static creer(nouveau: NouveauMagasin, maintenant: Date): Magasin {
     return new Magasin(
@@ -109,6 +123,7 @@ export class Magasin {
       nouveau.telephone,
       nouveau.email,
       StatutMagasin.ACTIF,
+      [],
       maintenant,
       maintenant,
     );
@@ -129,6 +144,7 @@ export class Magasin {
       etat.telephone,
       etat.email,
       etat.statut,
+      trierParOrdre(etat.images),
       etat.creeLe,
       etat.modifieLe,
     );
@@ -234,9 +250,63 @@ export class Magasin {
     this.derniereModification = maintenant;
   }
 
+  /**
+   * Ajoute une image après les autres (RDC-REF-007). Le fichier est déjà
+   * nommé par le use case, jamais d'après le nom envoyé par le client.
+   */
+  ajouterImage(nouvelle: NouvelleImageMagasin, maintenant: Date): ImageMagasin {
+    this.verifierModifiable();
+    if (this.imagesActuelles.some((image) => image.id.equals(nouvelle.id))) {
+      throw new MagasinImageDejaPresente(nouvelle.id);
+    }
+
+    const image = ImageMagasin.creer(nouvelle, this.ordreSuivant(), maintenant);
+    this.imagesActuelles.push(image);
+    this.derniereModification = maintenant;
+    return image;
+  }
+
+  /**
+   * Retire une image du magasin et la renvoie : son fichier reste à supprimer
+   * par le use case, une fois le retrait enregistré (RDC-REF-007).
+   */
+  retirerImage(imageId: ImageMagasinId, maintenant: Date): ImageMagasin {
+    this.verifierModifiable();
+    const image = this.imagesActuelles.find((candidate) =>
+      candidate.id.equals(imageId),
+    );
+    if (image === undefined) {
+      throw new MagasinImageIntrouvable(imageId);
+    }
+
+    this.imagesActuelles = this.imagesActuelles.filter(
+      (candidate) => candidate !== image,
+    );
+    this.derniereModification = maintenant;
+    return image;
+  }
+
+  /** Après la plus grande position : un retrait ne crée pas de doublon d'ordre. */
+  private ordreSuivant(): number {
+    return this.imagesActuelles.reduce(
+      (suivant, image) => Math.max(suivant, image.ordre + 1),
+      0,
+    );
+  }
+
   private verifierModifiable(): void {
     if (this.statutActuel === StatutMagasin.ARCHIVE) {
       throw new MagasinArchive(this.id);
     }
   }
+}
+
+/** Ordre d'affichage : position, puis date d'ajout et identité pour départager. */
+function trierParOrdre(images: readonly ImageMagasin[]): ImageMagasin[] {
+  return [...images].sort(
+    (a, b) =>
+      a.ordre - b.ordre ||
+      a.ajouteeLe.getTime() - b.ajouteeLe.getTime() ||
+      a.id.valeur.localeCompare(b.id.valeur),
+  );
 }

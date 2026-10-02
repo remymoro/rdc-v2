@@ -26,17 +26,17 @@
 
 ## Étapes
 
-| Étape | Contenu                                                            | État           |
-| ----- | ------------------------------------------------------------------ | -------------- |
-| 0     | Fondations : Nx, lint d'architecture, CI, règles Tenets, ADR       | ✅ Terminé     |
-| 1     | Référentiel : créer un centre (domaine → use case → Prisma → HTTP) | ✅ Terminé     |
-| 2     | Référentiel : cycle de vie d'un centre (désactiver, archiver)      | ✅ Terminé     |
-| 3     | Référentiel : magasins et produits                                 | 🔄 tout sauf C |
-| 4     | Identité et accès : bootstrap admin, connexion, rôles              | ⏳             |
-| 5     | Collecte : design doc, puis création et cycle de vie               | ⏳             |
-| 6     | Planification, saisie, bénévoles                                   | ⏳             |
-| 7     | Statistiques (modèle de lecture séparé)                            | ⏳             |
-| 8     | Front Angular 22 dans le workspace (Node ≥ 24.15)                  | ⏳             |
+| Étape | Contenu                                                            | État       |
+| ----- | ------------------------------------------------------------------ | ---------- |
+| 0     | Fondations : Nx, lint d'architecture, CI, règles Tenets, ADR       | ✅ Terminé |
+| 1     | Référentiel : créer un centre (domaine → use case → Prisma → HTTP) | ✅ Terminé |
+| 2     | Référentiel : cycle de vie d'un centre (désactiver, archiver)      | ✅ Terminé |
+| 3     | Référentiel : magasins et produits                                 | ✅ Terminé |
+| 4     | Identité et accès : bootstrap admin, connexion, rôles              | ⏳         |
+| 5     | Collecte : design doc, puis création et cycle de vie               | ⏳         |
+| 6     | Planification, saisie, bénévoles                                   | ⏳         |
+| 7     | Statistiques (modèle de lecture séparé)                            | ⏳         |
+| 8     | Front Angular 22 dans le workspace (Node ≥ 24.15)                  | ⏳         |
 
 L'ordre des étapes 3 à 7 reste à confirmer avec la carte des contextes.
 
@@ -114,24 +114,24 @@ Règles de la v1 reportées (décision du 2026-10-01) :
 
 Mission : `docs/missions/etape-3-magasins/00-plan.md`.
 
-| Élément                                                                                                                         | État |
-| ------------------------------------------------------------------------------------------------------------------------------- | ---- |
-| A1 — `MagasinId`, `StatutMagasin`, `Magasin.creer()` / `reconstituer()` (rattachement au centre)                                | ✅   |
-| A1 — `CleDoublonMagasin` globale, règle de rapprochement partagée avec le centre                                                | ✅   |
-| A1 — `Centre.verifierOuvertAuxRattachements()` : `CENTRE_NON_ACTIF` (RDC-REF-010)                                               | ✅   |
-| A1 — Port `MagasinRepository`, suite de contrat, fake en mémoire                                                                | ✅   |
-| A1 — `CreerMagasinUseCase` : `CENTRE_NOT_FOUND`, `CENTRE_NON_ACTIF`, `MAGASIN_ALREADY_EXISTS`                                   | ✅   |
-| A1 — Migration `Magasin.cleDoublon`, `PrismaMagasinRepository`, P2002 traduite en `MagasinDejaExistant`                         | ✅   |
-| A1 — `POST /api/centres/:centreId/magasins`, filtre d'erreurs, E2E                                                              | ✅   |
-| A2 — Cycle de vie d'un magasin : désactiver, activer, archiver (`MAGASIN_ARCHIVED`, `MAGASIN_NOT_FOUND`)                        | ✅   |
-| A3 — `PATCH /api/magasins/:id` : modifier (absent = inchangé, `null` = suppression), transférer, sans doublon                   | ✅   |
-| A4 — Lire les magasins : `GET /api/magasins`, `/api/magasins/:id`, `/api/centres/:centreId/magasins` (port de lecture dédié)    | ✅   |
-| B — Catalogue des produits : créer, modifier, activer, désactiver, lister (`/api/produits`)                                     | ✅   |
-| Centres — Archivage refusé tant qu'un magasin actif ou inactif est rattaché (`CENTRE_A_DES_MAGASINS`, RDC-REF-011, D-18)        | ✅   |
-| Centres — Lire : `GET /api/centres` (statut, recherche, tri), `/api/centres/:id`, avec le nombre de magasins actifs et inactifs | ✅   |
-| Centres — `PATCH /api/centres/:id` : modifier (absent = inchangé, `null` = suppression), sans doublon, archivé refusé           | ✅   |
-| Centres — Filet P2002 : `CentreDejaExistant` déclaré par le port, deux contraintes uniques traduites                            | ✅   |
-| C — Images d'un magasin                                                                                                         | ⏳   |
+| Élément                                                                                                                            | État |
+| ---------------------------------------------------------------------------------------------------------------------------------- | ---- |
+| A1 — `MagasinId`, `StatutMagasin`, `Magasin.creer()` / `reconstituer()` (rattachement au centre)                                   | ✅   |
+| A1 — `CleDoublonMagasin` globale, règle de rapprochement partagée avec le centre                                                   | ✅   |
+| A1 — `Centre.verifierOuvertAuxRattachements()` : `CENTRE_NON_ACTIF` (RDC-REF-010)                                                  | ✅   |
+| A1 — Port `MagasinRepository`, suite de contrat, fake en mémoire                                                                   | ✅   |
+| A1 — `CreerMagasinUseCase` : `CENTRE_NOT_FOUND`, `CENTRE_NON_ACTIF`, `MAGASIN_ALREADY_EXISTS`                                      | ✅   |
+| A1 — Migration `Magasin.cleDoublon`, `PrismaMagasinRepository`, P2002 traduite en `MagasinDejaExistant`                            | ✅   |
+| A1 — `POST /api/centres/:centreId/magasins`, filtre d'erreurs, E2E                                                                 | ✅   |
+| A2 — Cycle de vie d'un magasin : désactiver, activer, archiver (`MAGASIN_ARCHIVED`, `MAGASIN_NOT_FOUND`)                           | ✅   |
+| A3 — `PATCH /api/magasins/:id` : modifier (absent = inchangé, `null` = suppression), transférer, sans doublon                      | ✅   |
+| A4 — Lire les magasins : `GET /api/magasins`, `/api/magasins/:id`, `/api/centres/:centreId/magasins` (port de lecture dédié)       | ✅   |
+| B — Catalogue des produits : créer, modifier, activer, désactiver, lister (`/api/produits`)                                        | ✅   |
+| Centres — Archivage refusé tant qu'un magasin actif ou inactif est rattaché (`CENTRE_A_DES_MAGASINS`, RDC-REF-011, D-18)           | ✅   |
+| Centres — Lire : `GET /api/centres` (statut, recherche, tri), `/api/centres/:id`, avec le nombre de magasins actifs et inactifs    | ✅   |
+| Centres — `PATCH /api/centres/:id` : modifier (absent = inchangé, `null` = suppression), sans doublon, archivé refusé              | ✅   |
+| Centres — Filet P2002 : `CentreDejaExistant` déclaré par le port, deux contraintes uniques traduites                               | ✅   |
+| C — Images d'un magasin : ajouter, retirer (`/api/magasins/:id/images`), dossier `UPLOADS_DIR`, nettoyage des orphelins (ADR-0021) | ✅   |
 
 Produits : pas d'unicité du code (retirée volontairement en v1, migration
 `remove_produit_code_unique`) ; forme de `ProduitDto` et tri par code à vérifier
@@ -150,6 +150,12 @@ centre » d'un responsable arrive avec l'étape 4.
 À vérifier contre la v1 (non disponible lors du lot A1) : la forme exacte de
 `MagasinDto` (reprise du `CentreDto`, plus `centreId` et `images`) et les codes
 `MAGASIN_ID_EMPTY` / `MAGASIN_ID_INVALID`.
+
+Images (lot C, ADR-0021) : dossier lu dans `UPLOADS_DIR` (`./uploads` par
+défaut) ; le rendez-vous NAS ne fixe que sa valeur. `MagasinDto.images` suit le
+`MagasinImageDto` de la v1 (`id`, `url`, `ordre`, `createdAt`), URL publique
+`/uploads/magasins/<magasin>/<fichier>`. À confirmer avec le front : la lecture
+des codes `IMAGE_TROP_VOLUMINEUSE` (413) et `IMAGE_FORMAT_NON_SUPPORTE` (400).
 
 Concurrence sur un magasin : « le dernier qui écrit gagne », comme pour le
 centre (ADR-0017, proposé).

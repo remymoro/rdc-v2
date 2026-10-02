@@ -4,6 +4,15 @@ import type {
   StatutMagasin,
 } from '@rdc/referentiel-domain';
 
+/** Vue d'une image d'un magasin (RDC-REF-007). */
+export interface VueImageMagasin {
+  readonly id: string;
+  /** Nom du fichier dans le dossier du magasin. */
+  readonly fichier: string;
+  readonly ordre: number;
+  readonly ajouteeLe: Date;
+}
+
 /**
  * Vue d'un magasin pour la lecture : une projection en lecture seule, pas
  * l'agrégat (aucun comportement, aucun invariant à protéger).
@@ -18,6 +27,8 @@ export interface VueMagasin {
   readonly email?: string;
   readonly statut: StatutMagasin;
   readonly centreId: string;
+  /** Images dans leur ordre d'affichage. */
+  readonly images: readonly VueImageMagasin[];
   readonly creeLe: Date;
   readonly modifieLe: Date;
 }

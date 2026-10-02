@@ -17,7 +17,33 @@ export { CleDoublonCentre } from './centre/cle-doublon-centre';
 export type { IdentiteCentre } from './centre/cle-doublon-centre';
 export { CentreId, CentreIdInvalide, CentreIdVide } from './centre/centre-id';
 export { Magasin } from './magasin/magasin';
-export { MagasinArchive } from './magasin/magasin.errors';
+export {
+  MagasinArchive,
+  MagasinImageDejaPresente,
+  MagasinImageIntrouvable,
+} from './magasin/magasin.errors';
+export {
+  ImageMagasin,
+  OrdreImageInvalide,
+  type EtatImageMagasin,
+  type NouvelleImageMagasin,
+} from './magasin/image/image-magasin';
+export {
+  ImageMagasinId,
+  ImageMagasinIdInvalide,
+  ImageMagasinIdVide,
+} from './magasin/image/image-magasin-id';
+export {
+  FichierImage,
+  FichierImageInvalide,
+} from './magasin/image/fichier-image';
+export {
+  ContenuImage,
+  FormatImage,
+  ImageFormatNonSupporte,
+  ImageTropVolumineuse,
+  TAILLE_MAXIMALE_IMAGE,
+} from './magasin/image/contenu-image';
 export type {
   EtatMagasin,
   ModificationsMagasin,

@@ -143,18 +143,45 @@ pas dans un use case seul.
 
 ## RDC-REF-007 — Images d'un magasin
 
-`pragmatic` · erreur · ⏳ à implémenter (étape 3)
+`pragmatic` · erreur · ✅ implémentée (étape 3, lot C, ADR-0021)
 
-**Règle.** En v1, un magasin a des images ordonnées ; ajouter un identifiant déjà
-présent ou retirer une image absente est une erreur
-(`MAGASIN_IMAGE_DEJA_PRESENTE`, `MAGASIN_IMAGE_INTROUVABLE`, traduites en 400).
-En v2, le stockage passe par un port et corrige l'audit A-18 : nom UUID,
-extension non dérivée du nom client et type vérifié sur le contenu.
+**Règle.** Un magasin a des images ordonnées : une nouvelle image se place après
+la plus grande position existante. Ajouter un identifiant déjà présent ou
+retirer une image absente est une erreur (`MAGASIN_IMAGE_DEJA_PRESENTE`,
+`MAGASIN_IMAGE_INTROUVABLE`, traduites en 400). Un magasin archivé ne reçoit ni
+ne perd d'image (`MAGASIN_ARCHIVED`, 409). En v2, le stockage passe par un port
+(`StockageImages`) et corrige l'audit A-18 : nom UUID généré, extension du
+format reconnu par la signature du contenu (JPEG, PNG, WebP), jamais le nom ni
+le type envoyés ; 5 Mo au plus (`IMAGE_TROP_VOLUMINEUSE`, 413), autre format
+refusé (`IMAGE_FORMAT_NON_SUPPORTE`, 400).
+
+**Pourquoi.** Les photos aident les bénévoles à repérer le magasin ; un nom de
+fichier choisi par le client permettait d'écrire hors du dossier prévu.
+
+**La base fait foi.** Ajout : fichier, puis base ; le fichier est supprimé si
+la transaction échoue. Retrait : base, puis fichier. Un fichier sans image en
+base est un orphelin, supprimé après une heure par le nettoyage (au démarrage
+de l'API puis toutes les heures).
+
+```ts
+// ❌ Incorrect : extension tirée du nom envoyé (audit A-18)
+const ext = fichier.originalName.split('.').pop();
+
+// ✅ Correct : nom généré, format reconnu par le contenu
+const contenu = ContenuImage.creer(octets); // IMAGE_FORMAT_NON_SUPPORTE…
+const fichier = FichierImage.pour(generateur.nouvelleImageMagasinId(), contenu.format);
+magasin.ajouterImage({ id, fichier }, maintenant);
+```
+
+**Vérification en revue.** Aucun nom ni type client ne sert au stockage ; le
+chemin reste sous le dossier du magasin (`x./../evil` testé) ; les deux ordres
+d'écriture base/disque sont testés.
 
 **Source v1.** `libs/domain/src/magasin/magasin.entity.ts:324-357`.
 **Écart v2.**
 `docs/audit/audit-backend-2026-08-01.md:187-188` (A-18) ; le code v1 vulnérable
 est `apps/api/src/application/use-cases/magasin/ajouter-image-magasin.usecase.ts:39-45`.
+Autres écarts (ordre, retrait, codes d'erreur) : ADR-0021.
 
 ## RDC-REF-008 — Catalogue des produits
 

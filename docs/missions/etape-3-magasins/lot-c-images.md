@@ -1,9 +1,12 @@
 # Lot C — Images d'un magasin
 
 - **Branche :** `feat/referentiel-images-magasin`
-- **Prérequis :** A1 fusionné ; **lieu de stockage confirmé** après le
-  rendez-vous NAS (dossier partagé du NAS servi par nginx, comme le volume
-  `uploads` de la v1)
+- **Prérequis :** A1 fusionné. Le lot n'est plus bloqué par le rendez-vous
+  NAS : l'adapter disque lit le dossier racine des images dans la variable
+  `UPLOADS_DIR` (comme la v1), avec `./uploads` par défaut en développement,
+  hors du dépôt. Le rendez-vous NAS ne fixera que la valeur : le dossier
+  partagé du NAS, servi par nginx sous `/uploads` comme le volume de la v1
+  (ADR-0021).
 
 ## Ordre de mission (à coller dans Codex)
 
@@ -34,7 +37,8 @@ pull request titrée « feat(referentiel): images d'un magasin ».
   `IMAGE_FORMAT_NON_SUPPORTE`, **400**. L'extension stockée (`.jpg`, `.png`,
   `.webp`) vient du format reconnu.
 - Stockage derrière un port applicatif (`StockageImages`) ; adapter disque
-  local en production, fake en mémoire en test.
+  local en production, fake en mémoire en test. Dossier racine :
+  `UPLOADS_DIR`, `./uploads` par défaut (ADR-0021).
 - **Base et disque sans transaction commune : la base fait foi.** Une ligne
   d'image en base doit toujours avoir son fichier ; un fichier sans ligne
   (orphelin) est toléré puis nettoyé.
@@ -78,6 +82,6 @@ pull request titrée « feat(referentiel): images d'un magasin ».
 
 ## Critères d'acceptation
 
-- [ ] Un test prouve que `x./../evil` ne sort pas du dossier du magasin.
-- [ ] RDC-REF-007 passe à ✅.
+- [x] Un test prouve que `x./../evil` ne sort pas du dossier du magasin.
+- [x] RDC-REF-007 passe à ✅.
 - [ ] `pnpm agent:gate -- --full` passe.

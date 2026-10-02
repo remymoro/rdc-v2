@@ -1,16 +1,22 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
   Param,
+  ParseFilePipe,
   Patch,
   Post,
+  UploadedFile,
   UseFilters,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ActiverMagasinUseCase,
+  AjouterImageMagasinUseCase,
   ArchiverMagasinUseCase,
   CreerMagasinUseCase,
   DesactiverMagasinUseCase,
@@ -18,7 +24,9 @@ import {
   ListerMagasinsQuery,
   ModifierMagasinUseCase,
   ObtenirMagasinQuery,
+  RetirerImageMagasinUseCase,
 } from '@rdc/referentiel-application';
+import { TAILLE_MAXIMALE_IMAGE } from '@rdc/referentiel-domain';
 import {
   CreerMagasinRequete,
   versCreerMagasinCommande,
@@ -33,7 +41,14 @@ import {
   versObtenirMagasinRequete,
 } from './lire-magasins.requete';
 import {
+  type FichierTeleverse,
+  versAjouterImageMagasinCommande,
+  versRetirerImageMagasinCommande,
+} from './images-magasin.requete';
+import {
+  type ImageMagasinReponse,
   type MagasinReponse,
+  versImageMagasinReponse,
   versMagasinReponse,
   vueVersMagasinReponse,
 } from './magasin.reponse';
@@ -42,6 +57,7 @@ import {
   versModifierMagasinCommande,
 } from './modifier-magasin.requete';
 import { ReferentielErreursHttpFilter } from './referentiel-erreurs-http.filter';
+import { TeleversementImageFilter } from './televersement-image.filter';
 
 /**
  * Adapter primaire des magasins : traduit HTTP → use case → HTTP, sans
@@ -60,6 +76,8 @@ export class MagasinsController {
     private readonly listerMagasins: ListerMagasinsQuery,
     private readonly listerMagasinsDuCentre: ListerMagasinsDuCentreQuery,
     private readonly obtenirMagasin: ObtenirMagasinQuery,
+    private readonly ajouterImage: AjouterImageMagasinUseCase,
+    private readonly retirerImage: RetirerImageMagasinUseCase,
   ) {}
 
   // Lectures (contrat v1, ADR-0009). Pas encore de filtre « son centre » :
@@ -130,5 +148,37 @@ export class MagasinsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async archiver(@Param('id') id: string): Promise<void> {
     await this.archiverMagasin.execute(versArchiverMagasinCommande(id));
+  }
+
+  // Images (contrat v1, ADR-0009, RDC-REF-007). Multer garde le fichier en
+  // mémoire et s'arrête au-delà de 5 Mo ; taille et format sont vérifiés par
+  // le domaine, sur le contenu.
+  @Post('magasins/:id/images')
+  @HttpCode(HttpStatus.CREATED)
+  @UseFilters(TeleversementImageFilter)
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: TAILLE_MAXIMALE_IMAGE, files: 1 },
+    }),
+  )
+  async ajouterUneImage(
+    @Param('id') id: string,
+    @UploadedFile(new ParseFilePipe({ fileIsRequired: true }))
+    fichier: FichierTeleverse,
+  ): Promise<ImageMagasinReponse> {
+    const commande = versAjouterImageMagasinCommande(id, fichier);
+    const image = await this.ajouterImage.execute(commande);
+    return versImageMagasinReponse(commande.magasinId, image);
+  }
+
+  @Delete('magasins/:id/images/:imageId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async retirerUneImage(
+    @Param('id') id: string,
+    @Param('imageId') imageId: string,
+  ): Promise<void> {
+    await this.retirerImage.execute(
+      versRetirerImageMagasinCommande(id, imageId),
+    );
   }
 }

@@ -202,6 +202,7 @@ function magasin(
     codePostal: CodePostal.creer('47000'),
     ville: Ville.creer('Agen'),
     centreId: rattachement.id,
+    images: [],
     statut,
     creeLe: new Date('2026-10-01T09:00:00.000Z'),
     modifieLe: new Date('2026-10-01T09:00:00.000Z'),

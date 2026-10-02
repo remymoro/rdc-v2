@@ -28,6 +28,9 @@ vus dans la v1 ou tentants, qui ne doivent pas entrer dans le code v2.
 | **Activer** (`activer`)                 | referentiel | Passer un élément INACTIF à ACTIF.                                                                                                 | réactiver                           |
 | **Désactiver** (`desactiver`)           | referentiel | Passer un élément ACTIF à INACTIF, de façon réversible.                                                                            | mettre en pause                     |
 | **Archiver** (`archiver`)               | referentiel | Passer définitivement un élément ACTIF ou INACTIF à ARCHIVE.                                                                       | supprimer                           |
+| **Image d'un magasin** (`ImageMagasin`) | referentiel | Photo d'un magasin, à sa position (ordre) dans la liste de ses images. Son fichier porte un nom UUID, jamais le nom envoyé.        | photo, blob, pièce jointe           |
+| **Ajouter / Retirer une image**         | referentiel | `ajouterImage` place l'image après les autres ; `retirerImage` l'enlève du magasin, puis son fichier est supprimé.                 | téléverser, supprimer l'image       |
+| **Image orpheline**                     | referentiel | Fichier d'image sans image enregistrée en base (échec d'écriture). Toléré, puis supprimé par le nettoyage après une heure.         | blob orphelin, fichier perdu        |
 
 ## Collecte
 

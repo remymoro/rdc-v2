@@ -26,21 +26,23 @@ A1  Créer un magasin                   (domaine → HTTP, comme le centre)
  └── A4  Lire les magasins            (liste, liste d'un centre, détail)
 B   Catalogue des produits             (indépendant des lots A)
 Ctr Finir les centres                  (archivage protégé D-18, lecture, modification)
-C   Images d'un magasin                (après A1 et confirmation du lieu NAS)
+C   Images d'un magasin                (après A1 ; dossier configurable, ADR-0021)
 ```
 
-| Lot | Brief                           | Branche                              | Prérequis                          | État              |
-| --- | ------------------------------- | ------------------------------------ | ---------------------------------- | ----------------- |
-| A1  | `lot-a1-creer-magasin.md`       | `feat/referentiel-creer-magasin`     | —                                  | ✅ fusionné (#11) |
-| A2  | `lot-a2-cycle-de-vie.md`        | `feat/referentiel-cycle-vie-magasin` | A1                                 | ✅ fusionné (#13) |
-| A3  | `lot-a3-modifier-transferer.md` | `feat/referentiel-modifier-magasin`  | A1                                 | ✅ fusionné (#15) |
-| A4  | `lot-a4-lire-magasins.md`       | `feat/referentiel-lire-magasins`     | A1                                 | ✅ fusionné (#16) |
-| B   | `lot-b-produits.md`             | `feat/referentiel-produits`          | —                                  | ✅ fusionné (#17) |
-| Ctr | — (sans brief, voir la roadmap) | — (PR #18)                           | A1                                 | ✅ fusionné (#18) |
-| C   | `lot-c-images.md`               | `feat/referentiel-images-magasin`    | A1 + lieu de stockage NAS confirmé | ⏸ bloqué         |
+| Lot | Brief                           | Branche                              | Prérequis | État              |
+| --- | ------------------------------- | ------------------------------------ | --------- | ----------------- |
+| A1  | `lot-a1-creer-magasin.md`       | `feat/referentiel-creer-magasin`     | —         | ✅ fusionné (#11) |
+| A2  | `lot-a2-cycle-de-vie.md`        | `feat/referentiel-cycle-vie-magasin` | A1        | ✅ fusionné (#13) |
+| A3  | `lot-a3-modifier-transferer.md` | `feat/referentiel-modifier-magasin`  | A1        | ✅ fusionné (#15) |
+| A4  | `lot-a4-lire-magasins.md`       | `feat/referentiel-lire-magasins`     | A1        | ✅ fusionné (#16) |
+| B   | `lot-b-produits.md`             | `feat/referentiel-produits`          | —         | ✅ fusionné (#17) |
+| Ctr | — (sans brief, voir la roadmap) | — (PR #18)                           | A1        | ✅ fusionné (#18) |
+| C   | `lot-c-images.md`               | `feat/referentiel-images-magasin`    | A1        | 🔄 en revue       |
 
 A2, A3 et A4 peuvent avancer en parallèle après A1 ; A1 et B dès maintenant.
-Le lot C attend aussi la confirmation du lieu de stockage après le rendez-vous NAS.
+Le lot C n'attend plus le rendez-vous NAS : le dossier des images est lu dans
+la variable `UPLOADS_DIR` (`./uploads` par défaut), et le rendez-vous ne fixe
+que sa valeur (ADR-0021).
 Le lot 3 de `verification-magasins` attend A1 et A2 (magasin et statut).
 
 ## Ce qui ne fait pas partie de l'étape 3

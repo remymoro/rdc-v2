@@ -1,10 +1,12 @@
-import { Module, Scope } from '@nestjs/common';
+import { Logger, Module, Scope } from '@nestjs/common';
+import { ContextIdFactory, ModuleRef } from '@nestjs/core';
 import {
   ActiverCentreUseCase,
   ArchiverCentreUseCase,
   CreerCentreUseCase,
   CreerMagasinUseCase,
   ActiverMagasinUseCase,
+  AjouterImageMagasinUseCase,
   ArchiverMagasinUseCase,
   DesactiverMagasinUseCase,
   LecturesCentres,
@@ -24,6 +26,10 @@ import {
   ObtenirMagasinQuery,
   DesactiverCentreUseCase,
   GenerateurIdentifiants,
+  Journal,
+  NettoyerImagesOrphelinesUseCase,
+  RetirerImageMagasinUseCase,
+  StockageImages,
 } from '@rdc/referentiel-application';
 import {
   CentreRepository,
@@ -42,6 +48,10 @@ import { PrismaLecturesMagasins } from './prisma/prisma-lectures-magasins';
 import { PrismaLecturesProduits } from './prisma/prisma-lectures-produits';
 import { PrismaProduitRepository } from './prisma/prisma-produit.repository';
 import { PrismaMagasinRepository } from './prisma/prisma-magasin.repository';
+import { JournalNest } from './journal/journal-nest';
+import { dossierDesImages } from './stockage/configuration-images';
+import { DisqueStockageImages } from './stockage/disque-stockage-images';
+import { NettoyageImagesOrphelinesTache } from './taches/nettoyage-images-orphelines.tache';
 
 /**
  * Composition root du contexte Référentiel (TENETS-COMPOSE-001) : seul endroit
@@ -68,6 +78,96 @@ import { PrismaMagasinRepository } from './prisma/prisma-magasin.repository';
     {
       provide: GenerateurIdentifiants,
       useFactory: () => new GenerateurIdentifiantsUuid(),
+    },
+    {
+      // Dossier lu dans l'environnement par la composition (ADR-0021,
+      // TENETS-COMPOSE-002).
+      provide: StockageImages,
+      useFactory: () => new DisqueStockageImages(dossierDesImages(process.env)),
+    },
+    {
+      provide: Journal,
+      useFactory: () => new JournalNest(new Logger('ImagesMagasins')),
+    },
+    {
+      provide: AjouterImageMagasinUseCase,
+      scope: Scope.REQUEST,
+      useFactory: (
+        magasinRepository: MagasinRepository,
+        stockageImages: StockageImages,
+        generateurIdentifiants: GenerateurIdentifiants,
+        unitOfWork: UnitOfWork,
+        clock: Clock,
+        journal: Journal,
+      ) =>
+        new AjouterImageMagasinUseCase(
+          magasinRepository,
+          stockageImages,
+          generateurIdentifiants,
+          unitOfWork,
+          clock,
+          journal,
+        ),
+      inject: [
+        MagasinRepository,
+        StockageImages,
+        GenerateurIdentifiants,
+        UnitOfWork,
+        Clock,
+        Journal,
+      ],
+    },
+    {
+      provide: RetirerImageMagasinUseCase,
+      scope: Scope.REQUEST,
+      useFactory: (
+        magasinRepository: MagasinRepository,
+        stockageImages: StockageImages,
+        unitOfWork: UnitOfWork,
+        clock: Clock,
+        journal: Journal,
+      ) =>
+        new RetirerImageMagasinUseCase(
+          magasinRepository,
+          stockageImages,
+          unitOfWork,
+          clock,
+          journal,
+        ),
+      inject: [MagasinRepository, StockageImages, UnitOfWork, Clock, Journal],
+    },
+    {
+      provide: NettoyerImagesOrphelinesUseCase,
+      scope: Scope.REQUEST,
+      useFactory: (
+        magasinRepository: MagasinRepository,
+        stockageImages: StockageImages,
+        clock: Clock,
+        journal: Journal,
+      ) =>
+        new NettoyerImagesOrphelinesUseCase(
+          magasinRepository,
+          stockageImages,
+          clock,
+          journal,
+        ),
+      inject: [MagasinRepository, StockageImages, Clock, Journal],
+    },
+    {
+      // Hors requête HTTP : un contexte neuf par passage (TENETS-PATTERN-005).
+      provide: NettoyageImagesOrphelinesTache,
+      useFactory: (moduleRef: ModuleRef) =>
+        new NettoyageImagesOrphelinesTache(
+          async () =>
+            (
+              await moduleRef.resolve(
+                NettoyerImagesOrphelinesUseCase,
+                ContextIdFactory.create(),
+              )
+            ).execute(),
+          new Logger(NettoyageImagesOrphelinesTache.name),
+        ),
+      inject: [ModuleRef],
     },
     {
       provide: CreerCentreUseCase,

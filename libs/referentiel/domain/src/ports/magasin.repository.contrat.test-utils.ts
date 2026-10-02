@@ -6,6 +6,8 @@ import { Nom } from '../commun/nom';
 import { Telephone } from '../commun/telephone';
 import { Ville } from '../commun/ville';
 import { CleDoublonMagasin } from '../magasin/cle-doublon-magasin';
+import { FichierImage } from '../magasin/image/fichier-image';
+import { ImageMagasinId } from '../magasin/image/image-magasin-id';
 import { Magasin } from '../magasin/magasin';
 import { MagasinId } from '../magasin/magasin-id';
 import {
@@ -95,6 +97,72 @@ export function verifierContratMagasinRepository(
 
       expect(relu?.telephone).toBeUndefined();
       expect(relu?.email).toBeUndefined();
+    });
+
+    describe('images (RDC-REF-007)', () => {
+      const ajouteeLe = new Date('2026-10-02T09:00:00.000Z');
+      const ID_IMAGE_1 = '0d4e2b8c-6a1f-4c3e-9b7d-5f2a8e1c4b6d';
+      const ID_IMAGE_2 = '1e5f3c9d-7b2a-4d4f-8c8e-6a3b9f2d5c7e';
+
+      function ajouter(cible: Magasin, id: string, extension = 'jpg'): void {
+        cible.ajouterImage(
+          {
+            id: ImageMagasinId.creer(id),
+            fichier: FichierImage.creer(`${id}.${extension}`),
+          },
+          ajouteeLe,
+        );
+      }
+
+      it('relit les images enregistrées, dans leur ordre', async () => {
+        const enregistre = magasin();
+        ajouter(enregistre, ID_IMAGE_1, 'png');
+        ajouter(enregistre, ID_IMAGE_2);
+        await contexte.repository.save(enregistre);
+
+        const relu = await contexte.repository.get(enregistre.id);
+
+        expect(
+          relu?.images.map((image) => [
+            image.id.valeur,
+            image.fichier.valeur,
+            image.ordre,
+            image.ajouteeLe,
+          ]),
+        ).toEqual([
+          [ID_IMAGE_1, `${ID_IMAGE_1}.png`, 0, ajouteeLe],
+          [ID_IMAGE_2, `${ID_IMAGE_2}.jpg`, 1, ajouteeLe],
+        ]);
+        expect(relu?.images[0]?.id).toBeInstanceOf(ImageMagasinId);
+      });
+
+      it('enregistre le retrait d’une image', async () => {
+        const enregistre = magasin();
+        ajouter(enregistre, ID_IMAGE_1);
+        ajouter(enregistre, ID_IMAGE_2);
+        await contexte.repository.save(enregistre);
+
+        const relu = await contexte.repository.get(enregistre.id);
+        relu?.retirerImage(ImageMagasinId.creer(ID_IMAGE_1), ajouteeLe);
+        await contexte.repository.save(relu as Magasin);
+
+        const apresRetrait = await contexte.repository.get(enregistre.id);
+        expect(apresRetrait?.images.map((image) => image.id.valeur)).toEqual([
+          ID_IMAGE_2,
+        ]);
+      });
+
+      it('ne voit pas une image ajoutée sans save()', async () => {
+        const enregistre = magasin();
+        await contexte.repository.save(enregistre);
+
+        const relu = await contexte.repository.get(enregistre.id);
+        if (relu) ajouter(relu, ID_IMAGE_1);
+
+        expect((await contexte.repository.get(enregistre.id))?.images).toEqual(
+          [],
+        );
+      });
     });
 
     it('renvoie null pour un identifiant inconnu', async () => {
