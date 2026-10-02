@@ -65,6 +65,7 @@ export { DisqueStockageImages } from './stockage/disque-stockage-images';
 export { JournalNest } from './journal/journal-nest';
 export {
   dossierDesImages,
+  EXTENSIONS_IMAGES_SERVIES,
   PREFIXE_PUBLIC_IMAGES,
 } from './stockage/configuration-images';
 export { NettoyageImagesOrphelinesTache } from './taches/nettoyage-images-orphelines.tache';
