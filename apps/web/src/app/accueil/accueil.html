@@ -1,0 +1,43 @@
+<div class="space-y-8 text-lg">
+  <div class="space-y-2">
+    <h2 class="text-3xl font-bold text-slate-900">Bienvenue</h2>
+    <p class="text-slate-700">
+      Cette application aide les Restos du Cœur du Lot-et-Garonne à organiser
+      leurs collectes alimentaires. Voici ce que vous aurez à faire, étape par
+      étape.
+    </p>
+  </div>
+
+  <p
+    class="rounded-lg border border-rose-200 bg-rose-100/70 p-4 text-base text-rose-950"
+  >
+    L’application est en construction : ces étapes arriveront au fur et à
+    mesure.
+  </p>
+
+  <div class="grid gap-6 md:grid-cols-2">
+    @for (guide of guides; track guide.titre) {
+    <section
+      class="rounded-lg border border-rose-100 bg-white shadow-pink-950/5 p-6 shadow-sm"
+    >
+      <h3 class="mb-4 text-xl font-semibold text-pink-800">
+        {{ guide.titre }}
+      </h3>
+      <ol class="space-y-4">
+        @for (etape of guide.etapes; track etape; let numero = $index) {
+        <li class="flex gap-4">
+          <!-- Numéro décoratif : la liste <ol> numérote déjà pour les lecteurs d'écran. -->
+          <span
+            aria-hidden="true"
+            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-pink-700 font-bold text-white"
+          >
+            {{ numero + 1 }}
+          </span>
+          <span class="pt-1 text-slate-700">{{ etape }}</span>
+        </li>
+        }
+      </ol>
+    </section>
+    }
+  </div>
+</div>
