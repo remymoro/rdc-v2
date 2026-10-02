@@ -1,4 +1,6 @@
-import { mkdir, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
+import { Logger } from '@nestjs/common';
+import { link, mkdir, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { join, resolve, sep } from 'node:path';
 import {
   type FichierImageStocke,
@@ -61,6 +63,7 @@ const CODES_INDISPONIBLE = new Set([
  */
 export class DisqueStockageImages extends StockageImages {
   readonly racine: string;
+  private readonly logger = new Logger(DisqueStockageImages.name);
 
   constructor(racine: string) {
     super();
@@ -76,14 +79,32 @@ export class DisqueStockageImages extends StockageImages {
     const chemin = cheminDansLeDossier(dossier, fichier.valeur);
     await traduireLesPannes(async () => {
       await mkdir(dossier, { recursive: true });
-      // « wx » : un fichier existant n'est jamais écrasé.
+      const temporaire = cheminDansLeDossier(
+        dossier,
+        fichier.valeur + '.' + randomUUID() + '.tmp',
+      );
       try {
-        await writeFile(chemin, contenu.octets, { flag: 'wx' });
-      } catch (erreur) {
-        if (codeSysteme(erreur) === 'EEXIST') {
-          throw new FichierImageDejaExistant({ cause: erreur });
+        await writeFile(temporaire, contenu.octets, { flag: 'wx' });
+        try {
+          // Publication atomique sans écrasement (rename écraserait la cible).
+          await link(temporaire, chemin);
+        } catch (erreur) {
+          if (codeSysteme(erreur) === 'EEXIST') {
+            throw new FichierImageDejaExistant({ cause: erreur });
+          }
+          throw erreur;
         }
-        throw erreur;
+      } finally {
+        // Un résidu .tmp reste privé et sera retenté au prochain nettoyage.
+        try {
+          await rm(temporaire, { force: true });
+        } catch (erreur) {
+          this.logger.warn({
+            message: 'Fichier temporaire conservé après échec du nettoyage',
+            temporaire,
+            erreur,
+          });
+        }
       }
     });
   }
@@ -108,6 +129,14 @@ export class DisqueStockageImages extends StockageImages {
         }
         const dossier = this.dossierDuMagasin(magasinId);
         for (const element of await lireDossier(dossier)) {
+          if (element.isFile() && estTemporaire(element.name)) {
+            const chemin = cheminDansLeDossier(dossier, element.name);
+            const { mtimeMs } = await stat(chemin);
+            if (mtimeMs <= Date.now() - 60 * 60 * 1000) {
+              await rm(chemin, { force: true });
+            }
+            continue;
+          }
           const fichier = element.isFile()
             ? fichierDepuisNom(element.name)
             : null;
@@ -188,4 +217,15 @@ function fichierDepuisNom(nom: string): FichierImage | null {
     }
     throw erreur;
   }
+}
+
+/** Seulement les noms privés générés par cet adapter, jamais les fichiers v1. */
+function estTemporaire(nom: string): boolean {
+  const correspondance =
+    /^(.*)\.([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\.tmp$/.exec(
+      nom,
+    );
+  return (
+    correspondance !== null && fichierDepuisNom(correspondance[1]) !== null
+  );
 }
