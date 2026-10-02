@@ -8,6 +8,7 @@ import {
 import {
   CentreDejaExistant,
   CentreIntrouvable,
+  MagasinIntrouvable,
 } from '@rdc/referentiel-application';
 import {
   AdresseAbreviationInterdite,
@@ -21,7 +22,10 @@ import {
   EmailInvalide,
   EmailTropLong,
   EmailVide,
+  MagasinArchive,
   MagasinDejaExistant,
+  MagasinIdInvalide,
+  MagasinIdVide,
   NomTropLong,
   NomVide,
   TelephoneInvalide,
@@ -36,11 +40,13 @@ type ErreurConnue = Error & { readonly code: string };
 /**
  * Seul endroit où les erreurs connues du contexte deviennent des statuts HTTP
  * (TENETS-ERROR-006). Statuts identiques à RDC v1 : validation 400, centre
- * introuvable 404, conflit (doublon, centre archivé ou non actif) 409.
+ * ou magasin introuvable 404, conflit (doublon, centre archivé ou non actif) 409.
  */
 const STATUTS_HTTP = new Map<Type<ErreurConnue>, HttpStatus>([
   [CentreDejaExistant, HttpStatus.CONFLICT],
   [CentreIntrouvable, HttpStatus.NOT_FOUND],
+  [MagasinIntrouvable, HttpStatus.NOT_FOUND],
+  [MagasinArchive, HttpStatus.CONFLICT],
   [CentreArchive, HttpStatus.CONFLICT],
   [CentreNonActif, HttpStatus.CONFLICT],
   [MagasinDejaExistant, HttpStatus.CONFLICT],
@@ -48,6 +54,8 @@ const STATUTS_HTTP = new Map<Type<ErreurConnue>, HttpStatus>([
   [NomTropLong, HttpStatus.BAD_REQUEST],
   [CentreIdVide, HttpStatus.BAD_REQUEST],
   [CentreIdInvalide, HttpStatus.BAD_REQUEST],
+  [MagasinIdVide, HttpStatus.BAD_REQUEST],
+  [MagasinIdInvalide, HttpStatus.BAD_REQUEST],
   [CodePostalInvalide, HttpStatus.BAD_REQUEST],
   [VilleVide, HttpStatus.BAD_REQUEST],
   [VilleTropLongue, HttpStatus.BAD_REQUEST],

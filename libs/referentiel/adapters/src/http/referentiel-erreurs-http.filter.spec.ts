@@ -3,6 +3,7 @@ import { FILTER_CATCH_EXCEPTIONS } from '@nestjs/common/constants';
 import {
   CentreDejaExistant,
   CentreIntrouvable,
+  MagasinIntrouvable,
 } from '@rdc/referentiel-application';
 import {
   AdresseAbreviationInterdite,
@@ -17,7 +18,11 @@ import {
   EmailInvalide,
   EmailTropLong,
   EmailVide,
+  MagasinArchive,
   MagasinDejaExistant,
+  MagasinId,
+  MagasinIdInvalide,
+  MagasinIdVide,
   NomTropLong,
   NomVide,
   TelephoneInvalide,
@@ -109,6 +114,22 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
     );
   });
 
+  // Cycle de vie d'un magasin (lot A2) : mêmes statuts que pour le centre.
+  it.each([
+    [404, 'MagasinIntrouvable', 'MAGASIN_NOT_FOUND', MagasinIntrouvable],
+    [409, 'MagasinArchive', 'MAGASIN_ARCHIVED', MagasinArchive],
+  ] as const)('traduit en %i %s', (statut, nom, code, TypeErreur) => {
+    const { hote, reponse } = hoteHttp();
+    const magasinId = MagasinId.creer('3b8a5d6e-0f12-4f7a-9c1e-7f1c9d7e2d4b');
+
+    filtre.catch(new TypeErreur(magasinId), hote);
+
+    expect(reponse.status).toHaveBeenCalledWith(statut);
+    expect(reponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({ statusCode: statut, error: nom, code }),
+    );
+  });
+
   // @Catch filtre par instanceof : une sous-classe d'une erreur listée doit
   // garder le statut de son parent, pas retomber sur un statut par défaut.
   it.each([
@@ -131,6 +152,8 @@ describe('ReferentielErreursHttpFilter (TENETS-ERROR-006)', () => {
     [new NomTropLong(100), 'NOM_TOO_LONG'],
     [new CentreIdVide(), 'CENTRE_ID_EMPTY'],
     [new CentreIdInvalide(), 'CENTRE_ID_INVALID'],
+    [new MagasinIdVide(), 'MAGASIN_ID_EMPTY'],
+    [new MagasinIdInvalide(), 'MAGASIN_ID_INVALID'],
     [new CodePostalInvalide(), 'CODE_POSTAL_INVALID'],
     [new VilleVide(), 'VILLE_EMPTY'],
     [new VilleTropLongue(100), 'VILLE_TOO_LONG'],

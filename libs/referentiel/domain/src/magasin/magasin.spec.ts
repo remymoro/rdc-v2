@@ -6,6 +6,7 @@ import { Nom } from '../commun/nom';
 import { Telephone } from '../commun/telephone';
 import { Ville } from '../commun/ville';
 import { Magasin } from './magasin';
+import { MagasinArchive } from './magasin.errors';
 import { MagasinId } from './magasin-id';
 import { StatutMagasin } from './statut-magasin';
 
@@ -89,5 +90,76 @@ describe('Magasin', () => {
       expect(magasin.telephone?.valeur).toBe('+33553987654');
       expect(magasin.email).toBeUndefined();
     });
+  });
+
+  describe('cycle de vie (RDC-REF-002)', () => {
+    const plusTard = new Date('2026-10-25T10:00:00.000Z');
+    const precedemment = new Date('2026-10-20T14:00:00.000Z');
+
+    function existant(statut: StatutMagasin): Magasin {
+      return Magasin.reconstituer({
+        ...donneesObligatoires(),
+        statut,
+        creeLe: maintenant,
+        modifieLe: precedemment,
+      });
+    }
+
+    it.each([
+      ['desactiver', StatutMagasin.ACTIF, StatutMagasin.INACTIF],
+      ['activer', StatutMagasin.INACTIF, StatutMagasin.ACTIF],
+      ['archiver', StatutMagasin.ACTIF, StatutMagasin.ARCHIVE],
+      ['archiver', StatutMagasin.INACTIF, StatutMagasin.ARCHIVE],
+    ] as const)(
+      '%s : passe un magasin %s à %s et date la modification',
+      (action, depart, arrivee) => {
+        const magasin = existant(depart);
+
+        magasin[action](plusTard);
+
+        expect(magasin.statut).toBe(arrivee);
+        expect(magasin.modifieLe).toEqual(plusTard);
+        expect(magasin.creeLe).toEqual(maintenant);
+      },
+    );
+
+    it.each([
+      ['desactiver', StatutMagasin.INACTIF],
+      ['activer', StatutMagasin.ACTIF],
+      ['archiver', StatutMagasin.ARCHIVE],
+    ] as const)(
+      '%s : est sans effet pour un magasin déjà %s',
+      (action, statut) => {
+        const magasin = existant(statut);
+
+        magasin[action](plusTard);
+
+        expect(magasin.statut).toBe(statut);
+        expect(magasin.modifieLe).toEqual(precedemment);
+      },
+    );
+
+    it.each(['activer', 'desactiver'] as const)(
+      '%s : refuse un magasin archivé avec MAGASIN_ARCHIVED',
+      (action) => {
+        const magasin = existant(StatutMagasin.ARCHIVE);
+
+        let erreur: unknown;
+        try {
+          magasin[action](plusTard);
+        } catch (cause) {
+          erreur = cause;
+        }
+
+        expect(erreur).toBeInstanceOf(MagasinArchive);
+        expect(erreur).toMatchObject({
+          code: 'MAGASIN_ARCHIVED',
+          magasinId: id,
+          message: 'Ce magasin est archivé : il ne peut plus être modifié.',
+        });
+        expect(magasin.statut).toBe(StatutMagasin.ARCHIVE);
+        expect(magasin.modifieLe).toEqual(precedemment);
+      },
+    );
   });
 });

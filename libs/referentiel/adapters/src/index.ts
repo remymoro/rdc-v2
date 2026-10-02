@@ -20,6 +20,11 @@ export {
   versMagasinReponse,
   type MagasinReponse,
 } from './http/magasin.reponse';
+export {
+  versActiverMagasinCommande,
+  versArchiverMagasinCommande,
+  versDesactiverMagasinCommande,
+} from './http/cycle-de-vie-magasin.requete';
 export { MagasinsController } from './http/magasins.controller';
 export { PrismaMagasinRepository } from './prisma/prisma-magasin.repository';
 export { ReferentielModule } from './referentiel.module';

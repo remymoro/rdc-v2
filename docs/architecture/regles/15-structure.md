@@ -37,12 +37,18 @@ libs/
         centre.repository.ts             port du repository (abstract class)
         centre.repository.contrat.test-utils.ts   suite de contrat réutilisable (hors build)
       index.ts                           API publique de la lib
-    application/src/
-      commands.ts
-      errors.ts                          CentreIntrouvable…
+    application/src/                     un dossier par agrégat (convention RDC v2)
+      centre/
+        commandes.ts                     commandes des use cases du centre
+        creer-centre.use-case.ts (+ .spec.ts)   écriture : unitOfWork.run + commit
+      magasin/
+        commandes.ts
+        creer-magasin.use-case.ts (+ .spec.ts)
+        lectures/lister-magasins.query.ts       lecture seule, sans unité de travail
+      errors.ts                          CentreIntrouvable… (communes au contexte)
       ports/stockage-images.ts           port applicatif + ses erreurs
-      use-cases/creer-centre.use-case.ts (+ .spec.ts)
-      index.ts
+      testing/                           fakes partagés (*.test-utils.ts)
+      index.ts                           API publique, regroupée par agrégat
     adapters/src/                        (layer:adapters), créée au premier besoin
       http/centre.controller.ts, centre.requete.ts, centre.reponse.ts, referentiel-http-error.filter.ts
       prisma/prisma-centre.repository.ts, centre.mapper.ts
@@ -58,6 +64,10 @@ Principes :
 - Modèles Prisma, clients et mappers restent dans l'adapter qui les possède.
 - Ports de repository : avec le modèle du domaine. Ports de capacités externes :
   avec le workflow applicatif qui les consomme.
+- Couche application rangée **par agrégat** : un use case va dans le dossier de
+  l'agrégat qu'il modifie, même s'il en lit un autre (`CreerMagasinUseCase`
+  lit le centre, il est dans `magasin/`). Écriture : `*.use-case.ts` ; lecture
+  sans modification : `*.query.ts` dans `lectures/`.
 - Câblage : dans le module NestJS du contexte (`<contexte>.module.ts`),
   importé par `apps/api/src/app.module.ts`.
 - Le `shared-kernel` reste minuscule : tout ajout y est discuté en revue (un

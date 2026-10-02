@@ -12,7 +12,7 @@ import {
   StatutMagasin,
   Ville,
 } from '@rdc/referentiel-domain';
-import type { CreerMagasinCommande } from '../commands';
+import type { CreerMagasinCommande } from './commandes';
 import { CentreIntrouvable } from '../errors';
 import { CentreRepositoryEnMemoire } from '../testing/centre-repository-en-memoire.test-utils';
 import { unCentreExistant } from '../testing/centre-existant.test-utils';

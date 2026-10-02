@@ -6,7 +6,7 @@ import {
   MagasinRepository,
 } from '@rdc/referentiel-domain';
 import { Clock, UnitOfWork } from '@rdc/shared-kernel-application';
-import type { CreerMagasinCommande } from '../commands';
+import type { CreerMagasinCommande } from './commandes';
 import { CentreIntrouvable } from '../errors';
 import { GenerateurIdentifiants } from '../ports/generateur-identifiants';
 

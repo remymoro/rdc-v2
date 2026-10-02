@@ -6,6 +6,7 @@ import type { Nom } from '../commun/nom';
 import type { Telephone } from '../commun/telephone';
 import type { Ville } from '../commun/ville';
 import type { MagasinId } from './magasin-id';
+import { MagasinArchive } from './magasin.errors';
 import { StatutMagasin } from './statut-magasin';
 
 /** État initial complet d'un nouveau magasin (TENETS-LIFECYCLE-003). */
@@ -88,5 +89,43 @@ export class Magasin {
       etat.creeLe,
       etat.modifieLe,
     );
+  }
+
+  /** Met le magasin en pause : il ne participe plus aux nouvelles opérations. */
+  desactiver(maintenant: Date): void {
+    if (this.statutActuel === StatutMagasin.ARCHIVE) {
+      throw new MagasinArchive(this.id);
+    }
+
+    if (this.statutActuel === StatutMagasin.INACTIF) {
+      return;
+    }
+
+    this.statutActuel = StatutMagasin.INACTIF;
+    this.derniereModification = maintenant;
+  }
+
+  /** Remet en service un magasin précédemment désactivé. */
+  activer(maintenant: Date): void {
+    if (this.statutActuel === StatutMagasin.ARCHIVE) {
+      throw new MagasinArchive(this.id);
+    }
+
+    if (this.statutActuel === StatutMagasin.ACTIF) {
+      return;
+    }
+
+    this.statutActuel = StatutMagasin.ACTIF;
+    this.derniereModification = maintenant;
+  }
+
+  /** Retire définitivement le magasin : il ne pourra plus changer d'état. */
+  archiver(maintenant: Date): void {
+    if (this.statutActuel === StatutMagasin.ARCHIVE) {
+      return;
+    }
+
+    this.statutActuel = StatutMagasin.ARCHIVE;
+    this.derniereModification = maintenant;
   }
 }
