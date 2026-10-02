@@ -32,7 +32,7 @@ C   Images d'un magasin                (après A1 et confirmation du lieu NAS)
 | --- | ------------------------------- | ------------------------------------ | ---------------------------------- | ----------------- |
 | A1  | `lot-a1-creer-magasin.md`       | `feat/referentiel-creer-magasin`     | —                                  | ✅ fusionné (#11) |
 | A2  | `lot-a2-cycle-de-vie.md`        | `feat/referentiel-cycle-vie-magasin` | A1                                 | 🟣 en revue       |
-| A3  | `lot-a3-modifier-transferer.md` | `feat/referentiel-modifier-magasin`  | A1                                 | 🟢 prêt           |
+| A3  | `lot-a3-modifier-transferer.md` | `feat/referentiel-modifier-magasin`  | A1                                 | 🟣 en revue       |
 | A4  | `lot-a4-lire-magasins.md`       | `feat/referentiel-lire-magasins`     | A1                                 | 🟢 prêt           |
 | B   | `lot-b-produits.md`             | `feat/referentiel-produits`          | —                                  | 🟢 prêt           |
 | C   | `lot-c-images.md`               | `feat/referentiel-images-magasin`    | A1 + lieu de stockage NAS confirmé | ⏸ bloqué         |

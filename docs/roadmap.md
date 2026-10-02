@@ -31,7 +31,7 @@
 | 0     | Fondations : Nx, lint d'architecture, CI, règles Tenets, ADR       | ✅ Terminé |
 | 1     | Référentiel : créer un centre (domaine → use case → Prisma → HTTP) | ✅ Terminé |
 | 2     | Référentiel : cycle de vie d'un centre (désactiver, archiver)      | ✅ Terminé |
-| 3     | Référentiel : magasins et produits                                 | 🔄 A1, A2  |
+| 3     | Référentiel : magasins et produits                                 | 🔄 A1 à A3 |
 | 4     | Identité et accès : bootstrap admin, connexion, rôles              | ⏳         |
 | 5     | Collecte : design doc, puis création et cycle de vie               | ⏳         |
 | 6     | Planification, saisie, bénévoles                                   | ⏳         |
@@ -112,20 +112,20 @@ Règles de la v1 reportées (décision du 2026-10-01) :
 
 Mission : `docs/missions/etape-3-magasins/00-plan.md`.
 
-| Élément                                                                                                  | État |
-| -------------------------------------------------------------------------------------------------------- | ---- |
-| A1 — `MagasinId`, `StatutMagasin`, `Magasin.creer()` / `reconstituer()` (rattachement au centre)         | ✅   |
-| A1 — `CleDoublonMagasin` globale, règle de rapprochement partagée avec le centre                         | ✅   |
-| A1 — `Centre.verifierOuvertAuxRattachements()` : `CENTRE_NON_ACTIF` (RDC-REF-010)                        | ✅   |
-| A1 — Port `MagasinRepository`, suite de contrat, fake en mémoire                                         | ✅   |
-| A1 — `CreerMagasinUseCase` : `CENTRE_NOT_FOUND`, `CENTRE_NON_ACTIF`, `MAGASIN_ALREADY_EXISTS`            | ✅   |
-| A1 — Migration `Magasin.cleDoublon`, `PrismaMagasinRepository`, P2002 traduite en `MagasinDejaExistant`  | ✅   |
-| A1 — `POST /api/centres/:centreId/magasins`, filtre d'erreurs, E2E                                       | ✅   |
-| A2 — Cycle de vie d'un magasin : désactiver, activer, archiver (`MAGASIN_ARCHIVED`, `MAGASIN_NOT_FOUND`) | ✅   |
-| A3 — Modifier et transférer un magasin                                                                   | ⏳   |
-| A4 — Lire les magasins                                                                                   | ⏳   |
-| B — Catalogue des produits                                                                               | ⏳   |
-| C — Images d'un magasin                                                                                  | ⏳   |
+| Élément                                                                                                       | État |
+| ------------------------------------------------------------------------------------------------------------- | ---- |
+| A1 — `MagasinId`, `StatutMagasin`, `Magasin.creer()` / `reconstituer()` (rattachement au centre)              | ✅   |
+| A1 — `CleDoublonMagasin` globale, règle de rapprochement partagée avec le centre                              | ✅   |
+| A1 — `Centre.verifierOuvertAuxRattachements()` : `CENTRE_NON_ACTIF` (RDC-REF-010)                             | ✅   |
+| A1 — Port `MagasinRepository`, suite de contrat, fake en mémoire                                              | ✅   |
+| A1 — `CreerMagasinUseCase` : `CENTRE_NOT_FOUND`, `CENTRE_NON_ACTIF`, `MAGASIN_ALREADY_EXISTS`                 | ✅   |
+| A1 — Migration `Magasin.cleDoublon`, `PrismaMagasinRepository`, P2002 traduite en `MagasinDejaExistant`       | ✅   |
+| A1 — `POST /api/centres/:centreId/magasins`, filtre d'erreurs, E2E                                            | ✅   |
+| A2 — Cycle de vie d'un magasin : désactiver, activer, archiver (`MAGASIN_ARCHIVED`, `MAGASIN_NOT_FOUND`)      | ✅   |
+| A3 — `PATCH /api/magasins/:id` : modifier (absent = inchangé, `null` = suppression), transférer, sans doublon | ✅   |
+| A4 — Lire les magasins                                                                                        | ⏳   |
+| B — Catalogue des produits                                                                                    | ⏳   |
+| C — Images d'un magasin                                                                                       | ⏳   |
 
 À vérifier contre la v1 (non disponible lors du lot A1) : la forme exacte de
 `MagasinDto` (reprise du `CentreDto`, plus `centreId` et `images`) et les codes

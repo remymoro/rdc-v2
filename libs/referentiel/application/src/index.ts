@@ -18,11 +18,13 @@ export type {
   ArchiverMagasinCommande,
   CreerMagasinCommande,
   DesactiverMagasinCommande,
+  ModifierMagasinCommande,
 } from './magasin/commandes';
 export { CreerMagasinUseCase } from './magasin/creer-magasin.use-case';
 export { DesactiverMagasinUseCase } from './magasin/desactiver-magasin.use-case';
 export { ActiverMagasinUseCase } from './magasin/activer-magasin.use-case';
 export { ArchiverMagasinUseCase } from './magasin/archiver-magasin.use-case';
+export { ModifierMagasinUseCase } from './magasin/modifier-magasin.use-case';
 
 // Commun au contexte
 export {

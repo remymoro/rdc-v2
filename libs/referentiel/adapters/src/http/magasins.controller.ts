@@ -13,6 +13,7 @@ import {
   ArchiverMagasinUseCase,
   CreerMagasinUseCase,
   DesactiverMagasinUseCase,
+  ModifierMagasinUseCase,
 } from '@rdc/referentiel-application';
 import {
   CreerMagasinRequete,
@@ -24,6 +25,10 @@ import {
   versDesactiverMagasinCommande,
 } from './cycle-de-vie-magasin.requete';
 import { type MagasinReponse, versMagasinReponse } from './magasin.reponse';
+import {
+  ModifierMagasinRequete,
+  versModifierMagasinCommande,
+} from './modifier-magasin.requete';
 import { ReferentielErreursHttpFilter } from './referentiel-erreurs-http.filter';
 
 /**
@@ -39,6 +44,7 @@ export class MagasinsController {
     private readonly desactiverMagasin: DesactiverMagasinUseCase,
     private readonly activerMagasin: ActiverMagasinUseCase,
     private readonly archiverMagasin: ArchiverMagasinUseCase,
+    private readonly modifierMagasin: ModifierMagasinUseCase,
   ) {}
 
   @Post('centres/:centreId/magasins')
@@ -49,6 +55,19 @@ export class MagasinsController {
   ): Promise<MagasinReponse> {
     const magasin = await this.creerMagasin.execute(
       versCreerMagasinCommande(centreId, requete),
+    );
+    return versMagasinReponse(magasin);
+  }
+
+  // Modification et transfert (contrat v1, ADR-0009) : 200 MagasinDto.
+  @Patch('magasins/:id')
+  @HttpCode(HttpStatus.OK)
+  async modifier(
+    @Param('id') id: string,
+    @Body() requete: ModifierMagasinRequete,
+  ): Promise<MagasinReponse> {
+    const magasin = await this.modifierMagasin.execute(
+      versModifierMagasinCommande(id, requete),
     );
     return versMagasinReponse(magasin);
   }

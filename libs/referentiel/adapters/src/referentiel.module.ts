@@ -7,6 +7,7 @@ import {
   ActiverMagasinUseCase,
   ArchiverMagasinUseCase,
   DesactiverMagasinUseCase,
+  ModifierMagasinUseCase,
   DesactiverCentreUseCase,
   GenerateurIdentifiants,
 } from '@rdc/referentiel-application';
@@ -146,6 +147,23 @@ import { PrismaMagasinRepository } from './prisma/prisma-magasin.repository';
         clock: Clock,
       ) => new ArchiverMagasinUseCase(magasinRepository, unitOfWork, clock),
       inject: [MagasinRepository, UnitOfWork, Clock],
+    },
+    {
+      provide: ModifierMagasinUseCase,
+      scope: Scope.REQUEST,
+      useFactory: (
+        magasinRepository: MagasinRepository,
+        centreRepository: CentreRepository,
+        unitOfWork: UnitOfWork,
+        clock: Clock,
+      ) =>
+        new ModifierMagasinUseCase(
+          magasinRepository,
+          centreRepository,
+          unitOfWork,
+          clock,
+        ),
+      inject: [MagasinRepository, CentreRepository, UnitOfWork, Clock],
     },
   ],
 })

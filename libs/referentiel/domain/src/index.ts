@@ -11,7 +11,11 @@ export type { IdentiteCentre } from './centre/cle-doublon-centre';
 export { CentreId, CentreIdInvalide, CentreIdVide } from './centre/centre-id';
 export { Magasin } from './magasin/magasin';
 export { MagasinArchive } from './magasin/magasin.errors';
-export type { EtatMagasin, NouveauMagasin } from './magasin/magasin';
+export type {
+  EtatMagasin,
+  ModificationsMagasin,
+  NouveauMagasin,
+} from './magasin/magasin';
 export {
   MagasinId,
   MagasinIdInvalide,

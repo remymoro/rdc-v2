@@ -162,4 +162,100 @@ describe('Magasin', () => {
       },
     );
   });
+
+  describe('modifier et transférer (RDC-REF-005)', () => {
+    const plusTard = new Date('2026-10-25T10:00:00.000Z');
+    const precedemment = new Date('2026-10-20T14:00:00.000Z');
+    const autreCentre = CentreId.creer('0b6e3f7a-9c2d-4e1f-8a5b-6c7d8e9f0a1b');
+
+    function existant(statut = StatutMagasin.ACTIF): Magasin {
+      return Magasin.reconstituer({
+        ...donneesObligatoires(),
+        telephone: Telephone.creer('05 53 98 76 54'),
+        email: Email.creer('agen-sud@leclerc.fr'),
+        statut,
+        creeLe: maintenant,
+        modifieLe: precedemment,
+      });
+    }
+
+    it('remplace les champs fournis et garde les autres', () => {
+      const magasin = existant();
+
+      magasin.modifier(
+        {
+          nom: Nom.creer('Leclerc Agen Nord'),
+          ville: Ville.creer('Le Passage'),
+        },
+        plusTard,
+      );
+
+      expect(magasin.nom.valeur).toBe('Leclerc Agen Nord');
+      expect(magasin.ville.valeur).toBe('Le Passage');
+      expect(magasin.adresse.valeur).toBe('1 avenue du Général de Gaulle');
+      expect(magasin.telephone?.valeur).toBe('+33553987654');
+      expect(magasin.modifieLe).toEqual(plusTard);
+    });
+
+    it('supprime le téléphone ou l’email reçus à null', () => {
+      const magasin = existant();
+
+      magasin.modifier({ telephone: null, email: null }, plusTard);
+
+      expect(magasin.telephone).toBeUndefined();
+      expect(magasin.email).toBeUndefined();
+      expect(magasin.modifieLe).toEqual(plusTard);
+    });
+
+    it('ne change pas modifieLe pour une modification identique', () => {
+      const magasin = existant();
+
+      magasin.modifier(
+        {
+          nom: Nom.creer('Leclerc Agen Sud'),
+          telephone: Telephone.creer('05 53 98 76 54'),
+        },
+        plusTard,
+      );
+      magasin.modifier({}, plusTard);
+
+      expect(magasin.modifieLe).toEqual(precedemment);
+    });
+
+    it('transfère le magasin vers un autre centre et date la modification', () => {
+      const magasin = existant();
+
+      magasin.transfererVers(autreCentre, plusTard);
+
+      expect(magasin.centreId.equals(autreCentre)).toBe(true);
+      expect(magasin.modifieLe).toEqual(plusTard);
+    });
+
+    it('ne change rien pour un transfert vers son propre centre', () => {
+      const magasin = existant();
+
+      magasin.transfererVers(centreId, plusTard);
+
+      expect(magasin.centreId.equals(centreId)).toBe(true);
+      expect(magasin.modifieLe).toEqual(precedemment);
+    });
+
+    it.each([
+      [
+        'modifier',
+        (m: Magasin) => m.modifier({ nom: Nom.creer('Autre') }, plusTard),
+      ],
+      ['transférer', (m: Magasin) => m.transfererVers(autreCentre, plusTard)],
+    ] as const)(
+      'refuse de %s un magasin archivé (MAGASIN_ARCHIVED, RDC-REF-002)',
+      (_action, executer) => {
+        const magasin = existant(StatutMagasin.ARCHIVE);
+
+        expect(() => executer(magasin)).toThrow(MagasinArchive);
+        expect(magasin.nom.valeur).toBe('Leclerc Agen Sud');
+        expect(magasin.centreId.equals(centreId)).toBe(true);
+        expect(magasin.modifieLe).toEqual(precedemment);
+      },
+    );
+  });
 });

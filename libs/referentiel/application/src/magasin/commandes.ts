@@ -1,4 +1,9 @@
-import type { MagasinId, NouveauMagasin } from '@rdc/referentiel-domain';
+import type {
+  CentreId,
+  MagasinId,
+  ModificationsMagasin,
+  NouveauMagasin,
+} from '@rdc/referentiel-domain';
 
 /**
  * Création d'un magasin dans un centre : tout l'état initial sauf
@@ -19,4 +24,15 @@ export interface ActiverMagasinCommande {
 /** Archivage définitif d'un magasin. */
 export interface ArchiverMagasinCommande {
   readonly magasinId: MagasinId;
+}
+
+/**
+ * Modification d'un magasin (PATCH v1) : changements de l'identité et des
+ * contacts, et transfert éventuel vers un autre centre (RDC-REF-005).
+ */
+export interface ModifierMagasinCommande {
+  readonly magasinId: MagasinId;
+  readonly changements: ModificationsMagasin;
+  /** Absent = pas de transfert ; identique au centre actuel = sans effet. */
+  readonly centreId?: CentreId;
 }
