@@ -46,8 +46,8 @@ Lot 3  Événement « centre archivé » : compte désactivé, sessions révoqu�
 
 | Tranche | Branche                             | Prérequis | État        |
 | ------- | ----------------------------------- | --------- | ----------- |
-| 1a      | `feat/identite-acces-domaine`       | —         | 🔄 en cours |
-| 1b      | `feat/identite-acces-premier-admin` | 1a        | ⏳          |
+| 1a      | `feat/identite-acces-domaine`       | —         | ✅ #27      |
+| 1b      | `feat/identite-acces-premier-admin` | 1a        | 🔄 en cours |
 | 1c      | `feat/identite-acces-prisma`        | 1b        | ⏳          |
 | 1d      | `feat/identite-acces-sessions`      | 1c        | ⏳          |
 | 1e      | `feat/identite-acces-http`          | 1d        | ⏳          |
