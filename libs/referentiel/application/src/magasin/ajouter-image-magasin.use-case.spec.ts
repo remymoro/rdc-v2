@@ -153,21 +153,27 @@ describe('AjouterImageMagasinUseCase (RDC-REF-007)', () => {
   });
 
   it('refuse un magasin inconnu (MAGASIN_NOT_FOUND) sans écrire de fichier', async () => {
-    const erreur = await preparer({ statut: null })
+    const useCase = preparer({ statut: null });
+    const enregistrer = jest.spyOn(stockage, 'enregistrer');
+    const erreur = await useCase
       .execute({ magasinId, contenu: unContenuJpeg() })
       .catch((e: unknown) => e);
 
     expect(erreur).toBeInstanceOf(MagasinIntrouvable);
+    expect(enregistrer).not.toHaveBeenCalled();
     expect(stockage.noms()).toEqual([]);
     expect(unitOfWork.nombreDeCommits).toBe(0);
   });
 
   it('refuse un magasin archivé (MAGASIN_ARCHIVED) sans écrire de fichier', async () => {
-    const erreur = await preparer({ statut: StatutMagasin.ARCHIVE })
+    const useCase = preparer({ statut: StatutMagasin.ARCHIVE });
+    const enregistrer = jest.spyOn(stockage, 'enregistrer');
+    const erreur = await useCase
       .execute({ magasinId, contenu: unContenuJpeg() })
       .catch((e: unknown) => e);
 
     expect(erreur).toBeInstanceOf(MagasinArchive);
+    expect(enregistrer).not.toHaveBeenCalled();
     expect(stockage.noms()).toEqual([]);
     expect(unitOfWork.nombreDeCommits).toBe(0);
   });
