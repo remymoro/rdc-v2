@@ -15,14 +15,15 @@ vus dans la v1 ou tentants, qui ne doivent pas entrer dans le code v2.
 
 ## Identité et accès
 
-| Terme                                         | Contexte       | Définition                                                                                                               | À éviter                      |
-| --------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------ | ----------------------------- |
-| **Utilisateur** (`Utilisateur`)               | identite-acces | Ce qui se connecte à l'application : l'administrateur ou le compte d'un centre. Jamais un bénévole.                      | user, membre, personne        |
-| **Rôle** (`Role`)                             | identite-acces | `ADMIN` ou `RESPONSABLE_CENTRE` : décide de ce qu'un utilisateur peut faire.                                             | profil, permission, droit     |
-| **Compte de centre**                          | identite-acces | L'utilisateur `RESPONSABLE_CENTRE` d'un centre, partagé par son équipe. Au plus un compte actif par centre.              | compte personnel, responsable |
-| **Adresse de connexion** (`AdresseConnexion`) | identite-acces | Email qui identifie un utilisateur à la connexion, propre au compte et unique. Distinct de l'email de contact du centre. | login, identifiant, email     |
-| **Mot de passe haché** (`MotDePasseHache`)    | identite-acces | Empreinte du mot de passe, seule forme conservée. Le mot de passe en clair n'est jamais stocké.                          | hash, mot de passe chiffré    |
-| **Désactiver / Activer un compte**            | identite-acces | Empêcher ou rétablir la connexion d'un utilisateur, sans le supprimer. Désactiver coupe ses sessions.                    | supprimer, bloquer, bannir    |
+| Terme                                         | Contexte       | Définition                                                                                                                                                  | À éviter                   |
+| --------------------------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| **Utilisateur** (`Utilisateur`)               | identite-acces | Ce qui se connecte à l'application : l'administrateur ou le compte d'un centre. Jamais un bénévole.                                                         | user, membre, personne     |
+| **Rôle** (`Role`)                             | identite-acces | `ADMIN` ou `RESPONSABLE_CENTRE` : décide de ce qu'un utilisateur peut faire.                                                                                | profil, permission, droit  |
+| **Compte de centre**                          | identite-acces | Le **responsable de centre** (`RESPONSABLE_CENTRE`) vu comme utilisateur : le compte du centre, partagé par son équipe. Au plus un compte actif par centre. | compte personnel           |
+| **Adresse de connexion** (`AdresseConnexion`) | identite-acces | Email qui identifie un utilisateur à la connexion (« identifiant de connexion »), propre au compte et unique. Distinct de l'email de contact du centre.     | login, email du centre     |
+| **Mot de passe** (`MotDePasse`)               | identite-acces | Mot de passe en clair, tel que saisi (12 à 128 caractères). Il n'est jamais conservé : seulement haché ou vérifié.                                          | password, code             |
+| **Mot de passe haché** (`MotDePasseHache`)    | identite-acces | Empreinte du mot de passe, seule forme conservée. Le mot de passe en clair n'est jamais stocké.                                                             | hash, mot de passe chiffré |
+| **Désactiver / Activer un compte**            | identite-acces | Empêcher ou rétablir la connexion d'un utilisateur, sans le supprimer. Désactiver coupe ses sessions.                                                       | supprimer, bloquer, bannir |
 
 ## Référentiel
 
