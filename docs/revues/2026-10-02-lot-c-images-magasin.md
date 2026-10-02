@@ -264,3 +264,14 @@ TENETS-ERROR-005 · TENETS-ADAPTER-006
 3. **nginx du NAS.** Reprendre `client_max_body_size 6m` de la v1 : sinon,
    nginx renvoie 413 au-delà de 1 Mo, avant même l'API. Volume inscriptible
    par l'API ?
+
+## Suites données
+
+- **B1** — corrigé : le nettoyage garde et journalise les fichiers d'un
+  magasin inconnu en base ; les E2E utilisent `tmp/uploads-e2e` ; consigne de
+  déploiement dans l'ADR-0021. Reste à décider : faut-il désactiver la tâche par
+  défaut (question 1) ?
+- **B2** — corrigé : `PrismaMagasinRepository.get()` verrouille la ligne du
+  magasin (`SELECT … FOR UPDATE`). Test d'intégration « deux ajouts
+  simultanés » ; il n'a pas tourné en local (pas de PostgreSQL), la CI fait foi.
+- I1 à I7 et les points mineurs : à traiter dans un lot suivant.

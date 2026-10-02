@@ -22,7 +22,16 @@ export class PrismaMagasinRepository extends MagasinRepository {
     super();
   }
 
+  /**
+   * Dans une unité de travail, verrouille la ligne du magasin jusqu'à la
+   * validation : une seconde écriture sur le même magasin lit l'état validé
+   * par la première, au lieu d'effacer ses images en enregistrant un
+   * instantané périmé (save() efface les images que l'agrégat n'a plus).
+   * Hors transaction, le verrou est sans effet (revue du lot C, B2).
+   */
   async get(id: MagasinId): Promise<Magasin | null> {
+    await this.transaction.client
+      .$queryRaw`SELECT 1 FROM "Magasin" WHERE "id" = ${id.valeur} FOR UPDATE`;
     const ligne = await this.transaction.client.magasin.findUnique({
       where: { id: id.valeur },
       include: { images: true },

@@ -88,6 +88,13 @@ Deux autres points demandent une décision :
   `STOCKAGE_IMAGES_INDISPONIBLE` (503).
 - La tâche de nettoyage tourne dans chaque instance de l'API ; elle est
   idempotente, donc sans risque si l'API est un jour lancée deux fois.
+- Deux écritures simultanées sur un même magasin (deux ajouts d'images, un
+  ajout et un retrait) : `PrismaMagasinRepository.get()` verrouille la ligne
+  du magasin (`SELECT … FOR UPDATE`) jusqu'à la validation. La seconde
+  écriture attend et lit les images validées par la première ; sans ce
+  verrou, `save()` effaçait l'image de l'autre (revue du lot C, B2). Le verrou
+  sérialise toutes les écritures d'un magasin, ce qui remplace « le dernier
+  qui écrit gagne » (ADR-0017) pour le magasin.
 - Le nettoyage ne supprime jamais les fichiers d'un magasin inconnu en base :
   un magasin n'est jamais supprimé, son absence signale une base vide, en
   cours de reprise ou qui n'est pas celle du dossier. Il le journalise et

@@ -3,6 +3,8 @@ import {
   Centre,
   CentreId,
   CodePostal,
+  FichierImage,
+  ImageMagasinId,
   Magasin,
   MagasinDejaExistant,
   MagasinId,
@@ -117,6 +119,100 @@ describe('PrismaMagasinRepository — créations simultanées (TENETS-ADAPTER-00
     expect(echecs[0]?.reason).toBeInstanceOf(MagasinDejaExistant);
     expect((echecs[0]?.reason as Error).cause).toBeDefined();
     expect(await prisma.magasin.count()).toBe(1);
+  });
+});
+
+describe('PrismaMagasinRepository — écritures simultanées sur un magasin (revue du lot C, B2)', () => {
+  const magasinId = MagasinId.creer('3b8a5d6e-0f12-4f7a-9c1e-7f1c9d7e2d4b');
+  const maintenant = new Date('2026-10-02T10:00:00.000Z');
+
+  beforeEach(async () => {
+    await viderLaBase();
+    await enregistrerLeCentre();
+    await new PrismaMagasinRepository(new PrismaTransaction(prisma)).save(
+      Magasin.creer(
+        {
+          id: magasinId,
+          nom: Nom.creer('Leclerc Agen Sud'),
+          adresse: Adresse.creer('1 avenue du Général de Gaulle'),
+          codePostal: CodePostal.creer('47000'),
+          ville: Ville.creer('Agen'),
+          centreId,
+        },
+        maintenant,
+      ),
+    );
+  });
+
+  afterAll(viderLaBase);
+
+  function attendre(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Ajoute une image comme le use case : lire, modifier, enregistrer, valider.
+   * `apresLecture` laisse le test entrelacer les deux transactions.
+   */
+  async function ajouterUneImage(
+    imageId: string,
+    apresLecture: () => Promise<void>,
+  ): Promise<void> {
+    const transaction = new PrismaTransaction(prisma);
+    const unitOfWork = new PrismaUnitOfWork(prisma, transaction);
+    const repository = new PrismaMagasinRepository(transaction);
+    await unitOfWork.run(async () => {
+      const magasin = await repository.get(magasinId);
+      await apresLecture();
+      magasin?.ajouterImage(
+        {
+          id: ImageMagasinId.creer(imageId),
+          fichier: FichierImage.creer(`${imageId}.jpg`),
+        },
+        maintenant,
+      );
+      if (magasin) {
+        await repository.save(magasin);
+      }
+      await unitOfWork.commit();
+    });
+  }
+
+  it('garde les deux images de deux ajouts simultanés, à des positions distinctes', async () => {
+    // Sans verrou, B lit le magasin avant que A valide, puis efface l'image
+    // de A en enregistrant son instantané. Avec le verrou, la lecture de B
+    // attend la validation de A.
+    let premiereValidee!: () => void;
+    const premiereFinie = new Promise<void>((resolve) => {
+      premiereValidee = resolve;
+    });
+    let premiereLue!: () => void;
+    const premiereLecture = new Promise<void>((resolve) => {
+      premiereLue = resolve;
+    });
+
+    const premiere = ajouterUneImage(
+      '0d4e2b8c-6a1f-4c3e-9b7d-5f2a8e1c4b6d',
+      async () => {
+        premiereLue();
+        await attendre(300); // Laisse à B le temps de lire, s'il le peut.
+      },
+    ).finally(() => premiereValidee());
+    await premiereLecture;
+    const seconde = ajouterUneImage(
+      '1e5f3c9d-7b2a-4d4f-8c8e-6a3b9f2d5c7e',
+      () => premiereFinie,
+    );
+    await Promise.all([premiere, seconde]);
+
+    const images = await prisma.magasinImage.findMany({
+      where: { magasinId: magasinId.valeur },
+      orderBy: { ordre: 'asc' },
+    });
+    expect(images.map((image) => [image.id, image.ordre])).toEqual([
+      ['0d4e2b8c-6a1f-4c3e-9b7d-5f2a8e1c4b6d', 0],
+      ['1e5f3c9d-7b2a-4d4f-8c8e-6a3b9f2d5c7e', 1],
+    ]);
   });
 });
 
