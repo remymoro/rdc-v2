@@ -6,3 +6,5 @@
 pnpm-lock.yaml
 libs/shared-kernel/adapters/src/prisma/generated
 prisma/migrations
+
+.angular

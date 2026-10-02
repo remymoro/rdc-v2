@@ -56,3 +56,7 @@ libs/shared-kernel/adapters/src/prisma/generated
 
 # Images des magasins en développement (UPLOADS_DIR, ADR-0021)
 /uploads
+
+.angular
+
+__screenshots__/
