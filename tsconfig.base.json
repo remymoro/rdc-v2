@@ -38,6 +38,15 @@
       "@rdc/referentiel-adapters": ["./libs/referentiel/adapters/src/index.ts"],
       "@rdc/identite-acces-domain": [
         "./libs/identite-acces/domain/src/index.ts"
+      ],
+      "@rdc/identite-acces-domain/testing": [
+        "./libs/identite-acces/domain/src/testing.test-utils.ts"
+      ],
+      "@rdc/identite-acces-application": [
+        "./libs/identite-acces/application/src/index.ts"
+      ],
+      "@rdc/identite-acces-application/testing": [
+        "./libs/identite-acces/application/src/testing.test-utils.ts"
       ]
     }
   },

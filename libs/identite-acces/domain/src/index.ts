@@ -27,3 +27,8 @@ export {
   AdministrateurRattacheAUnCentre,
   CompteCentreSansCentre,
 } from './utilisateur/utilisateur.errors';
+export {
+  AdministrateurDejaExistant,
+  AdresseConnexionDejaUtilisee,
+  UtilisateurRepository,
+} from './ports/utilisateur.repository';
