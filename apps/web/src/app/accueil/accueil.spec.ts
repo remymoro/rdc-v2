@@ -23,9 +23,10 @@ describe('Page d’accueil', () => {
     const section = [...page().querySelectorAll('section')].find((s) =>
       s.querySelector('h3')?.textContent?.includes(titre),
     );
-    return [...(section?.querySelectorAll('ol > li') ?? [])].map(
-      (etape) => etape.textContent?.replace(/\s+/g, ' ').trim() ?? '',
-    );
+    // La phrase de l'étape, sans son numéro décoratif.
+    return [
+      ...(section?.querySelectorAll('ol > li > span:last-child') ?? []),
+    ].map((etape) => etape.textContent?.replace(/\s+/g, ' ').trim() ?? '');
   }
 
   it('souhaite la bienvenue', () => {
@@ -37,8 +38,12 @@ describe('Page d’accueil', () => {
 
     expect(etapes).toHaveLength(5);
     expect(etapes[0]).toMatch(/connectez-vous/i);
-    expect(etapes[1]).toMatch(/appelez les magasins/i);
-    expect(etapes[4]).toMatch(/déclarez votre saisie terminée/i);
+    expect(etapes[1]).toMatch(/notez sa réponse dans l’application/i);
+    expect(etapes[2]).toMatch(/« Transmettre au siège »/);
+    expect(etapes[2]).toMatch(/ne pourrez plus modifier/i);
+    // On pèse pendant la collecte, pas après (RDC-SAISIE-001).
+    expect(etapes[4]).toMatch(/^pendant la collecte/i);
+    expect(etapes[4]).toMatch(/« Saisie terminée »/);
   });
 
   it('guide l’administrateur du siège, étape par étape', () => {
@@ -46,7 +51,11 @@ describe('Page d’accueil', () => {
 
     expect(etapes).toHaveLength(7);
     expect(etapes[0]).toMatch(/créez la collecte/i);
-    expect(etapes[5]).toMatch(/approuvez la clôture/i);
+    expect(etapes[2]).toMatch(/« Renvoyer au centre »/);
+    // Jamais avant la date de début (RDC-COLLECTE-002).
+    expect(etapes[4]).toMatch(/démarre toute seule à sa date de début/i);
+    expect(etapes[4]).not.toMatch(/plus tôt/i);
+    expect(etapes[5]).toMatch(/« Approuver la clôture »/);
     expect(etapes[6]).toMatch(/statistiques/i);
   });
 

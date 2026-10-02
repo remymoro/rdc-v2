@@ -227,3 +227,8 @@ les étapes métier (ADR-0023).
 | Tests E2E du front (Playwright), avec le premier écran                              | ⏳   |
 | Premier écran : connexion (dépend de l'étape 4, lot 1)                              | ⏳   |
 | Servir le front sur le NAS derrière HTTPS (ADR-0019)                                | ⏳   |
+
+Libellés de boutons annoncés par l'accueil, à reprendre tels quels dans les
+écrans : « Transmettre au siège », « Saisie terminée » (centre) ; « Ouvrir la
+vérification », « Renvoyer au centre », « Ouvrir la planification »,
+« Approuver la clôture » (siège).
